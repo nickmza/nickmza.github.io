@@ -42,7 +42,7 @@ nav_text:
  
 share_enable: false
 
-excerpt_link: Read more...
+excerpt_link: Read more
 excerpt_all: false
 
 google_analytics: "G-KXJW9BVBJ4"
@@ -51,3 +51,11 @@ search:
     path: search.xml
     field: post
     format: html
+
+gitalk:
+  enable: true
+  clientID: 8318211c28156a054b60
+  clientSecret: a3e7c2c22e61867951cbca3c52fbcc22f43dcfb8
+  repo: BlogComments
+  owner: nickmza
+  admin: nickmza

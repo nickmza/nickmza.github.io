@@ -106,3 +106,13 @@ deploy:
   repo: https://github.com/nickmza/nickmza.github.io
   token: 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
   branch: prod
+
+feed:
+    type: atom
+    path: atom.xml
+    limit: 20
+    hub:
+    content:
+    content_limit: 140
+    content_limit_delim: ' '
+    order_by: -date
