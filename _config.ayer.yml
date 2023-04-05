@@ -46,3 +46,8 @@ excerpt_link: Read more...
 excerpt_all: false
 
 google_analytics: "G-KXJW9BVBJ4"
+
+search:
+    path: search.xml
+    field: post
+    format: html
