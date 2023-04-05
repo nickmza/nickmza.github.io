@@ -1,7 +1,10 @@
 ---
 title: 'Agile does not work but agile does'
 date: 2016-11-04
-tags: agile
+tags: Agile
+category: Agile
+excerpt:
+    In his article ‘[Agile Does Not Work](https://www.linkedin.com/pulse/agile-does-work-oleg-vishnepolsky?trk=hp-feed-article-title-like)’ Oleg Vishnepolsky makes several observations based on his experiences with Agile development (note the big ‘A’, it's my emphasis, not his). Specifically, he cites issues with quality, predictability, poor strategic alignment, monolithic architecture due to poor design, complex and costing infrastructure and challenges managing stakeholders.
 ---
 
 In his article ‘[Agile Does Not Work](https://www.linkedin.com/pulse/agile-does-work-oleg-vishnepolsky?trk=hp-feed-article-title-like)’ Oleg Vishnepolsky makes several observations based on his experiences with Agile development (note the big ‘A’, it's my emphasis, not his). Specifically, he cites issues with quality, predictability, poor strategic alignment, monolithic architecture due to poor design, complex and costing infrastructure and challenges managing stakeholders.

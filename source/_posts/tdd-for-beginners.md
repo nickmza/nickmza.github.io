@@ -3,6 +3,9 @@ title: 'TDD - Advice for Beginners'
 date: 2016-03-21 13:57:01
 tags: 
 - TDD
+category: Software Engineering
+excerpt:
+    The other day I read an article by Ian Sommerville describing his experiences with Test Driven Development (TDD) and his ultimate conclusion that TDD is fundamentally flawed. Robert Martin quickly posted an excellent response pointing out that what Sommerville was experiencing was typical of people new to Test Driven Development. Whilst Martin's response pulls no punches in pointing out the source of Sommerville's issues it does not really leave any practical advice for someone struggling with learning TDD. 
 ---
 
 The other day I read an article by Ian Sommerville describing his experiences with Test Driven Development (TDD) and his ultimate conclusion that TDD is fundamentally flawed. Robert Martin quickly posted an excellent response pointing out that what Sommerville was experiencing was typical of people new to Test Driven Development. Whilst Martin's response pulls no punches in pointing out the source of Sommerville's issues it does not really leave any practical advice for someone struggling with learning TDD. 
