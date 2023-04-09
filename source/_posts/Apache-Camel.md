@@ -91,7 +91,7 @@ producerTemplate.sendBody("direct:file:start", request);
 Mocks allow us to simulate the endpoints of the application so that our tests do not need to connect to real systems. We can make assertions about the mocks to ensure that the system is behaving as expected.
 
 ## MockEndpointsAndSkip
-To start mocking using Camel the MockEndpointsAndSkip attribute instructs the framework to create a mock for each endpoint that matches the supplied regex expressing. In the example above this means creating a mock for endpoints that start with 'https://' or 'wmq://'. 
+To start mocking using Camel the MockEndpointsAndSkip attribute instructs the framework to create a mock for each endpoint that matches the supplied regex expression. In the example above this means creating a mock for endpoints that start with 'https://' or 'wmq://'. 
 
 The 'Skip' suffix here indicates that Camel should not pass on the messages to the underlying endpoint. If this is desirable use the 'MockEndpoints' annotation instead.
 
@@ -146,7 +146,7 @@ In this example we expect the pfmEndpoint queue to have a single message on comp
 
 ## Returning Values from a Mock
 
-In some cases you need to be able to control the specific response from a mock. In these scenarios you can use Advice with to replace the original end-point with one that models the specific behaviour you require. For example:
+In some cases you need to be able to control the specific response from a mock. In these scenarios you can use AdviceWith to replace the original end-point with one that models the specific behaviour you require. For example:
 
 {% codeblock lang:java %}
 
