@@ -6,13 +6,13 @@ tags:
 - Camel
 category: Software Engineering
 excerpt:
-    Recently I've been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to IBM AppConnect which is our defactor integration platform. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evole our integration code using tests to drive the approach. This is very cool. That said, it's not been exactly easy so whilst it's still fresh in my head I thought I would put down some points about how to make this work in your own projects.
+    Recently I've been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to IBM AppConnect which is our defacto integration platform. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evolve our integration code using tests to drive the approach. This is very cool. That said, it's not been exactly easy so whilst it's still fresh in my head I thought I would put down some points about how to make this work in your own projects.
 ---
 
-Recently I've been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to IBM AppConnect which is our defactor integration platform. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evole our integration code using tests to drive the approach. This is very cool. That said, it's not been exactly easy so whilst it's still fresh in my head I thought I would put down some points about how to make this work in your own projects.
+Recently I've been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to IBM AppConnect which is our defacto integration platform. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evolve our integration code using tests to drive the approach. This is very cool. That said, it's not been exactly easy so whilst it's still fresh in my head I thought I would put down some points about how to make this work in your own projects.
 
 # Scenario
-The requirement is quite simple. When specific parts of a Customer's record are modified in the CBS we need to send a message to the Fraud System. The Fraud System exposes a SOAP Interface so we need to translate the XML Format provided by the CBS into a valid SOAP message. In addition we need to handle various retry and reject semantics. For example if the incoming message is badly formatted, and this not recoverable, we need to send it to a Poison queue. If the Fraud System is temporarily unavailable we need to send it to a Retry queue. At a high level it looks like this:
+The requirement is quite simple. When specific parts of a Customer's record are modified in the CBS we need to send a message to the Fraud System. The Fraud System exposes a SOAP Interface so we need to translate the XML Format provided by the CBS into a valid SOAP message. In addition we need to handle various retry and reject semantics. For example if the incoming message is badly formatted, and thus not recoverable, we need to send it to a Poison queue. If the Fraud System is temporarily unavailable we need to send it to a Retry queue. At a high level it looks like this:
 
 ![A simple diagram of the design](images/camel-overview.png)
 
@@ -93,7 +93,7 @@ Mocks allow us to simulate the endpoints of the application so that our tests do
 ## MockEndpointsAndSkip
 To start mocking using Camel the MockEndpointsAndSkip attribute instructs the framework to create a mock for each endpoint that matches the supplied regex expressing. In the example above this means creating a mock for endpoints that start with 'https://' or 'wmq://'. 
 
-The 'Skip' suffix here indicates that Camel should not passon the messages to the underlying endpoint. If this is desirable use the 'MockEndpoints' annotation instead.
+The 'Skip' suffix here indicates that Camel should not pass on the messages to the underlying endpoint. If this is desirable use the 'MockEndpoints' annotation instead.
 
 ## Accessing Mocks
 
@@ -142,7 +142,7 @@ public void validMessageShouldBeProcessed() throws Exception {
 }
 {% endcodeblock %}
 
-In this example we expect the pfmEndpoint queue to have a single message with a specific body on completion of the test.
+In this example we expect the pfmEndpoint queue to have a single message on completion of the test.
 
 ## Returning Values from a Mock
 
@@ -165,6 +165,42 @@ AdviceWith.adviceWith(camelContext,
 {% endcodeblock %}
 
 Here we are configuring the endpoint to return an HTTP 500 return code and a specific fault payload.
+
+Here is the full test:
+{% codeblock lang:java %}
+
+@Test
+public void parseFaultResult() throws Exception {
+
+    var request = createSampleRequest();
+
+    var faultContent = faultResultResource.getContentAsString(StandardCharsets.UTF_8);
+
+    replaceFromWithMock();
+
+    var HTTPHeader = new SimpleExpression("400");
+    HTTPHeader.setResultType(Integer.class);
+
+    AdviceWith.adviceWith(camelContext,
+            "core-banking-pfm-customer-updates",
+            rb -> rb.weaveByToUri(pfmConfig.getHost()+"?throwExceptionOnFailure=false")
+                    .replace()
+                    .setHeader(CAMEL_HTTP_RESPONSE_CODE, HTTPHeader)
+                    .setBody(new ConstantExpression(faultContent)));
+
+    poisonQueue.expectedBodiesReceived(faultContent);
+    poisonQueue.expectedMessageCount(1);
+    retryQueue.expectedMessageCount(0);
+
+    camelContext.start();
+
+    producerTemplate.sendBody("direct:file:start", request);
+
+    poisonQueue.assertIsSatisfied();
+    retryQueue.assertIsSatisfied();
+}
+
+{% endcodeblock %}
 
 
 
