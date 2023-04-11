@@ -6,10 +6,10 @@ tags:
 - Camel
 category: Software Engineering
 excerpt:
-    Recently I've been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to IBM AppConnect which is our defacto integration platform. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evolve our integration code using tests to drive the approach. This is very cool. That said, it's not been exactly easy so whilst it's still fresh in my head I thought I would put down some points about how to make this work in your own projects.
+    Recently I've been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to our standard integration platform IBM AppConnect. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evolve our integration code using tests to drive the approach. This is very cool. That said, it's not been exactly easy so whilst it's still fresh in my head I thought I would put down some points about how to make this work in your own projects.
 ---
 
-Recently I've been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to IBM AppConnect which is our defacto integration platform. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evolve our integration code using tests to drive the approach. This is very cool. That said, it's not been exactly easy so whilst it's still fresh in my head I thought I would put down some points about how to make this work in your own projects.
+Recently I've been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to our standard integration platform IBM AppConnect. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evolve our integration code using tests to drive the approach. This is very cool. That said, it's not been exactly easy so whilst it's still fresh in my head I thought I would put down some points about how to make this work in your own projects.
 
 # Scenario
 The requirement is quite simple. When specific parts of a Customer's record are modified in the CBS we need to send a message to the Fraud System. The Fraud System exposes a SOAP Interface so we need to translate the XML Format provided by the CBS into a valid SOAP message. In addition we need to handle various retry and reject semantics. For example if the incoming message is badly formatted, and thus not recoverable, we need to send it to a Poison queue. If the Fraud System is temporarily unavailable we need to send it to a Retry queue. At a high level it looks like this:
@@ -60,7 +60,7 @@ public class CamelRouteTests {
 
 
 ## UseAdviceWith
-The 'UseAdviceWith' attribute tells Camel that we are running in test mode and that we will provide 'advice' on how to proceed. If you do not add this attribute Camel will start normally and active all configured routes. See [here](https://www.javadoc.io/static/org.apache.camel/camel-test-spring/2.20.1/org/apache/camel/test/spring/UseAdviceWith.html) for more details.
+The 'UseAdviceWith' attribute tells Camel that we are running in test mode and that we will provide 'advice' on how to proceed. If you do not add this attribute Camel will start normally and activate all configured routes. See [here](https://www.javadoc.io/static/org.apache.camel/camel-test-spring/2.20.1/org/apache/camel/test/spring/UseAdviceWith.html) for more details.
 
 ## DirtiesConext
 This attribute tells the test framework to reset the application context after each test invocation. This ensures that the results from one test does not pollute the results of another. See [here](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/annotation/DirtiesContext.html) for more details.
@@ -72,7 +72,7 @@ The Camel Context gives you access to all the routes and services running. This 
 The Producer Template is used to inject messages into a route.
 
 ## Changing the entry-point
-In the route above the entry-point for the Route is a message queue. In order to make testing simpler we would want to be able to submit messages directly into the Route rather than having to queue a message. This can be done by instructing Camel to replace parts of the Route for the duration of the tests. For example:
+In the Route defined above the entry-point is a message queue. In order to make testing simpler we would want to be able to submit messages directly into the Route rather than having to queue a message. This can be done by instructing Camel to replace parts of the Route for the duration of the tests. For example:
 
 {% codeblock lang:java %}
     AdviceWith.adviceWith(camelContext,
@@ -201,6 +201,15 @@ public void parseFaultResult() throws Exception {
 }
 
 {% endcodeblock %}
+
+Here the test is ensuring that in the event of a HTTP 400 Error that the message is not retried and sent to the poison queue.
+
+# Results
+![Camel Code Coverage](images/camel-code-coverage.png)
+
+TDD with Camel works really well. There is some initial setup in terms of creating the various request/response pairs and you need to be sure to keep your tests clean and tidy. It's great that when we find a problem we add the suspect message into the project and run the tests. If the tests pass then we know we have a bug and so the first step is to create a failing tests. Once this passes we can be pretty sure that the bug is addressed. 
+
+Code Coverage works as expected and is great to make sure that the tests are exercising the expected aspects of the application.
 
 
 
