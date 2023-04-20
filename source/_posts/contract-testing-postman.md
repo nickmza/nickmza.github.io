@@ -1,13 +1,18 @@
 ---
 title: Contract Testing with Postman
-category:
-- Software Engineering
 tags:
-- TDD
-- Postman
-excerpt:
-    I’m giving some training next week on Contract Driven Development using Postman. There’s been a couple of hurdles to overcome to get to a workflow that I feel is efficient so I thought I’d share in the hopes that a) this might help someone else or b) someone could point out a better way to do this!
+  - TDD
+  - Postman
+category:
+  - Software Engineering
+excerpt: >-
+  I’m giving some training next week on Contract Driven Development using
+  Postman. There’s been a couple of hurdles to overcome to get to a workflow
+  that I feel is efficient so I thought I’d share in the hopes that a) this
+  might help someone else or b) someone could point out a better way to do this!
+date: 2023-04-20 08:17:02
 ---
+
 
 I'm giving some training next week on Contract Driven Development using Postman. There's been a couple of hurdles to overcome to get to a workflow that I feel is efficient so I thought I'd share in the hopes that a) this might help someone else or b) someone could point out a better way to do this. 
 
@@ -238,7 +243,7 @@ pm.test("There should be no transactions for a new account.", function () {
 
 {% endcodeblock %}
 
-The last thing I need to do is tell the Mock server to use the specific 'No Results' response. To do this I send the 'x-mock-response-name' header with a value of 'No Results' with the call to the 'transactions' service. This asks the Mock server to return this specific results. There are many ways to nudge the Mock server. See [here](https://learning.postman.com/docs/designing-and-developing-your-api/mocking-data/matching-algorithm/) for more details.
+The last thing I need to do is tell the Mock server to use the specific 'No Results' response. To do this I send the 'x-mock-response-name' header with a value of 'No Results' with the call to the 'transactions' service. This asks the Mock server to return this specific result. There are many ways to nudge the Mock server towards a specific result. See [here](https://learning.postman.com/docs/designing-and-developing-your-api/mocking-data/matching-algorithm/) for more details.
 
 This test will pass but it is not a good test. The reason is that there is no guarantee that this will work against the real service. This is because the only reason we receive the empty response is because we asked the Mock server for it. In practice the empty response should be as a consequence of calling the 'transcations' service immediately after creating a new account. At the moment our test does not reflect this. 
 
@@ -258,9 +263,13 @@ pm.test("Ensure Account Created.", function () {
 
 {% endcodeblock %}
 
-The we use this variable as an input to the call to 'transactions':
+Then we use this variable as an input to the call to 'transactions':
 
 <img src='transactions.png' width=500/>
+
+The test still passes but note the use of the generated account number:
+
+<img src='results.png' width=800/>
 
 # Wrapping up 
 
