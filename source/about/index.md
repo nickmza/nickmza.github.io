@@ -19,7 +19,7 @@ I started with this list of requirements:
 - Uses Markdown. 
 - Minimal Admin. A quick glance at my timeline will show you how sporadically I post. I do not want to spend more time on admin than I do writing.
 
-I looked at a bunch of tools including Jeckyl and Gastby and whilst they both seemed very capable they also felt like overkill for someone who can go for years without posting.
+I looked at a bunch of tools including Jekyll and Gatsby and whilst they both seemed very capable they also felt like overkill for someone who can go for years without posting.
 
 
 
