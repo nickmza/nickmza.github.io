@@ -4,7 +4,7 @@ tags:
   - TDD
   - Camel
 excerpt: >-
-  In a previous postI wrote about taking a Test-Driven approach to Camel
+  In a previous post I wrote about taking a Test-Driven approach to Camel
   development. I've been asked to share the code and explain some of the steps
   in more detail so here we go...
 date: 2023-05-18 18:10:04
@@ -74,7 +74,7 @@ The first thing we want to do is to replace the Timer component that triggers th
 
 This swops the 'From' in the Route (currently a Timer) with a new Direct component. 
 
-Next we can set up an assertion. We want to configure that the Http endpoint is called exactly once. We can do this via the Mock we referenced earlier: 
+Next we can set up an assertion. We want to configure that the HTTP endpoint is called exactly once. We can do this via the Mock we referenced earlier: 
 
 {% codeblock lang:java %}
 
