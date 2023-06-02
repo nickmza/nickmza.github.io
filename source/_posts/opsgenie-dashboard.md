@@ -1,9 +1,12 @@
 ---
 title: Real-time Dashboards with OpsGenie and PowerBI
 tags:
-- devops
-excerpt:
-    We needed to visualise alerts from OpsGenie in real-time. Here's how we did it using PowerBI and Power Automate.
+  - devops
+excerpt: >-
+  We needed to visualise alerts from OpsGenie in real-time. Here's how we did it
+  using PowerBI and Power Automate.
+date: 2023-06-02 14:54:55
+ogimage: https://nickmck.net/2023/06/02/opsgenie-dashboard/og7.jpeg
 ---
 
 <img src="og7.jpeg"/>
