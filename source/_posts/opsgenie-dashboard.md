@@ -6,10 +6,10 @@ excerpt: >-
   We needed to visualise alerts from OpsGenie in real-time. Here's how we did it
   using PowerBI and Power Automate.
 date: 2023-06-02 14:54:55
-ogimage: https://nickmck.net/2023/06/02/opsgenie-dashboard/og7.jpeg
+ogimage: https://nickmck.net/2023/06/02/opsgenie-dashboard/og7b.jpg
 ---
 
-<img src="og7.jpeg"/>
+<img src="og7b.jpg"/>
 
 We use OpsGenie for Alert Management. Our intention is to have all alerts surfaced in OpsGenie as this gives us an end-to-end view of what's happening in the environment. Whilst OpsGenie provides a serviceable user interface and mobile tools one thing it lacks is the ability to build dashboards to visualise the information. This week I built a solution using PowerBI.
 
