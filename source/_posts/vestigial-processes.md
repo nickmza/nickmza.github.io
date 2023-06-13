@@ -1,18 +1,20 @@
 ---
 title: Vestigial Activities
 tags:
-- Agile
+  - Agile
 excerpt: >-
-  What does the human appendix, floppy disks and some agile processes have in common?
-
+  What does the human appendix, a floppy disk and some agile processes have in
+  common?
 ogimage: https://nickmck.net/2023/06/07/vestigial-processes/vp1.png
+date: 2023-06-07 15:39:47
 ---
+
 
 <img src="vp1.png" width="400px" style="float:left;"/>
 
 In biology Vestigial Organs *are rudimentary anatomical structures that are retained in a species despite having lost their primary ancestral function*. In agile we uncover 'Vestigial Activities' - tasks or steps that teams continue to perform without a clear understanding of their original purpose or relevance. This blog post explores the concept of vestigial activities in agile teams, their potential negative impact, and suggests strategies for identifying and addressing them.
 
-Often steps are added to a process in response to a specific event or need. They also arise organically as part of the team's retrospective process. In the short term these steps may add value and after a while they become 'part of the furniture'; something the team has always done. Over time, as people come and go, the reasons for the step being added are forgotten as well as the specific problem being solved. If the activity is still quietly adding value this is well and good - but in many cases they could be actively impeding the team. 
+Often steps are added to a process in response to a specific event or need. They also arise organically as part of the team's retrospective process. In the short term these steps may add value and after a while they become 'part of the furniture'; something the team has always done. Over time, as people come and go, the reasons for the step being added are forgotten as well as the specific problem being solved. If the activity is still quietly adding value this is well and good - but in many cases it could be actively impeding the team. 
 
 A pernicious form of this situation arises when attempts are made to 'standardise' processes across teams in large organisations. Although this is typically done with good intentions, it can inadvertently introduce a set of vestigial activities into the process. The original intent behind these activities becomes obscured, and teams may be hesitant to question or challenge the dogma of the "official" process.
 
