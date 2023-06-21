@@ -17,6 +17,11 @@ subtitle:
   backSpeed: 100
   showCursor: true
 
+broadcast:
+  enable: false # true开启，false关闭
+  type: 2
+  text: Hello
+
 # Favicon and sidebar logo
 favicon: /favicon.ico
 logo: /images/goober.png
@@ -48,6 +53,9 @@ excerpt_all: false
 
 google_analytics: "G-KXJW9BVBJ4"
 
+reward: false
+reward_type: 0
+
 search:
     path: search.xml
     field: post
@@ -60,3 +68,6 @@ gitalk:
   repo: BlogComments
   owner: nickmza
   admin: nickmza
+
+busuanzi:
+  enable: false
