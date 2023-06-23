@@ -6,6 +6,7 @@ category:
   - School of Hard Knocks
 excerpt: Some lessons learned about hiring Software Engineers.
 date: 2023-06-21 10:31:33
+ogimage: https://www.engineeringladders.com/charts/template.png
 ---
 
 
