@@ -14,7 +14,7 @@ date: 2023-06-23 12:39:31
 ---
 
 
-<img src="./k1.png" width = 300/>
+<img src="./k1.png" />
 
 We are currently looking for a API Gateway. Ideally I'd like something that is Open Source, DevOps friendly and has first class support for OpenApi in addition to its general API Gateway features. Today I'm playing with the excellently named [KrakenD](https://www.krakend.io/)...
 
