@@ -5,9 +5,14 @@ tags:
 category:
   - Release The KrakenD
 ogimage: ka2.png
-excerpt:
-    In a previous article I described getting a minimal KrakenD installation up and running using a simple Node Backend. I also configured logging and tracing so that I could see what was happening. Today I'm going to explore some of KrakenD's authentication capabilities.    
+excerpt: >-
+  In a previous article I described getting a minimal KrakenD installation up
+  and running using a simple Node Backend. I also configured logging and tracing
+  so that I could see what was happening. Today I'm going to explore some of
+  KrakenD's authentication capabilities.
+date: 2023-07-08 07:04:50
 ---
+
 
 In a [previous article](https://nickmck.net/2023/06/23/release-the-krakend/) I described getting a minimal KrakenD installation up and running using a simple Node Backend. I also configured logging and tracing so that I could see what was happening. Today I'm going to explore some of KrakenD's authentication capabilities.
 
