@@ -4,11 +4,15 @@ tags:
   - devops
 category:
   - Release The KrakenD
-excerpt:
-    I wrote previously about configuring logging on KrakenD as well as setting up JWT Security. This week I'm looking at how KrakenD can shape Requests and Responses from back-end systems.    
+excerpt: >-
+  I wrote previously about configuring logging on KrakenD as well as setting up
+  JWT Security. This week I'm looking at how KrakenD can shape Requests and
+  Responses from back-end systems.
+date: 2023-07-16 07:11:14
 ---
 
-I wrote previously about configuring logging on KrakenD as well as setting up JWT Security. This week I'm looking at how KrakenD can shape Requests and Responses from back-end systems.
+
+I wrote previously about [configuring logging](https://nickmck.net/2023/06/23/release-the-krakend/) on KrakenD as well as setting up [JWT Security](https://nickmck.net/2023/07/08/kraken-auth/). This week I'm looking at how KrakenD can shape Requests and Responses from back-end systems.
 
 KrakenD provides multiple facilities for Request/Response Shaping:
 - Filtering. Removing specific fields from the response.
@@ -18,7 +22,7 @@ KrakenD provides multiple facilities for Request/Response Shaping:
 - Plugins. Completely rewrite requests/reponses using custom code. Maximum performance but requires you to build and deploy the plugin.
 - Lua. Same as for Plugins but via the Lua scripting language. You take a (potentially negligible) performance hit but gain the flexibility of scripting.
 
-My requirement is to format the response from our Core Banking into JSON. The challenging part is that our Core Banking response format looks like this:
+My requirement is to format the response from our Core Banking system into JSON. The challenging part is that our Core Banking response format looks like this:
 
 ```
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -41,9 +45,9 @@ My requirement is to format the response from our Core Banking into JSON. The ch
 </T24>
 ```
 
-For each column in the response table there will be an 'enquiryColumn' record and an associated enquiryRecord/column record. The association is based on the index. So the enquiryColumn at position 0 will describe the column at position 0 in the enquiryRecord. For extra fun if the response contains more than one row the values will be separated by a | delimiter.
+For each column in the response table there will be an 'enquiryColumn' record and an associated enquiryRecord/column record. The association is based on the index. So the enquiryColumn at position 0 will describe the column at position 0 in the enquiryRecord. For extra fun, if the response contains more than one row the values will be separated by a | delimiter.
 
-The only option that could achieve all of this were either a Plugin or Lua. I opted for the Lua route. Only problem with that was I didn't know Lua... 
+The only options that could achieve all of this were either a Plugin or Lua. I opted for the Lua route. Only problem with that was I didn't know Lua... 
 
 # Lua
 
