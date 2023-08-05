@@ -1,9 +1,12 @@
 ---
 title: Sidecar Logging in Openshift with Fluentd and Elasticsearch
 tags: devops
-excerpt:
-  How to set-up a 'sidecar' container to log events from your Kubernetes applicationt to Elasticsearch using Fluentd.
+excerpt: >-
+  How to set-up a 'sidecar' container to log events from your Kubernetes
+  applicationt to Elasticsearch using Fluentd.
+date: 2023-08-05 10:13:24
 ---
+
 
 We use Elasticsearch for logging in our Openshift environments. This means that each application needs to figure out how to aggregate their logs and ship them to Elasticsearch. This duplication of effort is wasteful and increases maintenance costs as a change at Elasticsearch level must then be absorbed by each application. This approach also amplifies the impact of a security vulnerability such as the recent [Log4j](https://nvd.nist.gov/vuln/detail/CVE-2021-44228) vulnerability in that it requires patching in multiple places. One solution would be to have a single 'certified' logging library however we would need one for each technology stack we use. There is another way however - the sidecar deployment.
 
@@ -103,17 +106,13 @@ To this point I've hardcoded the Fluentd settings. This will not work for everyo
   @type tail
   path "#{ENV['LOG_FILE'] || '/var/log/mcb.log'}"
   pos_file /var/log/td-agent/mcb.log.pos
-  tag apache.access
+  tag mcb
   <parse>
     @type none
   </parse>
 </source>
 
-#<match **>
-#  @type stdout
-#</match>
-
-<match apache.access>
+<match mcb>
   @type elasticsearch
   @log_level "#{ENV['LOG_LEVEL'] || 'debug'}"
   host "#{ENV['ES_HOST'] || 'es-dev.mcb.local'}"
