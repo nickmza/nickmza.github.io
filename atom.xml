@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>nick dot blog</title>
+  
+  
+  <link href="https://nickmza.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://nickmza.github.io/"/>
+  <updated>2023-08-05T06:13:24.426Z</updated>
+  <id>https://nickmza.github.io/</id>
+  
+  <author>
+    <name>Nick Mckenzie</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Sidecar Logging in Openshift with Fluentd and Elasticsearch</title>
+    <link href="https://nickmza.github.io/2023/08/05/sidecar-logging/"/>
+    <id>https://nickmza.github.io/2023/08/05/sidecar-logging/</id>
+    <published>2023-08-05T06:13:24.000Z</published>
+    <updated>2023-08-05T06:13:24.426Z</updated>
+    
+    
+    <summary type="html">How to set-up a &#39;sidecar&#39; container to log events from your Kubernetes applicationt to Elasticsearch using Fluentd.</summary>
+    
+    
+    
+    
+    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Request/Response Shaping with KrakenD</title>
+    <link href="https://nickmza.github.io/2023/07/16/krakend-response/"/>
+    <id>https://nickmza.github.io/2023/07/16/krakend-response/</id>
+    <published>2023-07-16T03:11:14.000Z</published>
+    <updated>2023-07-27T06:02:28.034Z</updated>
+    
+    
+    <summary type="html">I wrote previously about configuring logging on KrakenD as well as setting up JWT Security. This week I&#39;m looking at how KrakenD can shape Requests and Responses from back-end systems.</summary>
+    
+    
+    
+    <category term="Release The KrakenD" scheme="https://nickmza.github.io/categories/Release-The-KrakenD/"/>
+    
+    
+    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Authenticate the KrakenD!</title>
+    <link href="https://nickmza.github.io/2023/07/08/kraken-auth/"/>
+    <id>https://nickmza.github.io/2023/07/08/kraken-auth/</id>
+    <published>2023-07-08T03:04:50.000Z</published>
+    <updated>2023-07-27T06:02:28.028Z</updated>
+    
+    
+    <summary type="html">In a previous article I described getting a minimal KrakenD installation up and running using a simple Node Backend. I also configured logging and tracing so that I could see what was happening. Today I&#39;m going to explore some of KrakenD&#39;s authentication capabilities.</summary>
+    
+    
+    
+    <category term="Release The KrakenD" scheme="https://nickmza.github.io/categories/Release-The-KrakenD/"/>
+    
+    
+    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>eKYC with Azure Face API &amp; Cognitive Services</title>
+    <link href="https://nickmza.github.io/2023/07/01/adventures-in-facial-recognition/"/>
+    <id>https://nickmza.github.io/2023/07/01/adventures-in-facial-recognition/</id>
+    <published>2023-07-01T04:04:56.000Z</published>
+    <updated>2023-07-27T06:02:28.009Z</updated>
+    
+    
+    <summary type="html">I wanted to see how Azure&#39;s Face API and Cognitive Services for Vision would stand-up against commercial off-the-shelf offerings. Here&#39;s what happened...</summary>
+    
+    
+    
+    
+    <category term="azure" scheme="https://nickmza.github.io/tags/azure/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Release the KrakenD. Part 1 - Metrics</title>
+    <link href="https://nickmza.github.io/2023/06/23/release-the-krakend/"/>
+    <id>https://nickmza.github.io/2023/06/23/release-the-krakend/</id>
+    <published>2023-06-23T08:39:31.000Z</published>
+    <updated>2023-07-27T06:02:28.046Z</updated>
+    
+    
+    <summary type="html">We are currently looking for a API Gateway. Ideally I&#39;d like something that is Open Source, DevOps friendly and has first class support for OpenApi in addition to its general API Gateway features. Today I&#39;m playing with the excellently named KrakenD...</summary>
+    
+    
+    
+    <category term="Release The KrakenD" scheme="https://nickmza.github.io/categories/Release-The-KrakenD/"/>
+    
+    
+    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>How I hire</title>
+    <link href="https://nickmza.github.io/2023/06/21/how-I-hire/"/>
+    <id>https://nickmza.github.io/2023/06/21/how-I-hire/</id>
+    <published>2023-06-21T06:31:33.000Z</published>
+    <updated>2023-07-27T06:02:28.028Z</updated>
+    
+    
+    <summary type="html">Some lessons learned about hiring Software Engineers.</summary>
+    
+    
+    
+    <category term="School of Hard Knocks" scheme="https://nickmza.github.io/categories/School-of-Hard-Knocks/"/>
+    
+    
+    <category term="Engineering Management" scheme="https://nickmza.github.io/tags/Engineering-Management/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Vestigial Activities</title>
+    <link href="https://nickmza.github.io/2023/06/07/vestigial-processes/"/>
+    <id>https://nickmza.github.io/2023/06/07/vestigial-processes/</id>
+    <published>2023-06-07T11:39:47.000Z</published>
+    <updated>2023-07-27T06:02:28.051Z</updated>
+    
+    
+    <summary type="html">What does the human appendix, a floppy disk and some agile processes have in common?</summary>
+    
+    
+    
+    
+    <category term="Agile" scheme="https://nickmza.github.io/tags/Agile/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Adding Link Preview to your Hexo Blog</title>
+    <link href="https://nickmza.github.io/2023/06/03/link-preview/"/>
+    <id>https://nickmza.github.io/2023/06/03/link-preview/</id>
+    <published>2023-06-03T11:09:05.000Z</published>
+    <updated>2023-07-27T06:02:28.034Z</updated>
+    
+    
+    <summary type="html">How to add Link Preview support to your Hexo-based blog.</summary>
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Real-time Dashboards with OpsGenie and PowerBI</title>
+    <link href="https://nickmza.github.io/2023/06/02/opsgenie-dashboard/"/>
+    <id>https://nickmza.github.io/2023/06/02/opsgenie-dashboard/</id>
+    <published>2023-06-02T10:54:55.000Z</published>
+    <updated>2023-07-27T06:02:28.037Z</updated>
+    
+    
+    <summary type="html">We needed to visualise alerts from OpsGenie in real-time. Here&#39;s how we did it using PowerBI and Power Automate.</summary>
+    
+    
+    
+    
+    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Unit Testing Camel - A simple example</title>
+    <link href="https://nickmza.github.io/2023/05/18/camel-simple/"/>
+    <id>https://nickmza.github.io/2023/05/18/camel-simple/</id>
+    <published>2023-05-18T14:10:04.000Z</published>
+    <updated>2023-07-27T06:02:28.025Z</updated>
+    
+    
+    <summary type="html">In a previous post I wrote about taking a Test-Driven approach to Camel development. I&#39;ve been asked to share the code and explain some of the steps in more detail so here we go...</summary>
+    
+    
+    
+    
+    <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
+    
+    <category term="Camel" scheme="https://nickmza.github.io/tags/Camel/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>TDD - Triggering Dopamine Development</title>
+    <link href="https://nickmza.github.io/2023/05/17/tdd-dopamine/"/>
+    <id>https://nickmza.github.io/2023/05/17/tdd-dopamine/</id>
+    <published>2023-05-17T08:44:16.000Z</published>
+    <updated>2023-07-27T06:02:28.051Z</updated>
+    
+    
+    <summary type="html">The other morning I attended an excellent talk by Andrew Richardson on the importance of having small goals. One of the points Andrew made was that completing a task, however small,  triggers a hit of Dopamine - the neurotransmitter associated with feelings of pleasure and satisfaction. The way Andrew described the feedback loop involved reminded me  of Test-Driven Development (TDD). This got me thinking - maybe this is why I like it so much?</summary>
+    
+    
+    
+    
+    <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Configuring Swagger Security</title>
+    <link href="https://nickmza.github.io/2023/05/17/swagger-sec/"/>
+    <id>https://nickmza.github.io/2023/05/17/swagger-sec/</id>
+    <published>2023-05-17T06:35:57.000Z</published>
+    <updated>2023-07-27T06:02:28.050Z</updated>
+    
+    
+    <summary type="html">Having issues with getting Swagger to send an Auth header? Merging multiple OpenApi documents at runtime using Node Express? This could help.</summary>
+    
+    
+    
+    
+    <category term="OpenApi" scheme="https://nickmza.github.io/tags/OpenApi/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Contract Testing with Postman</title>
+    <link href="https://nickmza.github.io/2023/04/20/contract-testing-postman/"/>
+    <id>https://nickmza.github.io/2023/04/20/contract-testing-postman/</id>
+    <published>2023-04-20T04:17:02.000Z</published>
+    <updated>2023-07-27T06:02:28.026Z</updated>
+    
+    
+    <summary type="html">I’m giving some training next week on Contract Driven Development using Postman. There’s been a couple of hurdles to overcome to get to a workflow that I feel is efficient so I thought I’d share in the hopes that a) this might help someone else or b) someone could point out a better way to do this!</summary>
+    
+    
+    
+    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    
+    
+    <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
+    
+    <category term="Postman" scheme="https://nickmza.github.io/tags/Postman/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Team Topologies Applied</title>
+    <link href="https://nickmza.github.io/2023/04/18/team-topo/"/>
+    <id>https://nickmza.github.io/2023/04/18/team-topo/</id>
+    <published>2023-04-18T04:03:05.000Z</published>
+    <updated>2023-07-27T06:02:28.051Z</updated>
+    
+    
+    <summary type="html">Team size and structure is a common topic of discussion in software engineering at scale, and while the &quot;2 Pizza&quot; team concept popularized by Amazon can be a helpful starting point, it may not be enough. When pizzas are being delivered by the truckload, a different set of tools and strategies is required to manage the complexity and ensure successful outcomes.</summary>
+    
+    
+    
+    <category term="Team Topologies" scheme="https://nickmza.github.io/categories/Team-Topologies/"/>
+    
+    
+    <category term="Agile" scheme="https://nickmza.github.io/tags/Agile/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Riding the Camel: A Practical Guide to TDD with Apache Camel</title>
+    <link href="https://nickmza.github.io/2023/03/31/Apache-Camel/"/>
+    <id>https://nickmza.github.io/2023/03/31/Apache-Camel/</id>
+    <published>2023-03-31T09:57:01.000Z</published>
+    <updated>2023-07-27T06:02:28.009Z</updated>
+    
+    
+    <summary type="html">Recently I&#39;ve been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to our standard integration platform IBM AppConnect. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evolve our integration code using tests to drive the approach. This is very cool. That said, it&#39;s not been exactly easy so whilst it&#39;s still fresh in my head I thought I would put down some points about how to make this work in your own projects.</summary>
+    
+    
+    
+    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    
+    
+    <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
+    
+    <category term="Camel" scheme="https://nickmza.github.io/tags/Camel/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Agile does not work but agile does</title>
+    <link href="https://nickmza.github.io/2016/11/04/agile-does-not-work/"/>
+    <id>https://nickmza.github.io/2016/11/04/agile-does-not-work/</id>
+    <published>2016-11-03T20:00:00.000Z</published>
+    <updated>2023-07-27T06:02:28.025Z</updated>
+    
+    
+    <summary type="html">In his article ‘[Agile Does Not Work](https://www.linkedin.com/pulse/agile-does-work-oleg-vishnepolsky?trk=hp-feed-article-title-like)’ Oleg Vishnepolsky makes several observations based on his experiences with Agile development (note the big ‘A’, it&#39;s my emphasis, not his). Specifically, he cites issues with quality, predictability, poor strategic alignment, monolithic architecture due to poor design, complex and costing infrastructure and challenges managing stakeholders.</summary>
+    
+    
+    
+    <category term="Agile" scheme="https://nickmza.github.io/categories/Agile/"/>
+    
+    
+    <category term="Agile" scheme="https://nickmza.github.io/tags/Agile/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>TDD - Advice for Beginners</title>
+    <link href="https://nickmza.github.io/2016/03/21/tdd-for-beginners/"/>
+    <id>https://nickmza.github.io/2016/03/21/tdd-for-beginners/</id>
+    <published>2016-03-21T09:57:01.000Z</published>
+    <updated>2023-07-27T06:02:28.051Z</updated>
+    
+    
+    <summary type="html">The other day I read an article by Ian Sommerville describing his experiences with Test Driven Development (TDD) and his ultimate conclusion that TDD is fundamentally flawed. Robert Martin quickly posted an excellent response pointing out that what Sommerville was experiencing was typical of people new to Test Driven Development. Whilst Martin&#39;s response pulls no punches in pointing out the source of Sommerville&#39;s issues it does not really leave any practical advice for someone struggling with learning TDD.</summary>
+    
+    
+    
+    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    
+    
+    <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
+    
+  </entry>
+  
+</feed>

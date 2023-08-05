@@ -1,0 +1,786 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>eKYC with Azure Face API &amp; Cognitive Services</title>
+    <url>/2023/07/01/adventures-in-facial-recognition/</url>
+    <content><![CDATA[<p>I wanted to see how Azure’s Face API and Cognitive Services for Vision would stand-up against commercial off-the-shelf offerings. Here’s what happened…</p>
+<h1 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h1><p>The requirement is to scan the Mauritian National Identity Card and extract the various text fields. In addition we’ll need to scan the barcode found on the back of the card and compare it with the ID Number on the front. Lastly we need to compare the photo on the card with a selfie provided by the customer.</p>
+<h1 id="Set-up"><a href="#Set-up" class="headerlink" title="Set-up"></a>Set-up</h1><p>I started by building a simple app using Node Express &amp; Bootstrap that would allow me to upload the ID Card and display the extracted details.</p>
+<img src="fr1.png"/>
+
+<h1 id="Identifying-the-Face"><a href="#Identifying-the-Face" class="headerlink" title="Identifying the Face"></a>Identifying the Face</h1><p>Azure provides a dedicated <a href="https://azure.microsoft.com/en-gb/products/cognitive-services/face">Face API</a> for this purpose. Simply call the <a href="https://learn.microsoft.com/en-us/rest/api/faceapi/face/detect-with-stream?tabs=HTTP">‘detect’ endpoint</a> passing the image data as an octet-stream. I set the returnFaceId to true and returnFaceLandmarks to false. Here are the results:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;faceId&quot;: &quot;d6e2d95e-976c-4709-8f79-f6d93299408e&quot;,</span><br><span class="line">    &quot;faceRectangle&quot;: &#123;</span><br><span class="line">        &quot;top&quot;: 696,</span><br><span class="line">        &quot;left&quot;: 200,</span><br><span class="line">        &quot;width&quot;: 413,</span><br><span class="line">        &quot;height&quot;: 413</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The faceId is a reference to the underlying biometric data now residing in Azure and will be used later when we verify the selfie. The faceRectangle is exactly that - the coordinates of the face in the source image.</p>
+<blockquote>
+<p>I’m not posting the code here as it’s trivial. If you’re interested let me know in the comments and I’ll share it. </p>
+</blockquote>
+<h1 id="Identifying-Card-Details"><a href="#Identifying-Card-Details" class="headerlink" title="Identifying Card Details"></a>Identifying Card Details</h1><p>To extract the card details I used the Cognitive Services <a href="https://azure.microsoft.com/en-us/products/cognitive-services/vision-services">Computer Vision Service</a>. I called the <a href="https://centraluseuap.dev.cognitive.microsoft.com/docs/services/unified-vision-apis-public-preview-2023-02-01-preview/operations/61d65934cd35050c20f73ab6">‘analyse’ endpoint</a> again passing the image data as an octet-stream. I set the ‘features’ parameter to ‘read’ as I want to extract text data from the image. </p>
+<p>Here are the results:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">        &quot;readResult&quot;: &#123;</span><br><span class="line">            &quot;stringIndexType&quot;: &quot;TextElements&quot;,</span><br><span class="line">            &quot;content&quot;: &quot;REPUBLIC OF MAURITIUS\nNATIONAL IDENTITY CARD\...&quot;,</span><br><span class="line">            &quot;pages&quot;: [</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;height&quot;: 1491.0,</span><br><span class="line">                    &quot;width&quot;: 2284.0,</span><br><span class="line">                    &quot;angle&quot;: 0.8425,</span><br><span class="line">                    &quot;pageNumber&quot;: 1,</span><br><span class="line">                    &quot;words&quot;: [</span><br><span class="line">                        &#123;</span><br><span class="line">                            &quot;content&quot;: &quot;REPUBLIC&quot;,</span><br><span class="line">                            &quot;boundingBox&quot;: [],</span><br><span class="line">                            &quot;confidence&quot;: 0.994,</span><br><span class="line">                            &quot;span&quot;: &#123;</span><br><span class="line">                                &quot;offset&quot;: 0,</span><br><span class="line">                                &quot;length&quot;: 8</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;,</span><br><span class="line">                        ...</span><br><span class="line">                    ],</span><br><span class="line">                    &quot;spans&quot;: [</span><br><span class="line">                        &#123;</span><br><span class="line">                            &quot;offset&quot;: 0,</span><br><span class="line">                            &quot;length&quot;: 232</span><br><span class="line">                        &#125;</span><br><span class="line">                    ],</span><br><span class="line">                    &quot;lines&quot;: [</span><br><span class="line">                        &#123;</span><br><span class="line">                            &quot;content&quot;: &quot;REPUBLIC OF MAURITIUS&quot;,</span><br><span class="line">                            &quot;boundingBox&quot;: [],</span><br><span class="line">                            &quot;spans&quot;: [</span><br><span class="line">                                &#123;</span><br><span class="line">                                    &quot;offset&quot;: 0,</span><br><span class="line">                                    &quot;length&quot;: 21</span><br><span class="line">                                &#125;</span><br><span class="line">                            ]</span><br><span class="line">                        &#125;,</span><br><span class="line">                    ]</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            &quot;styles&quot;: [</span><br><span class="line">                &#123;</span><br><span class="line">                    &quot;isHandwritten&quot;: true,</span><br><span class="line">                    &quot;spans&quot;: [</span><br><span class="line">                        &#123;</span><br><span class="line">                            &quot;offset&quot;: 199,</span><br><span class="line">                            &quot;length&quot;: 8</span><br><span class="line">                        &#125;</span><br><span class="line">                    ],</span><br><span class="line">                    &quot;confidence&quot;: 0.9</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            &quot;modelVersion&quot;: &quot;2022-04-30&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;modelVersion&quot;: &quot;2023-02-01-preview&quot;,</span><br><span class="line">        &quot;metadata&quot;: &#123;</span><br><span class="line">            &quot;width&quot;: 2284,</span><br><span class="line">            &quot;height&quot;: 1491</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>The results are separated into individual words, lines of text as well as handwritten information. Each data element is presented with the extracted text as well as the coordinates of the text in the image. </p>
+<h1 id="Displaying-the-Results"><a href="#Displaying-the-Results" class="headerlink" title="Displaying the Results"></a>Displaying the Results</h1><p>Here are the results. I uploaded the card images, ran the API’s and rendered the results. In my testing across a number of cards the overall accuracy was extremely high. There were some issues though which I will describe later.</p>
+<img src="fr2.png"/>
+
+<h2 id="Matching-fields"><a href="#Matching-fields" class="headerlink" title="Matching fields"></a>Matching fields</h2><p>To figure out which fields were which I needed to map data fields to the labels. Since I knew the labels I am expecting, for example ‘First Name’, and I know the data for this field is immediately below it I calculated the distance from each label field to each non-label field and then selected the closest one. I added a cutoff for cases where there was no field. For example here there is no value for ‘Surname at Birth’ so the nearest field would have been invalid.</p>
+<h2 id="Coordinate-translation"><a href="#Coordinate-translation" class="headerlink" title="Coordinate translation"></a>Coordinate translation</h2><p>I wanted to render the extracted data on the image. In addition to the aesthetic value (I am aware that I am stretching this term here when used in reference to my UI) having this visual feedback is essential for debugging. You really do need to see what is being extracted and where on the image. </p>
+<p>A challenge though is that the coordinates returned from the API are based on the dimensions of the source image. When the image is rendered onto the webpage, unless it is rendered to the original size, the coordinates will be invalid. To correct this you need to translate the coordinates between the source image and the destination image. I use the following approach:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">var translatedX = (sourceX / sourceWidth) * translatedWidth;</span><br><span class="line">var translatedY = (sourceY / sourceHeight) * translatedHeight;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Verifying-the-Selfie"><a href="#Verifying-the-Selfie" class="headerlink" title="Verifying the Selfie"></a>Verifying the Selfie</h1><p>The last step is to verify the selfie. Once I have the image I use the ‘detect’ endpoint described earlier to get the faceId for the selfie. All that remains is to pass both faceId’s to the <a href="https://learn.microsoft.com/en-us/rest/api/faceapi/face/verify-face-to-face?tabs=HTTP">‘verify’ endpoint</a>. Here’s the result:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;isIdentical&quot;: true,</span><br><span class="line">  &quot;confidence&quot;: 0.9</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Essentially there is a 90% chance that the two faces belong to the same person or the face belongs to the person.</p>
+<h1 id="Image-processing-Gotchas"><a href="#Image-processing-Gotchas" class="headerlink" title="Image processing Gotchas"></a>Image processing Gotchas</h1><p>Putting this together I ran into a few issues:</p>
+<h2 id="Selfie-Capture"><a href="#Selfie-Capture" class="headerlink" title="Selfie Capture"></a>Selfie Capture</h2><p>If you are designing a flow to capture a selfie you need to ensure that your UX gives you the best possible chance to capture a high-quality selfie. As image quality drops the accuracy of the processing drops dramatically. Fortunately Microsoft has provided some excellent <a href="https://learn.microsoft.com/en-us/azure/cognitive-services/computer-vision/enrollment-overview">guidance and sample applications</a> to assist.</p>
+<h2 id="Image-Quality"><a href="#Image-Quality" class="headerlink" title="Image Quality"></a>Image Quality</h2><p>Blurry or badly scaled images throw off the face identification as well as text extraction. You will need to account for this in designing your process.</p>
+<h2 id="Image-Sizes"><a href="#Image-Sizes" class="headerlink" title="Image Sizes"></a>Image Sizes</h2><p>The Azure API’s have limits on the size of file you can upload. You will need to resize the image as part of your process.</p>
+<h2 id="Item-Padding"><a href="#Item-Padding" class="headerlink" title="Item Padding"></a>Item Padding</h2><p>In our dataset there were several images where the card had been placed on a flatbed scanner and copied as an A4 page. This means that we had a lot of dead space around the card. Simply scaling the image caused problems as the scaled card lost too much data in the process to be useful. We will need to develop a mechanism to identity where on the A4 page the card is sitting and then crop the source image to those dimensions.</p>
+<h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><p>All-in-all a great experience working with these services. We’ve got a basic solution running and it did not take a huge amount of time. There are still a few features, such as liveness checking and image tampering, I’d still want to play with but for now I’ve got a good feel for the effort and challenges involved in going this route.</p>
+]]></content>
+      <tags>
+        <tag>azure</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Unit Testing Camel - A simple example</title>
+    <url>/2023/05/18/camel-simple/</url>
+    <content><![CDATA[<p>In a <a href="https://nickmck.net/2023/03/31/Apache-Camel/">previous post</a> I wrote about taking a Test-Driven approach to Camel development. I’ve been asked to share the code and explain some of the steps in more detail so here we go…</p>
+<blockquote>
+<p>The code for this article is <a href="https://github.com/nickmza/camel-tdd.git">here</a></p>
+</blockquote>
+<h1 id="The-Route"><a href="#The-Route" class="headerlink" title="The Route"></a>The Route</h1><p>For this example I’ve created a simple route:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">from(<span class="string">&quot;timer://example?repeatCount=1&quot;</span>)</span><br><span class="line">        .routeId(<span class="string">&quot;simple-rest&quot;</span>)</span><br><span class="line">        .process(<span class="built_in">this</span>::createMessage)</span><br><span class="line">        .marshal().json()</span><br><span class="line">        .setHeader(Exchange.CONTENT_TYPE, constant(<span class="string">&quot;text/xml; charset=utf-8&quot;</span>))</span><br><span class="line">        .to(<span class="string">&quot;https://en1gvb5qo7vg4.x.pipedream.net&quot;</span>);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>This code is triggered from a Timer, the ‘repeatCount’ option specifies that it should fire only once. We then create a message in the createMessage function, convert the message to JSON, set the ‘Content-Type’ header and send the message to an HTTP endpoint. In this case im using a <a href="https://public.requestbin.com/">RequestBin</a>.</p>
+<p>If we run the application we can see this in the RequestBin:</p>
+<img src="./camel1.png" />
+
+<h1 id="Mocking-the-Http-Endpoint"><a href="#Mocking-the-Http-Endpoint" class="headerlink" title="Mocking the Http Endpoint"></a>Mocking the Http Endpoint</h1><p>To effectively test this route we must be able to mock the HTTP endpoint. To do this we need to add the following annotation to our test class:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@MockEndpointsAndSkip(&quot;https://.*&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">simpleRestRouteTests</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>This tells the test framework to create a Mock for any endpoint that starts with ‘https:&#x2F;&#x2F;‘. This Mock can then be accessed like this:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@EndpointInject(&quot;mock:https:en1gvb5qo7vg4.x.pipedream.net&quot;)</span></span><br><span class="line"><span class="keyword">private</span> MockEndpoint restEndpoint;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>The value passed to EndpointInject must match the endpoint value configured in your route. </p>
+</blockquote>
+<h1 id="A-Simple-Test"><a href="#A-Simple-Test" class="headerlink" title="A Simple Test"></a>A Simple Test</h1><p>Let’s write a test to ensure that Camel is calling the endpoint. </p>
+<p>The first thing we want to do is to replace the Timer component that triggers the flow. This will make it easier to inject data into the Route. To do this we use AdviceWith.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">AdviceWith.adviceWith(camelContext,</span><br><span class="line">        <span class="string">&quot;simple-rest&quot;</span>,</span><br><span class="line">        rb -&gt; rb.replaceFromWith(<span class="string">&quot;direct:file:start&quot;</span>));</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>This swops the ‘From’ in the Route (currently a Timer) with a new Direct component. </p>
+<p>Next we can set up an assertion. We want to configure that the HTTP endpoint is called exactly once. We can do this via the Mock we referenced earlier: </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">restEndpoint.expectedMessageCount(<span class="number">1</span>);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Finally we want to send a message into the route and assert that the Mock was called:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">producerTemplate.sendBody(<span class="string">&quot;direct:file:start&quot;</span>, <span class="string">&quot;Hello from Test!&quot;</span>);</span><br><span class="line">restEndpoint.assertIsSatisfied();</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Here’s the full listing…</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">EnsureThatEndpointIsCalled</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">    AdviceWith.adviceWith(camelContext,</span><br><span class="line">            <span class="string">&quot;simple-rest&quot;</span>,</span><br><span class="line">            rb -&gt; rb.replaceFromWith(<span class="string">&quot;direct:file:start&quot;</span>));</span><br><span class="line"></span><br><span class="line">    camelContext.start();</span><br><span class="line"></span><br><span class="line">    restEndpoint.expectedMessageCount(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    restEndpoint.whenAnyExchangeReceived( (Exchange exchange) -&gt; &#123;</span><br><span class="line">        logger.log(Level.INFO, <span class="string">&quot;Mock was HIT!!!&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    producerTemplate.sendBody(<span class="string">&quot;direct:file:start&quot;</span>, <span class="string">&quot;Hello from Test!&quot;</span>);</span><br><span class="line"></span><br><span class="line">    restEndpoint.assertIsSatisfied();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="Sending-specific-results-from-the-Mock"><a href="#Sending-specific-results-from-the-Mock" class="headerlink" title="Sending specific results from the Mock"></a>Sending specific results from the Mock</h1><p>Sometimes we need a Mock to return a specific response body, header or HTTP response code. To set this up we need to use AdviceWith again.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">var</span> <span class="variable">HTTPHeader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleExpression</span>(<span class="string">&quot;200&quot;</span>);</span><br><span class="line">HTTPHeader.setResultType(Integer.class);</span><br><span class="line"></span><br><span class="line">AdviceWith.adviceWith(camelContext,</span><br><span class="line">        <span class="string">&quot;simple-rest&quot;</span>,</span><br><span class="line">        rb -&gt; rb.weaveByToUri(<span class="string">&quot;https://en1gvb5qo7vg4.x.pipedream.net&quot;</span>)</span><br><span class="line">                .replace()</span><br><span class="line">                .setHeader(<span class="string">&quot;CamelHttpResponseCode&quot;</span>, HTTPHeader)</span><br><span class="line">                .setBody(<span class="keyword">new</span> <span class="title class_">ConstantExpression</span>(<span class="string">&quot;Response&quot;</span>)));</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>What’s happening here is that we are replacing the endpoint “<a href="https://en1gvb5qo7vg4.x.pipedream.net/">https://en1gvb5qo7vg4.x.pipedream.net</a>“ with a new implementation that returns our custom HTTP header and a body of “Response”.</p>
+<h1 id="Next-Steps"><a href="#Next-Steps" class="headerlink" title="Next Steps"></a>Next Steps</h1><p>This should be enough to get some basic testing in place. Let me know in the comments if there are any other scenarios you’d like to see covered.</p>
+]]></content>
+      <tags>
+        <tag>TDD</tag>
+        <tag>Camel</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Agile does not work but agile does</title>
+    <url>/2016/11/04/agile-does-not-work/</url>
+    <content><![CDATA[<p>In his article ‘<a href="https://www.linkedin.com/pulse/agile-does-work-oleg-vishnepolsky?trk=hp-feed-article-title-like">Agile Does Not Work</a>’ Oleg Vishnepolsky makes several observations based on his experiences with Agile development (note the big ‘A’, it’s my emphasis, not his). Specifically, he cites issues with quality, predictability, poor strategic alignment, monolithic architecture due to poor design, complex and costing infrastructure and challenges managing stakeholders.</p>
+<p>A response frequently heard to such accusations is that “If Agile is not working for you then you are not doing it right”. This response is the last defence of an Agile consultant or coach that has nothing left to offer. Sadly, In many cases this is all many coaches have to offer in the first place.</p>
+<p>Oleg is quite correct when he talks about the lack of understanding of the principles underpinning agile development and the hordes of consultants trying to make a quick buck packaging principles and techniques as dogma and selling them wholesale. How can he not be when anyone could be proclaimed a Scrum MASTER after attending a  trivial 2-day training course?</p>
+<p>Sadly. what Oleg is describing will ring true for many teams that have attempted to go Agile. I have heard the same criticisms from many teams and the conclusion is always the same: We tried Agile and it did not work for us.</p>
+<p>When teams go Agile and it fails they are left in a difficult situation. The populist view is that Waterfall &#x3D; Bad and Agile &#x3D; Good. To say otherwise would be heresy and result in hordes of Agilistas storming your team area with pitchforks and sticky notes! But, if Agile failed for you then what? Most teams end up where Oleg seems to have landed – “Common Sense Development” or just “Built it till it works”.</p>
+<p>The tragedy here is that the (agile) baby has been thrown out with the (Agile) bathwater. Whilst there may still be value for the team in agile principles and techniques the team are now totally switched off to the notion and are left to fend for themselves. They now have to re-discover many of the lessons that have already been learned in the broader agile community.  </p>
+<p>Ultimately they will learn that “Common Sense development” is actually just agile development.</p>
+<p>If your team is struggling with the issues listed above or if your experience of applying agile is more of religious, dogmatic exercise heavily reliant on faith and light on results then you have more than likely been sold Agile with a big A. Agile is the dogmatic, fast food, saccharin flavour of agile concocted by the consultants and peddled to the masses. It does not work and will add little value. As Oleg will attest.</p>
+<p>So where to from here?</p>
+<p>Let’s start by sticking a large pin that overinflated A and get Agile back to plan old agile. Let’s stop doing things because someone told us that if we don’t we are not Agile. Rather let’s start doing things because they add value, because they make sense and because they help the team move faster.</p>
+<p>Look at what you are doing in the name of ‘being Agile’ and ask yourself and your team the following questions:</p>
+<ul>
+<li>Do we know why we are doing this and the value it should add?</li>
+<li>Is what we are doing adding the expected value?</li>
+<li>If we stopped doing this would anyone notice or care?</li>
+<li>Did we learn something from this activity that changed what we originally planned to do or thought?</li>
+</ul>
+<p>If you answered NO to more than a couple of these, you should really re-evaluate whether you need it. Start by looking at why you are doing something and the value you expect to extract. Agile will fill your days with arcane rituals that add little value. Use common sense here – do more of the things that add value and less of things that don’t.</p>
+<p>There are some specific pitfalls that result in the issues that Oleg identified I’ll address each of these in an upcoming post.</p>
+]]></content>
+      <categories>
+        <category>Agile</category>
+      </categories>
+      <tags>
+        <tag>Agile</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Contract Testing with Postman</title>
+    <url>/2023/04/20/contract-testing-postman/</url>
+    <content><![CDATA[<p>I’m giving some training next week on Contract Driven Development using Postman. There’s been a couple of hurdles to overcome to get to a workflow that I feel is efficient so I thought I’d share in the hopes that a) this might help someone else or b) someone could point out a better way to do this. </p>
+<h1 id="The-Scenario"><a href="#The-Scenario" class="headerlink" title="The Scenario"></a>The Scenario</h1><p>For the training we are using a simplistic banking interface defined using OpenApi. The intention is to show how as a Consumer, Contract-Driven Development helps us to safely move forward whilst another team is still implementing the actual service. </p>
+<p>The service itself is simple. Its an Accounts service with the following endpoints:</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Path</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td>accounts</td>
+<td>Returns the list of accounts for the customer.</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>accounts&#x2F;{accountId}&#x2F;transactions</td>
+<td>Returns the list of transactions for the specified account.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>accounts</td>
+<td>Create a new Account.</td>
+</tr>
+</tbody></table>
+<h1 id="Creating-a-failing-test"><a href="#Creating-a-failing-test" class="headerlink" title="Creating a failing test"></a>Creating a failing test</h1><p>The first thing I’d like to test is the Account creation. As per the OpenApi spec I need to POST the following request:</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;AccountType&quot;</span>:<span class="string">&quot;Savings Account&quot;</span>,</span><br><span class="line">    <span class="string">&quot;Currency&quot;</span>: <span class="string">&quot;ZAR&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>and expect the following result:</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;AcccountNumber&quot;</span>: <span class="string">&quot;61779244&quot;</span>,</span><br><span class="line">    <span class="string">&quot;AccountType&quot;</span>: <span class="string">&quot;Savings Account&quot;</span>,</span><br><span class="line">    <span class="string">&quot;Currency&quot;</span>: <span class="string">&quot;ZAR&quot;</span>,</span><br><span class="line">    <span class="string">&quot;Balance&quot;</span>: <span class="number">0.00</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>I start by setting up this request&#x2F;response in Postman and pointing it to a Postman Mock server. As there is nothing configured on the Mock Server yet when I run my request I receive:</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;error&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;name&quot;</span>: <span class="string">&quot;mockRequestNotFoundError&quot;</span>,</span><br><span class="line">        <span class="string">&quot;message&quot;</span>: <span class="string">&quot;Double check your method and the request path and try again.&quot;</span>,</span><br><span class="line">        <span class="string">&quot;header&quot;</span>: <span class="string">&quot;No matching requests&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>See <a href="https://learning.postman.com/docs/designing-and-developing-your-api/mocking-data/setting-up-mock/">here</a> for help on configuring a Mock Server with Postman.</p>
+<h1 id="Schema-validation"><a href="#Schema-validation" class="headerlink" title="Schema validation"></a>Schema validation</h1><p>The first thing to get working is the ability to verify that any responses we receive are valid as per the OpenApi specification. Whilst Postman does this out of the box it does not generate a test failure. We need failing tests so that we can run our contract tests as part of the CI&#x2F;CD pipeline. </p>
+<p>In order to validate responses we need a reference to the OpenApi spec itself. To to this we use the Postman API to download the spec and save it as a variable. There’s some gymnastics here as we must first convert our OpenApi document from YAML to JSON which requires an external library - js-yaml. </p>
+<p>You could avoid this by putting the OpenAPI in JSON format directly into the variable but then you’ll need to remember to update it when the spec changes.</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">const</span> schema_url = <span class="string">&#x27;https://api.getpostman.com/apis/API ID/versions/VERSION ID/schemas/SCHEMA ID&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> postRequest = &#123;</span><br><span class="line">  <span class="attr">url</span>: schema_url,</span><br><span class="line">  <span class="attr">method</span>: <span class="string">&#x27;GET&#x27;</span>,</span><br><span class="line">  <span class="attr">header</span>: &#123;</span><br><span class="line">    <span class="string">&#x27;Content-Type&#x27;</span>: <span class="string">&#x27;application/json&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;X-Api-Key&#x27;</span>: pm.<span class="property">variables</span>.<span class="title function_">get</span>(<span class="string">&#x27;apiKey&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">pm.<span class="title function_">sendRequest</span>(<span class="string">&quot;https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js&quot;</span>, <span class="function">(<span class="params">err, res</span>) =&gt;</span> &#123;</span><br><span class="line"></span><br><span class="line">   <span class="built_in">eval</span>(res.<span class="title function_">text</span>()); <span class="comment">//Load the library.</span></span><br><span class="line"></span><br><span class="line">    pm.<span class="title function_">sendRequest</span>(postRequest, <span class="function">(<span class="params">error, response</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(!error)&#123;</span><br><span class="line">            <span class="keyword">var</span> schema = response.<span class="title function_">json</span>().<span class="property">schema</span>.<span class="property">schema</span>;</span><br><span class="line">            <span class="keyword">var</span> yaml = <span class="variable language_">this</span>.<span class="property">jsyaml</span>.<span class="title function_">load</span>(schema);</span><br><span class="line">            pm.<span class="property">variables</span>.<span class="title function_">set</span>(<span class="string">&#x27;accountsOpenApi&#x27;</span>, <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(yaml,<span class="literal">null</span>, <span class="number">2</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(error ? error : <span class="string">&quot;Schema Loaded...&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Now that we have the OpenApi spec we can use this to validate responses. Using the <a href="https://ajv.js.org/api.html">AJV</a> library we add the OpenApi spec as a schema. We then retrieve a reference to the schema we want to validate against (in this case ‘Account’) and then validate that our response matches the spec.</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> <span class="title class_">Ajv</span> = <span class="built_in">require</span>(<span class="string">&#x27;ajv&#x27;</span>),</span><br><span class="line">    ajv = <span class="keyword">new</span> <span class="title class_">Ajv</span>(&#123;<span class="attr">logger</span>: <span class="variable language_">console</span>&#125;);</span><br><span class="line"></span><br><span class="line">pm.<span class="title function_">test</span>(<span class="string">&quot;Response use a valid schema&quot;</span>, <span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line"></span><br><span class="line">        pm.<span class="property">response</span>.<span class="property">to</span>.<span class="property">have</span>.<span class="title function_">status</span>(<span class="number">200</span>);</span><br><span class="line">        pm.<span class="property">response</span>.<span class="property">to</span>.<span class="property">be</span>.<span class="property">json</span>;</span><br><span class="line">        <span class="keyword">const</span> responseJson = pm.<span class="property">response</span>.<span class="title function_">json</span>();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> openApi = <span class="title class_">JSON</span>.<span class="title function_">parse</span>(pm.<span class="property">variables</span>.<span class="title function_">get</span>(<span class="string">&quot;accountsOpenApi&quot;</span>));</span><br><span class="line">        ajv.<span class="title function_">addSchema</span>(openApi,<span class="string">&quot;Accounts&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> accountSchema = ajv.<span class="title function_">getSchema</span>(<span class="string">&#x27;Accounts#/components/schemas/Account&#x27;</span>);</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">var</span> result = <span class="title function_">accountSchema</span>(responseJson);</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(accountSchema?.<span class="property">errors</span>);</span><br><span class="line">        <span class="keyword">var</span> message = accountSchema.<span class="property">errors</span> ? accountSchema.<span class="property">errors</span>[<span class="number">0</span>].<span class="property">dataPath</span> + <span class="string">&#x27; &#x27;</span> +  accountSchema.<span class="property">errors</span>[<span class="number">0</span>].<span class="property">message</span> : <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"></span><br><span class="line">        pm.<span class="title function_">expect</span>(result, message).<span class="property">to</span>.<span class="property">be</span>.<span class="property">true</span>;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Running this test fails (as expected) because the error response from the Mock Server does not match the requirements of the OpenApi spec. Now let’s try get it to pass…</p>
+<h1 id="Getting-a-simple-test-to-pass"><a href="#Getting-a-simple-test-to-pass" class="headerlink" title="Getting a simple test to pass"></a>Getting a simple test to pass</h1><p>The first thing I’m going to do is configure the Mock Server to return this:</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;AcccountNumber&quot;</span>: <span class="string">&quot;&#123; &#123;$randomBankAccount&#125; &#125;&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>It’s a little closer to what we want - but it’s still not valid. If the schema validation is working this should fail. Note the use of the randomly generated Bank Account number. For more details see <a href="https://learning.postman.com/docs/writing-scripts/script-references/variables-list/">here</a>.</p>
+<p>Now when I run the test it fails with the following errors:</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="attr">keyword</span>: <span class="string">&quot;required&quot;</span></span><br><span class="line"><span class="attr">message</span>: <span class="string">&quot;should have required property &#x27;Balance&#x27;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>The validation seems to be working. Let’s update the mock to return a valid response:</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;AcccountNumber&quot;</span>: <span class="string">&quot;&#123; &#123;$randomBankAccount&#125; &#125;&quot;</span>,</span><br><span class="line">    <span class="string">&quot;AccountType&quot;</span>: <span class="string">&quot;&#123; &#123;$body &#x27;AccountType&#x27;&#125; &#125;&quot;</span>,</span><br><span class="line">    <span class="string">&quot;Currency&quot;</span>: <span class="string">&quot;&#123; &#123;$body &#x27;Currency&#x27;&#125; &#125;&quot;</span>,</span><br><span class="line">    <span class="string">&quot;Balance&quot;</span>: <span class="number">0.00</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Success. We now have a passing test! </p>
+<p>At this point I am going to create tests for the negative case as well so that I have a test that proves that validation will fail if the server sends something that does not conform to the spec. I will also implement a test to ensure that the request also conforms to the spec.</p>
+<p>I am not specifically going to create tests for every constraint defined in the OpenApi spec. I am going to trust that my colleagues implementing the service will verify their implementation against the spec and hopefully generate a lot of their code as well. The tests that I write from this point will focus on the specific behaviours that my client application relies upon or dynamic scenarios that cannot be easily be captured using OpenApi.</p>
+<h1 id="Behaviour-Testing"><a href="#Behaviour-Testing" class="headerlink" title="Behaviour Testing"></a>Behaviour Testing</h1><p>At this point we have a test that will ensure correct requests and responses as per the OpenApi definition. This is only the end of the beginning though. Whilst OpenApi does a great job of specifying Request and Response formats it is less capable of describing dynamic behaviour. For example, OpenApi can model that a property may contain an array of objects and even specify ranges of values but it cannot easily describe under what conditions these results would occur. For this we need Contract Tests.</p>
+<p>In Contract Driven Development we should create tests for the specific behaviour we care about as a Consumer of the service. With these tests in place I can quickly verify if a Producer’s implementation of the service agrees to the contract.</p>
+<p>Let’s add a simple one. Let’s say that ZAR-denominated accounts can only be ‘Current Accounts’. My expectation then would be that if I submit a request to create a ZAR-denominated Savings Account I should get an 400 error response and an error description.</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;AccountType&quot;</span>:<span class="string">&quot;Savings Account&quot;</span>,</span><br><span class="line">    <span class="string">&quot;Currency&quot;</span>: <span class="string">&quot;ZAR&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;ErrorCode&quot;</span>: <span class="string">&quot;Invalid Account Request&quot;</span>,</span><br><span class="line">    <span class="string">&quot;Error&quot;</span>: <span class="string">&quot;ZAR Denominated Accounts must be Current.&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>To achieve this I need to create a Mock for this specific request&#x2F;response and then add a test to assert the outcome.</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">pm.<span class="title function_">test</span>(<span class="string">&quot;Ensure ZAR Accounts are Current.&quot;</span>, <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line"></span><br><span class="line">    pm.<span class="property">response</span>.<span class="property">to</span>.<span class="property">have</span>.<span class="title function_">status</span>(<span class="number">400</span>);</span><br><span class="line">    pm.<span class="property">response</span>.<span class="property">to</span>.<span class="property">be</span>.<span class="property">json</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> responseJson = pm.<span class="property">response</span>.<span class="title function_">json</span>();</span><br><span class="line">    pm.<span class="title function_">expect</span>(responseJson.<span class="property">ErrorCode</span>).<span class="property">to</span>.<span class="title function_">contain</span>(<span class="string">&quot;Invalid Account Request&quot;</span>);</span><br><span class="line"></span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="Scenario-Tests"><a href="#Scenario-Tests" class="headerlink" title="Scenario Tests"></a>Scenario Tests</h1><p>The above test will handle cases where the expected behaviour can be assessed with a single call to the service. Other behaviours however will require multiple calls to different services. To test these we need to build out scenarios and prompt the Mock server for specific responses. The main risk in creating these types of tests are that then end up being so tightly coupled to specific data and patterns that there is no guarantee that they will pass when used against the real implementation.</p>
+<p>Let’s take a simple example: I want to ensure that when I create a new account that there should be no transactions. This will require a POST to the ‘account’ service and then a GET to the account&#x2F;{account id}&#x2F;transactions service to verify that there are no transactions.</p>
+<p>The challenge is that I already have a Mock for the ‘transactions’ service which returns an array of transactions. I need a way to tell the Mock server to return an empty array under certain circumstances. </p>
+<p>To implement this using Postman I created a new folder and added the 2 Requests I need to create the account and get the transactions. This allows me to run these tests in sequence and add specific rules.</p>
+<img src='scenario.png' width=300/>
+
+<p>I then create a Mock which returns an empty array and call it ‘No Results’.</p>
+<img src='no-results.png' width=300/>
+
+<p>Finally I add my test to the call to the ‘transactions service’:</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">pm.<span class="title function_">test</span>(<span class="string">&quot;There should be no transactions for a new account.&quot;</span>, <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line"></span><br><span class="line">    pm.<span class="property">response</span>.<span class="property">to</span>.<span class="property">have</span>.<span class="title function_">status</span>(<span class="number">200</span>);</span><br><span class="line">    pm.<span class="property">response</span>.<span class="property">to</span>.<span class="property">be</span>.<span class="property">json</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> responseJson = pm.<span class="property">response</span>.<span class="title function_">json</span>();</span><br><span class="line"></span><br><span class="line">    pm.<span class="title function_">expect</span>(responseJson.<span class="property">length</span>).<span class="property">to</span>.<span class="title function_">eq</span>(<span class="number">0</span>, <span class="string">&quot;There should be no transactions on a new account.&quot;</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>The last thing I need to do is tell the Mock server to use the specific ‘No Results’ response. To do this I send the ‘x-mock-response-name’ header with a value of ‘No Results’ with the call to the ‘transactions’ service. This asks the Mock server to return this specific result. There are many ways to nudge the Mock server towards a specific result. See <a href="https://learning.postman.com/docs/designing-and-developing-your-api/mocking-data/matching-algorithm/">here</a> for more details.</p>
+<p>This test will pass but it is not a good test. The reason is that there is no guarantee that this will work against the real service. This is because the only reason we receive the empty response is because we asked the Mock server for it. In practice the empty response should be as a consequence of calling the ‘transactions’ service immediately after creating a new account. At the moment our test does not reflect this. </p>
+<p>Fixing this requires us to ensure that we use the account number returned by the call to ‘accounts’ as an input to the call to ‘transactions’. To do this we save the results for the first call to a variable:</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">pm.<span class="title function_">test</span>(<span class="string">&quot;Ensure Account Created.&quot;</span>, <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line"></span><br><span class="line">    pm.<span class="property">response</span>.<span class="property">to</span>.<span class="property">have</span>.<span class="title function_">status</span>(<span class="number">200</span>);</span><br><span class="line">    pm.<span class="property">response</span>.<span class="property">to</span>.<span class="property">be</span>.<span class="property">json</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> responseJson = pm.<span class="property">response</span>.<span class="title function_">json</span>();</span><br><span class="line"></span><br><span class="line">    pm.<span class="property">variables</span>.<span class="title function_">set</span>(<span class="string">&quot;newAccountNumber&quot;</span>, responseJson.<span class="property">AcccountNumber</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Then we use this variable as an input to the call to ‘transactions’:</p>
+<img src='transactions.png' width=500/>
+
+<p>The test still passes but note the use of the generated account number:</p>
+<img src='results.png' width=800/>
+
+<h1 id="Wrapping-up"><a href="#Wrapping-up" class="headerlink" title="Wrapping up"></a>Wrapping up</h1><p>At this point we can verify that requests and responses are valid as per the OpenApi spec. This ensures that the tests we write have valid requests and that responses, whether from the Mock or real serve, are also valid. We can also write tests to assert for specific behaviour in the context of a single call as well as during a series of calls. What’s left is to set-up a build pipeline to run these tests automatically so that both the Consumer and Producer teams can get fast feedback when the implementation breaks the contract.</p>
+]]></content>
+      <categories>
+        <category>Software Engineering</category>
+      </categories>
+      <tags>
+        <tag>TDD</tag>
+        <tag>Postman</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>How I hire</title>
+    <url>/2023/06/21/how-I-hire/</url>
+    <content><![CDATA[<p>I’ve been hiring software engineers for over 20 years now. In that time I’ve interviewed literally hundreds of people. Here are some of the lesson’s I’ve learned along the way…</p>
+<h1 id="Fit-over-skills"><a href="#Fit-over-skills" class="headerlink" title="Fit over skills"></a>Fit over skills</h1><p>I’ll take attitude, willingness to learn and enthusiasm over skills every time. It’s nice if the person has the skills but, given that the gap is not unassailable, we can generally teach any missing skills. I cannot teach empathy, intuition or curiosity however.</p>
+<h1 id="Flexibility"><a href="#Flexibility" class="headerlink" title="Flexibility"></a>Flexibility</h1><p>I always ask some questions about favorite tools or approaches. Then I challenge these to see the reaction. A ‘red flag’ for me is someone who is inflexible about their technology choices. In my view it’s equivalent to having a favorite hammer that you will always use - even when what you actually need is a scalpel. </p>
+<p>What I am looking for flexibility. If presented with a viable alternative would the person still stick to their firmly held belief? If working in a team that used a different tech stack how would they react?</p>
+<h1 id="Learning"><a href="#Learning" class="headerlink" title="Learning"></a>Learning</h1><p>Learning is a lifelong commitment in Software Engineering. Some of the skills &amp; technologies we have today will change over time. This is one of the reasons that hiring solely for skills is problematic. It’s critical for me to asses the person’s ability to learn and how they learn. If the person is unable or unwilling to learn it’s better to know up-front. If the person’s learning style is at odds with how your organisation trains this could also be a problem.</p>
+<p> I normally ask these question:</p>
+<ul>
+<li>“How do you go about learning something new?”</li>
+<li>“What was the last thing your learnt?”</li>
+<li>“What is the thing you are most proud of having mastered?”</li>
+</ul>
+<blockquote>
+<p>Tactical vs Strategic skills. I classify skills as Tactical or Strategic. Tactical Skills are the things we use every day. Think your IDE, Javascript Framework or Build System. Strategic skills are things like Enterprise Integration Patterns, SOLID, OOP, Functional Programming. What I’ve found is that Tactical Skills change at a different rate than Strategic. Some of the Strategic ideas have been around, largely unchanged, for decades.</p>
+</blockquote>
+<h1 id="What-I-test-for"><a href="#What-I-test-for" class="headerlink" title="What I test for"></a>What I test for</h1><p>I use our engineering ladder as a basis for the interview. Our ladder is based on the framework proposed by <a href="http://www.engineeringladders.com/">Engineering Ladders</a>. It looks at individuals in terms of a number of dimensions:</p>
+<ul>
+<li>System - level of ownership of the system(s).</li>
+<li>People - relationship with the team(s).</li>
+<li>Tech - knowledge of the tech stack and tools.</li>
+<li>Influence - scope of influence of the position.</li>
+<li>Process - level of engagement with the development process.</li>
+</ul>
+<p><img src="https://www.engineeringladders.com/charts/template.png" alt="Engineering Ladders Diagram"></p>
+<p>Each role is plotted against this model to determine the minimum level of capability for that role. For example we would expect a Tech Lead to score above an ‘Enforces’ on the Process dimension as we expect our Tech Leads to be a driving force in process improvement.</p>
+<p>During the interview I try to assess where I think the person is on the ladder and compare that to where they would need to be for the role. You can then ask question to get a feel for where the person might be. For example:</p>
+<ul>
+<li>System: Tell us about a time you tried to improved a system you were working on? How did it go? How would you as a new team member suggest and implement such a change?</li>
+<li>Team: Tell us about your previous teams. What worked well? What role - did you fulfill? Tell us about a time you helped the team or team members. </li>
+<li>Process: Tell us about a time you tried to improve a team process?</li>
+<li>Tech: See ‘Testing for Skills’ below.</li>
+<li>Impact: What other teams do you work with frequently? How do you interact with those teams?</li>
+</ul>
+<h1 id="Testing-for-Skills"><a href="#Testing-for-Skills" class="headerlink" title="Testing for Skills"></a>Testing for Skills</h1><p>In the past I relied heavily on whiteboard interviews and supervised coding tests. I have come to learn that these approaches are fundamentally flawed at best and inhumane at worst. </p>
+<p>Software Engineers are not expected to work with someone looming over their shoulder watching their every keystroke. Neither are they expected to be shown an esoteric piece of code and instantly spot the errors and propose a fix within a 20m conversation. Many people simply cannot handle this type of pressure - the fight or flight reflex kicks in and they literally <a href="https://www.medicalnewstoday.com/articles/amygdala-hijack#summary">lose the ability to reason</a>. I’ve seen talented engineers completely flunk questions that, if asked in a different environment, they would have been more than capable of answering.</p>
+<p>My approach these days is to ask the person to share some code they have written. If they don’t have something I propose a small problem - something that can be accomplished in a couple of hours. The person can tackle this on their own time, using their own tools, in the language of their choice and send it to us. We then can have a conversation about what they wrote.</p>
+<p>I frequently hear the concern ‘what if the person has help’ or ‘what if they Google the answer’. This is obviously a factor, even more so in the age of ChatGPT. Let’s say that happens though.  When we do have the conversation would they be able to explain ‘Why’ certain things were done? Would they be able to explain ‘how’ they arrived at the solution? Even if someone had help with the solution but can eloquently explain the ‘why’ and the ‘how’ of what is there and extrapolate beyond the scope of the initial question I’m OK with this. After all - collaborating, asking questions, Stack Overflow and now ChatGPT are all valid tools in the Engineer’s Toolbox. Why should we expect people to fly solo for the sake of the interview?</p>
+<blockquote>
+<p>Hire a contractor if you are only looking for specific skills. In some cases you simply need to have access to a specific skill-set. In these cases I would try to find a contractor or company to work with. Compromising on ‘fit’ because of short-term skills can be risky if the person does not work out. A short-term contract with the option to convert to full-time is a safer bet. </p>
+</blockquote>
+<h1 id="Be-careful-of-group-think"><a href="#Be-careful-of-group-think" class="headerlink" title="Be careful of group-think"></a>Be careful of group-think</h1><p>Keep a careful eye on your successful candidates and those you filter out. This is especially important when you scale and start to devolve the hiring process to individual teams. There is a tendency for people to hire those who look, act and think like them. If this happens it’s to the detriment of the organisation as a whole. There are numerous studies to support this position. In addition bias in the hiring process artificially reduces an already limited pool of options. If you find yourself saying ‘We can’t find anyone’ go back and check who you filtered out and why.</p>
+<h1 id="CV-Scanning"><a href="#CV-Scanning" class="headerlink" title="CV Scanning"></a>CV Scanning</h1><p>When looking for an engineer it’s not uncommon to be presented with a list of 40 plus candidates. Here’s how I whittle them down…</p>
+<ul>
+<li>Do a quick screen to remove obvious non-starters. I’ll frequently get people who are below our ability to train or simply have the wrong background. For example, someone wanting to move from the Accounting Team to Engineering with zero programming knowledge. This is not something that we are geared for.</li>
+<li>Scan through the remaining CV’s and and select the ones that ‘stand-out’. For me these typically have one or more of the following characteristics:<br> – Some details on what the person has done above just a simple chronology and list of technologies. For example: “Performed a complete rewrite of the mobile application using Redux for state management, rebuilt the storage system which now runs on Watermelon and RxJS.”. This tell me much more than ‘PHP Development’ or ‘Android Development’.<br> – Range of technologies. This shows that the person is capable of learning new things and has done so.<br> – Links to Open Source projects, Blogs etc. These are interview gold. If the person has a GitHub I can quickly take a look and see what level they are at. Blogs and community contributions also give good insight into the person’s communications skills.</li>
+<li>If at this stage I have enough candidates I’ll stop there. If not I’ll repeat until I do. The number of candidates is based on the Interview to Hire ratio. For example if you typically take 7 interviews to select on developer then you would need at least 7 candidates.</li>
+</ul>
+]]></content>
+      <categories>
+        <category>School of Hard Knocks</category>
+      </categories>
+      <tags>
+        <tag>Engineering Management</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Request/Response Shaping with KrakenD</title>
+    <url>/2023/07/16/krakend-response/</url>
+    <content><![CDATA[<p>I wrote previously about <a href="https://nickmck.net/2023/06/23/release-the-krakend/">configuring logging</a> on KrakenD as well as setting up <a href="https://nickmck.net/2023/07/08/kraken-auth/">JWT Security</a>. This week I’m looking at how KrakenD can shape Requests and Responses from back-end systems.</p>
+<p>KrakenD provides multiple facilities for Request&#x2F;Response Shaping:</p>
+<ul>
+<li>Filtering. Removing specific fields from the response.</li>
+<li>Grouping. Placing a response within a specific tag.</li>
+<li>Mapping. Renaming certain fields.</li>
+<li>Collection Manipulation. Move, delete or append items in arrays.</li>
+<li>Plugins. Completely rewrite requests&#x2F;reponses using custom code. Maximum performance but requires you to build and deploy the plugin.</li>
+<li>Lua. Same as for Plugins but via the Lua scripting language. You take a (potentially negligible) performance hit but gain the flexibility of scripting.</li>
+</ul>
+<p>My requirement is to format the response from our Core Banking system into JSON. The challenging part is that our Core Banking response format looks like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;</span><br><span class="line">&lt;T24 xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">    xmlns=&quot;http://www.temenos.com/T24/OFSML/130&quot; xsi:schemaLocation=&quot;http://www.temenos.com/T24/OFSML/130 ofsml13.xsd&quot;&gt;</span><br><span class="line">    &lt;serviceResponse&gt;</span><br><span class="line">        &lt;ofsStandardEnquiry name=&quot;E.CUST.FIN.SUMMARY.6.MCB.MU&quot; status=&quot;OK&quot;&gt;</span><br><span class="line">            &lt;enquiryColumn id=&quot;RETURN.CODE&quot; label=&quot;RETURN.CODE&quot; type=&quot;ALPHANUMERIC&quot;/&gt;</span><br><span class="line"></span><br><span class="line">            &lt;!--List of Enquiry Columns&gt;</span><br><span class="line"></span><br><span class="line">            &lt;enquiryRecord&gt;</span><br><span class="line">                &lt;column&gt;0&lt;/column&gt;</span><br><span class="line"></span><br><span class="line">                &lt;!--List of Result Columns&gt;</span><br><span class="line"></span><br><span class="line">            &lt;/enquiryRecord&gt;</span><br><span class="line">        &lt;/ofsStandardEnquiry&gt;</span><br><span class="line">    &lt;/serviceResponse&gt;</span><br><span class="line">&lt;/T24&gt;</span><br></pre></td></tr></table></figure>
+
+<p>For each column in the response table there will be an ‘enquiryColumn’ record and an associated enquiryRecord&#x2F;column record. The association is based on the index. So the enquiryColumn at position 0 will describe the column at position 0 in the enquiryRecord. For extra fun, if the response contains more than one row the values will be separated by a | delimiter.</p>
+<p>The only options that could achieve all of this were either a Plugin or Lua. I opted for the Lua route. Only problem with that was I didn’t know Lua… </p>
+<h1 id="Lua"><a href="#Lua" class="headerlink" title="Lua"></a>Lua</h1><p>From the website: <a href="https://www.lua.org/">Lua</a> is a powerful, efficient, lightweight, embeddable scripting language. It supports procedural programming, object-oriented programming, functional programming, data-driven programming, and data description.</p>
+<p>I found it really easy to pick up. Some pointers:</p>
+<p><strong>Everything is a table</strong><br>Seriously - everything! Want an array? Create a table with an integer as its first column. </p>
+<p><strong>Invoke methods with :</strong><br>For example:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">print(t:len())</span><br></pre></td></tr></table></figure>
+<p>Invokes the len method of t. In this case printing the length of the table t.</p>
+<p><strong>Creating new tables</strong><br>Like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">local result = &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Setting&#x2F;Getting Values</strong><br>Like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">result[&quot;ResponseStatus&quot;] = &quot;foo&quot;</span><br><span class="line">print(result[&quot;ResponseStatus&quot;])</span><br></pre></td></tr></table></figure>
+<p><strong>String Manipulation</strong><br>This was a little tricky. I think C# has spoiled me a little. Here’s the code to split up a pipe-delimited string.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function split(value)</span><br><span class="line"></span><br><span class="line">    if(string.sub(value,1,1) == &quot;|&quot;) then</span><br><span class="line">        value = &quot; &quot;..value</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    local t=&#123;&#125;</span><br><span class="line">    for str in string.gmatch(value, &quot;([^|]+)&quot;) do</span><br><span class="line">        local k = string.gsub(str, &quot;[ ]+$&quot;, &quot;&quot;)</span><br><span class="line">        table.insert(t, k)</span><br><span class="line">    end</span><br><span class="line">    return t</span><br><span class="line">end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>Here’s what this does:</p>
+<ul>
+<li>Start by appending an empty string to the start of the string. The .. is the concatenation operator.</li>
+<li>Create a new table, t, to store the results.</li>
+<li>Use a regex passed to the gsub method to find each part of the string.</li>
+<li>Use a regex passed to gsub to trim spaces.</li>
+<li>Add the resultant string to the table with table.insert.</li>
+</ul>
+<blockquote>
+<p>It’s entirely likely that an experienced Lua practitioner is recoiling in horror at this right now. Feel free to correct my poor Lua in the comments.</p>
+</blockquote>
+<h1 id="Shaping-the-Response"><a href="#Shaping-the-Response" class="headerlink" title="Shaping the Response"></a>Shaping the Response</h1><p>Armed with my rudimentary understanding of Lua I was able to put together a working map between the Core Banking XML and Json. I won’t reproduce the entire script but here are the highlights:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function post_proxy( resp )</span><br><span class="line"> </span><br><span class="line">    local r = resp.load()</span><br><span class="line">    local responseData = r:data()</span><br><span class="line">    local enquiryColumn = responseData:get(&quot;T24&quot;):get(&quot;serviceResponse&quot;):get(&quot;ofsStandardEnquiry&quot;):get(&quot;enquiryColumn&quot;)</span><br><span class="line">    local dataColumn = responseData:get(&quot;T24&quot;):get(&quot;serviceResponse&quot;):get(&quot;ofsStandardEnquiry&quot;):get(&quot;enquiryRecord&quot;):get(&quot;column&quot;)</span><br><span class="line">    local size = enquiryColumn:len()</span><br><span class="line">     </span><br><span class="line">    local result = &#123;&#125;</span><br><span class="line">    for i=0,size-1 do</span><br><span class="line">      local key = enquiryColumn:get(i):get(&quot;-id&quot;)</span><br><span class="line">      local value = dataColumn:get(i)</span><br><span class="line">      result[key] = value;</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    local response = &#123;&#125;</span><br><span class="line">    response[&quot;ResponseStatus&quot;] = &#123;&#125;</span><br><span class="line">    response[&quot;ResponseStatus&quot;][&quot;ReturnCode&quot;] = 0</span><br><span class="line"></span><br><span class="line">    response[&quot;ResponseData&quot;] = &#123;&#125;</span><br><span class="line">    local rd = response[&quot;ResponseData&quot;]</span><br><span class="line"></span><br><span class="line">    rd[&quot;Exception&quot;] = getException(result)</span><br><span class="line"></span><br><span class="line">    local items = luaList.new()</span><br><span class="line">    gfs[&quot;Ac_Contracts&quot;] = items</span><br><span class="line"></span><br><span class="line">    local contractList = split(result[&quot;AC.CONTRACT.NO&quot;])</span><br><span class="line"></span><br><span class="line">    local contractCount = 1</span><br><span class="line">    for k,v in pairs(contractList) do</span><br><span class="line">        local acrData = getContractRecord(contractCount, result)</span><br><span class="line">        items:set(contractCount-1,acrData)</span><br><span class="line">        contractCount = contractCount + 1</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    responseData:set(&quot;response&quot;, response)</span><br><span class="line">    responseData:del(&quot;T24&quot;)</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>Here are the highlights:</p>
+<ul>
+<li>Access the backend response via resp.load()</li>
+<li>We then get the enquiryColumn and dataColumn</li>
+<li>We can then loop through the enquiryColum and populate the results table. We can then treat the response as key-value pairs rather than 2 disconnected arrays. </li>
+<li>We build up our response object by pulling values from the results array.<ul>
+<li>Note the use of lualist.new() this is a KrakenD helper to allow you to model a JSON array.</li>
+</ul>
+</li>
+<li>Finally we remove the original response via the del function.</li>
+</ul>
+<h1 id="Wiring-it-up"><a href="#Wiring-it-up" class="headerlink" title="Wiring it up"></a>Wiring it up</h1><p>As with all things KrakenD it’s just a matter of updating the endpoint definition:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;endpoints&quot;: [</span><br><span class="line">&#123;</span><br><span class="line">    &quot;endpoint&quot;: &quot;/v1/getfinancialsummary&quot;,</span><br><span class="line">    &quot;method&quot;: &quot;POST&quot;,</span><br><span class="line">    &quot;output_encoding&quot;: &quot;json&quot;,</span><br><span class="line">    &quot;backend&quot;: [</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;extra_config&quot;: &#123;</span><br><span class="line">        &quot;modifier/lua-backend&quot;: &#123;</span><br><span class="line">            &quot;sources&quot;: [&quot;formatT24.lua&quot;],</span><br><span class="line">            &quot;live&quot;: true,</span><br><span class="line">            &quot;allow_open_libs&quot;: true,</span><br><span class="line">            &quot;post&quot;: post_proxy(response);&quot;</span><br><span class="line">        &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;url_pattern&quot;: &quot;/getfinancialsummary&quot;,</span><br><span class="line">        &quot;encoding&quot;: &quot;xml&quot;,</span><br><span class="line">        &quot;sd&quot;: &quot;static&quot;,</span><br><span class="line">        &quot;method&quot;: &quot;POST&quot;,</span><br><span class="line">        &quot;disable_host_sanitize&quot;: true,</span><br><span class="line">        &quot;host&quot;: [</span><br><span class="line">            &quot;http://demo.mock.pstmn.io&quot;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;    </span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>Here’s how it works:</p>
+<ul>
+<li>sources - defines the list of Lua script files to load. It looks for them in the same directory as your krakend.json file.</li>
+<li>live - tells Krakend to reload the script when it is changed. Super-handy for development.</li>
+<li>allow_open_libs - allows Lua to pull in libraries from other sources.</li>
+<li>post - this is the entry point for our script. In this case we want to invoke our script after the response has been received from the backend.</li>
+</ul>
+<h1 id="That’s-all-folks…"><a href="#That’s-all-folks…" class="headerlink" title="That’s all folks…"></a>That’s all folks…</h1><p>This worked really well. Even with mock data hosted in Postman we are getting a 400ms response time on a large response. The bulk of this is network latency. I’m not sure what voodoo has been worked on the Lua side to make this work but it’s impressive. I’m also secure in the knowledge that if the performance ever becomes an issue I can drop to a dedicated plugin (would just need to learn Go first…)</p>
+]]></content>
+      <categories>
+        <category>Release The KrakenD</category>
+      </categories>
+      <tags>
+        <tag>devops</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Riding the Camel: A Practical Guide to TDD with Apache Camel</title>
+    <url>/2023/03/31/Apache-Camel/</url>
+    <content><![CDATA[<p>Recently I’ve been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to our standard integration platform IBM AppConnect. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evolve our integration code using tests to drive the approach. This is very cool. That said, it’s not been exactly easy so whilst it’s still fresh in my head I thought I would put down some points about how to make this work in your own projects.</p>
+<h1 id="Scenario"><a href="#Scenario" class="headerlink" title="Scenario"></a>Scenario</h1><p>The requirement is quite simple. When specific parts of a Customer’s record are modified in the CBS we need to send a message to the Fraud System. The Fraud System exposes a SOAP Interface so we need to translate the XML Format provided by the CBS into a valid SOAP message. In addition we need to handle various retry and reject semantics. For example if the incoming message is badly formatted, and thus not recoverable, we need to send it to a Poison queue. If the Fraud System is temporarily unavailable we need to send it to a Retry queue. At a high level it looks like this:</p>
+<p><img src="/images/camel-overview.png" alt="A simple diagram of the design"></p>
+<p>The Camel route to achieve this is as follows:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">from(<span class="string">&quot;wmq:queue:PFM.CUSTOMER&quot;</span>)</span><br><span class="line">        .routeId(<span class="string">&quot;core-banking-pfm-customer-updates&quot;</span>)</span><br><span class="line">        .log(LoggingLevel.INFO, <span class="string">&quot;Message Received.&quot;</span>)</span><br><span class="line">        .unmarshal().jacksonXml(BatchMultiupdateCustomer.class)</span><br><span class="line">        .process(<span class="built_in">this</span>::createSoapRequest)</span><br><span class="line">        .setHeader(<span class="string">&quot;SOAPAction&quot;</span>, constant(SOAP_Update_Action))</span><br><span class="line">        .setHeader(Exchange.CONTENT_TYPE, constant(<span class="string">&quot;text/xml; charset=utf-8&quot;</span>))</span><br><span class="line">        .to(pfmConfig.getHost() + <span class="string">&quot;?throwExceptionOnFailure=false&quot;</span>)</span><br><span class="line">        .unmarshal().jacksonXml(Envelope.class)</span><br><span class="line">        .process(<span class="built_in">this</span>::checkResult)</span><br><span class="line">        .log(LoggingLevel.INFO, <span class="string">&quot;Message sent to PFM.&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h1><p>In general you follow the same setup procedure as you would for any Springboot test with some additions.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@SpringBootTest</span></span><br><span class="line"><span class="meta">@CamelSpringBootTest</span></span><br><span class="line"><span class="meta">@UseAdviceWith</span></span><br><span class="line"><span class="meta">@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)</span></span><br><span class="line"><span class="meta">@MockEndpointsAndSkip(&quot;https://.*|wmq:.*&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CamelRouteTests</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">protected</span> CamelContext camelContext;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">protected</span> ProducerTemplate producerTemplate;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="UseAdviceWith"><a href="#UseAdviceWith" class="headerlink" title="UseAdviceWith"></a>UseAdviceWith</h2><p>The ‘UseAdviceWith’ attribute tells Camel that we are running in test mode and that we will provide ‘advice’ on how to proceed. If you do not add this attribute Camel will start normally and activate all configured routes. See <a href="https://www.javadoc.io/static/org.apache.camel/camel-test-spring/2.20.1/org/apache/camel/test/spring/UseAdviceWith.html">here</a> for more details.</p>
+<h2 id="DirtiesConext"><a href="#DirtiesConext" class="headerlink" title="DirtiesConext"></a>DirtiesConext</h2><p>This attribute tells the test framework to reset the application context after each test invocation. This ensures that the results from one test does not pollute the results of another. See <a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/annotation/DirtiesContext.html">here</a> for more details.</p>
+<h2 id="Camel-Context"><a href="#Camel-Context" class="headerlink" title="Camel Context"></a>Camel Context</h2><p>The Camel Context gives you access to all the routes and services running. This is used to reconfigure routes for testing and gain access to endpoints.</p>
+<h2 id="Producer-Template"><a href="#Producer-Template" class="headerlink" title="Producer Template"></a>Producer Template</h2><p>The Producer Template is used to inject messages into a route.</p>
+<h2 id="Changing-the-entry-point"><a href="#Changing-the-entry-point" class="headerlink" title="Changing the entry-point"></a>Changing the entry-point</h2><p>In the Route defined above the entry-point is a message queue. In order to make testing simpler we would want to be able to submit messages directly into the Route rather than having to queue a message. This can be done by instructing Camel to replace parts of the Route for the duration of the tests. For example:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">AdviceWith.adviceWith(camelContext,</span><br><span class="line">        <span class="string">&quot;core-banking-pfm-customer-updates&quot;</span>,</span><br><span class="line">        rb -&gt; rb.replaceFromWith(<span class="string">&quot;direct:file:start&quot;</span>));</span><br></pre></td></tr></table></figure>
+
+<p>Here we are replacing the original ‘From’ with  ‘direct:file:start’. This allows us to post messages to the route using: </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">producerTemplate.sendBody(<span class="string">&quot;direct:file:start&quot;</span>, request);</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="Mocks"><a href="#Mocks" class="headerlink" title="Mocks"></a>Mocks</h1><p>Mocks allow us to simulate the endpoints of the application so that our tests do not need to connect to real systems. We can make assertions about the mocks to ensure that the system is behaving as expected.</p>
+<h2 id="MockEndpointsAndSkip"><a href="#MockEndpointsAndSkip" class="headerlink" title="MockEndpointsAndSkip"></a>MockEndpointsAndSkip</h2><p>To start mocking using Camel the MockEndpointsAndSkip attribute instructs the framework to create a mock for each endpoint that matches the supplied regex expression. In the example above this means creating a mock for endpoints that start with ‘https:&#x2F;&#x2F;‘ or ‘wmq:&#x2F;&#x2F;‘. </p>
+<p>The ‘Skip’ suffix here indicates that Camel should not pass on the messages to the underlying endpoint. If this is desirable use the ‘MockEndpoints’ annotation instead.</p>
+<h2 id="Accessing-Mocks"><a href="#Accessing-Mocks" class="headerlink" title="Accessing Mocks"></a>Accessing Mocks</h2><p>Mocks can be accessed via injection or directly from the Camel Context.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@EndpointInject(&quot;mock:wmq:queue:PFM.POISON&quot;)</span></span><br><span class="line"><span class="keyword">private</span> MockEndpoint poisonQueue;</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">var</span> <span class="variable">mock</span> <span class="operator">=</span> camelContext.getEndpoint(<span class="string">&quot;mock:wmq:queue:PFM.POISON&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Mock-Naming"><a href="#Mock-Naming" class="headerlink" title="Mock Naming"></a>Mock Naming</h3><p>Each mock created via MockEndpointsAndSkip or MockEndpoints will create a unique mock with it’s own URI. The format of this URI is the original URI prefixed with ‘mock’.</p>
+<p>For example:</p>
+<table>
+<thead>
+<tr>
+<th>URI</th>
+<th>Mock URI</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://example.com/Fraud/DetectionService.svc">https://example.com/Fraud/DetectionService.svc</a></td>
+<td>mock:https:example.com&#x2F;Fraud&#x2F;DetectionService.svc</td>
+</tr>
+<tr>
+<td>wmq:queue:PFM.POISON</td>
+<td>mock:wmq:queue:PFM.POISON</td>
+</tr>
+</tbody></table>
+<p><strong>Note:</strong> Notice that for the HTTP endpoint the forward slashes are removed from the mock name. If you have any doubt Camel outputs the URI of both the original endpoint and the mock endpoint in the logs.</p>
+<h2 id="Asserting-Mock-Behaviour"><a href="#Asserting-Mock-Behaviour" class="headerlink" title="Asserting Mock Behaviour"></a>Asserting Mock Behaviour</h2><p>Once you have a reference to the mock you can set your expectations and then make an assertion in the test.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">validMessageShouldBeProcessed</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">var</span> <span class="variable">request</span> <span class="operator">=</span> createSampleRequest();</span><br><span class="line"></span><br><span class="line">    replaceFromWithMock(); <span class="comment">//Replace the From with &#x27;direct:file:start&#x27;</span></span><br><span class="line"></span><br><span class="line">    camelContext.start(); <span class="comment">//Start Camel</span></span><br><span class="line"></span><br><span class="line">    pfmEndpoint.expectedMessageCount(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    producerTemplate.sendBody(<span class="string">&quot;direct:file:start&quot;</span>, request); <span class="comment">//Send message to the Route...</span></span><br><span class="line"></span><br><span class="line">    pfmEndpoint.assertIsSatisfied();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>In this example we expect the pfmEndpoint queue to have a single message on completion of the test.</p>
+<h2 id="Returning-Values-from-a-Mock"><a href="#Returning-Values-from-a-Mock" class="headerlink" title="Returning Values from a Mock"></a>Returning Values from a Mock</h2><p>In some cases you need to be able to control the specific response from a mock. In these scenarios you can use AdviceWith to replace the original end-point with one that models the specific behaviour you require. For example:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">var</span> <span class="variable">faultContent</span> <span class="operator">=</span> faultResultResource.getContentAsString(StandardCharsets.UTF_8);</span><br><span class="line"></span><br><span class="line"><span class="type">var</span> <span class="variable">header</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleExpression</span>(<span class="string">&quot;500&quot;</span>);</span><br><span class="line">header.setResultType(Integer.class);</span><br><span class="line"></span><br><span class="line">AdviceWith.adviceWith(camelContext,</span><br><span class="line">        <span class="string">&quot;core-banking-pfm-customer-updates&quot;</span>,</span><br><span class="line">        rb -&gt; rb.weaveByToUri(pfmConfig.getHost())</span><br><span class="line">                .replace()</span><br><span class="line">                .setHeader(CAMEL_HTTP_RESPONSE_CODE, header)</span><br><span class="line">                .setBody(<span class="keyword">new</span> <span class="title class_">ConstantExpression</span>(faultContent)));</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Here we are configuring the endpoint to return an HTTP 500 return code and a specific fault payload.</p>
+<p>Here is the full test:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">parseFaultResult</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">var</span> <span class="variable">request</span> <span class="operator">=</span> createSampleRequest();</span><br><span class="line"></span><br><span class="line">    <span class="type">var</span> <span class="variable">faultContent</span> <span class="operator">=</span> faultResultResource.getContentAsString(StandardCharsets.UTF_8);</span><br><span class="line"></span><br><span class="line">    replaceFromWithMock();</span><br><span class="line"></span><br><span class="line">    <span class="type">var</span> <span class="variable">HTTPHeader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleExpression</span>(<span class="string">&quot;400&quot;</span>);</span><br><span class="line">    HTTPHeader.setResultType(Integer.class);</span><br><span class="line"></span><br><span class="line">    AdviceWith.adviceWith(camelContext,</span><br><span class="line">            <span class="string">&quot;core-banking-pfm-customer-updates&quot;</span>,</span><br><span class="line">            rb -&gt; rb.weaveByToUri(pfmConfig.getHost()+<span class="string">&quot;?throwExceptionOnFailure=false&quot;</span>)</span><br><span class="line">                    .replace()</span><br><span class="line">                    .setHeader(CAMEL_HTTP_RESPONSE_CODE, HTTPHeader)</span><br><span class="line">                    .setBody(<span class="keyword">new</span> <span class="title class_">ConstantExpression</span>(faultContent)));</span><br><span class="line"></span><br><span class="line">    poisonQueue.expectedBodiesReceived(faultContent);</span><br><span class="line">    poisonQueue.expectedMessageCount(<span class="number">1</span>);</span><br><span class="line">    retryQueue.expectedMessageCount(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    camelContext.start();</span><br><span class="line"></span><br><span class="line">    producerTemplate.sendBody(<span class="string">&quot;direct:file:start&quot;</span>, request);</span><br><span class="line"></span><br><span class="line">    poisonQueue.assertIsSatisfied();</span><br><span class="line">    retryQueue.assertIsSatisfied();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Here the test is ensuring that in the event of a HTTP 400 Error that the message is not retried and sent to the poison queue.</p>
+<h1 id="Results"><a href="#Results" class="headerlink" title="Results"></a>Results</h1><p><img src="/images/camel-code-coverage.png" alt="Camel Code Coverage"></p>
+<p>TDD with Camel works really well. There is some initial setup in terms of creating the various request&#x2F;response pairs and you need to be sure to keep your tests clean and tidy. It’s great that when we find a problem we add the suspect message into the project and run the tests. If the tests pass then we know we have a bug and so the first step is to create a failing tests. Once this passes we can be pretty sure that the bug is addressed. </p>
+<p>Code Coverage works as expected and is great to make sure that the tests are exercising the expected aspects of the application.</p>
+]]></content>
+      <categories>
+        <category>Software Engineering</category>
+      </categories>
+      <tags>
+        <tag>TDD</tag>
+        <tag>Camel</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Authenticate the KrakenD!</title>
+    <url>/2023/07/08/kraken-auth/</url>
+    <content><![CDATA[<p>In a <a href="https://nickmck.net/2023/06/23/release-the-krakend/">previous article</a> I described getting a minimal KrakenD installation up and running using a simple Node Backend. I also configured logging and tracing so that I could see what was happening. Today I’m going to explore some of KrakenD’s authentication capabilities.</p>
+<h2 id="Setting-up-JWT-Authentication"><a href="#Setting-up-JWT-Authentication" class="headerlink" title="Setting up JWT Authentication"></a>Setting up JWT Authentication</h2><p>When you define an endpoint in KrakenD there are a number of options for controlling how requests are authenticated.</p>
+<img src="ka1.png"/>
+
+<p>I want to use KrakenD to verify incoming JWT tokens. There are a number of advantages to this:</p>
+<ul>
+<li>By validating tokens early we ensure only valid, authenticated and authorized requests reach the backend service in the first place.</li>
+<li>Load on the back-end is reduced.</li>
+<li>Token Management and configuration is centralised.</li>
+</ul>
+<blockquote>
+<p>Note this does not eliminate the need for backend service validation entirely. The API Gateway acts as a first line of defense, but the backend should still enforce its own security measures and validate requests for complete protection.</p>
+</blockquote>
+<p> Setting this up was <em>mostly</em> straightforward. The first thing I needed to do was to expose my keys as a <a href="https://openid.net/specs/draft-jones-json-web-key-03.html">JWKS</a> endpoint. I did this using the <a href="https://github.com/cisco/node-jose">node-jose</a> library for Node. If you’re interested in the details of this let me know in the comments.</p>
+<p>Now when I hit my JWKS endpoint I get this:</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;keys&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;kty&quot;</span><span class="punctuation">:</span> <span class="string">&quot;RSA&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;kid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;DATA&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;use&quot;</span><span class="punctuation">:</span> <span class="string">&quot;sig&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;alg&quot;</span><span class="punctuation">:</span> <span class="string">&quot;RS256&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;e&quot;</span><span class="punctuation">:</span> <span class="string">&quot;DATA&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;n&quot;</span><span class="punctuation">:</span> <span class="string">&quot;DATA&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Next step is to connect KrakenD to my JWKS Endpoint. This is done by adding an auth&#x2F;validator to the Endpoint’s extra_config section:</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="attr">&quot;extra_config&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;auth/validator&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;alg&quot;</span><span class="punctuation">:</span> <span class="string">&quot;RS256&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;jwk_url&quot;</span><span class="punctuation">:</span> <span class="string">&quot;https://MyEndPoint/jwks&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;operation_debug&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>That’s it. Incoming requests that provide a token are authenticated using the information in the JWKS.</p>
+<p>There was one snag. I was receiving this error:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">▶ ERROR [ENDPOINT: /v1/atms][JWTValidator] Unable to validate the token: algorithm is invalid</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>If you run into trouble set the operation_debug property to true on the auth&#x2F;validator.</p>
+</blockquote>
+<p>This was curious because my tracing showed that my JWKS endpoint was not being hit at all. It turns out that this error can also happen if there are connectivity issues. The issue was that my containers were not talking to each other. I fixed this and all was fine.</p>
+<h2 id="Parameter-Forwarding"><a href="#Parameter-Forwarding" class="headerlink" title="Parameter Forwarding"></a>Parameter Forwarding</h2><img src="ka3.png" width="500px"/>
+
+<p>By default KrakenD will not automatically forward the Authorization header to the downstream system. To do this add ‘Authorization’ to the input_headers array of the endpoint.</p>
+<h2 id="Authentication-Options"><a href="#Authentication-Options" class="headerlink" title="Authentication Options"></a>Authentication Options</h2><p>KrakenD allows a lot of flexibility in terms of how tokens are processed. You can test for specific Scopes, the Issuer, the Audience and specific roles. In addition you can cache results to improve performance for repeated validations. This is all done via the auth&#x2F;validator object. For example to constrain the audience to ‘<a href="https://www.mcb.mu/api">https://www.mcb.mu/api</a>‘ and add caching:</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="attr">&quot;extra_config&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;auth/validator&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;alg&quot;</span><span class="punctuation">:</span> <span class="string">&quot;RS256&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;jwk_url&quot;</span><span class="punctuation">:</span> <span class="string">&quot;https://MyEndPoint/jwks&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;audience&quot;</span><span class="punctuation">:</span> <span class="string">&quot;https://www.mcb.mu/api&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;cache&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="Claim-Extraction"><a href="#Claim-Extraction" class="headerlink" title="Claim Extraction"></a>Claim Extraction</h2><p>KrakenD can extract claims from the token and use them in the requests made to downstream services. For example I would like to take my Subject claim and inject it as a HTTP Header with the key ‘x-user’.</p>
+<p>This can be achieved via the propagate_claims property of the auth&#x2F;validator.</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="attr">&quot;extra_config&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;auth/validator&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;propagate_claims&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">      <span class="punctuation">[</span><span class="string">&quot;sub&quot;</span><span class="punctuation">,</span> <span class="string">&quot;x-user&quot;</span><span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Note you will also have to add the x-user header to the input_headers array otherwise KrakenD will block it.</p>
+</blockquote>
+<p>Here’s the result. Note the ‘x-user’ header in the debug trace.</p>
+<img src="ka4.png"/>
+
+<h2 id="Debugging"><a href="#Debugging" class="headerlink" title="Debugging"></a>Debugging</h2><p>If it’s not working start by <a href="https://jwt.io/">decoding</a> your token and ensuring that the claims and expiry dates are valid. </p>
+<img src="ka2.png">
+
+<p>If that does not work KrakenD provides a __debug endpoint to help you figure out what’s going on. To use this:</p>
+<ul>
+<li>Set the debug_endpoint to ‘true’.</li>
+<li>Set your log level to ‘DEBUG’. </li>
+<li>Add a new backend that points to KrakenD as the Host and ‘&#x2F;__debug’ as the URL.</li>
+</ul>
+<p>With this in place KrakenD will log everything that is sent to the __debug endpoint so that you can see if anything is being filtered out or mismatched.</p>
+<h2 id="Next-Steps"><a href="#Next-Steps" class="headerlink" title="Next Steps"></a>Next Steps</h2><p>The next thing I’d like to play with is seeing how I can shape the request and response messages as they pass through the gateway. For example seeing if I can get the gateway to filter out specific properties of fields with specific patterns. </p>
+]]></content>
+      <categories>
+        <category>Release The KrakenD</category>
+      </categories>
+      <tags>
+        <tag>devops</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Adding Link Preview to your Hexo Blog</title>
+    <url>/2023/06/03/link-preview/</url>
+    <content><![CDATA[<p>As discussed <a href="https://nickmck.net/about/">here</a>, I use Hexo for this Blog. When sharing to LinkedIn or Twitter I noticed that my links were lacking the title image for the blog post. For example:</p>
+<img src="lp1.png" />
+
+<p>The Link Preview image is controlled via the <a href="https://ogp.me/">OG Meta Tag</a>. The question is how to add these tags via Hexo. </p>
+<p>There are two steps. </p>
+<h1 id="Front-Matter"><a href="#Front-Matter" class="headerlink" title="Front Matter"></a>Front Matter</h1><p>Each Hexo post contains a [Front Matter] (<a href="https://hexo.io/docs/front-matter.html">https://hexo.io/docs/front-matter.html</a>) section that contains the post’s metadata such as Title, Tags etc. Any data added to this section is parsed into the Page object for use during rendering. All that’s needed then is to add the data we want to use in the OG Meta tags. Here Ive added a new tag ‘ogimage’ to hold the data.</p>
+<img src="lp3.png"/>
+
+<h1 id="Template-update"><a href="#Template-update" class="headerlink" title="Template update"></a>Template update</h1><p>The last thing to do is update the EJS template used to render the page headers. This is found under ‘Themes&#x2F;<Theme Name>&#x2F;layout&#x2F;_partial’. Simply add some code to render the meta tags if the value is provided in the post. For example:</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&lt;% <span class="keyword">if</span> (page.<span class="property">ogimage</span>)&#123; %&gt;</span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">property</span>=<span class="string">&quot;og:image&quot;</span> <span class="attr">content</span>=<span class="string">&quot;&lt;%= page.ogimage %&gt;&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">property</span>=<span class="string">&quot;og:description&quot;</span> <span class="attr">content</span>=<span class="string">&quot;&lt;%= page.excerpt %&gt;&quot;</span>/&gt;</span></span></span><br><span class="line">&lt;% &#125; %&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="All-Done"><a href="#All-Done" class="headerlink" title="All Done"></a>All Done</h1><p>Now when you generate your site the OG metadata is set if you provided the data in your Front Matter. It should look something like this:</p>
+<img src="lp2.png" width="300px"/>
+
+<p>Happy blogging…</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Real-time Dashboards with OpsGenie and PowerBI</title>
+    <url>/2023/06/02/opsgenie-dashboard/</url>
+    <content><![CDATA[<img src="og7b.jpg"/>
+
+<p>We use OpsGenie for Alert Management. Our intention is to have all alerts surfaced in OpsGenie as this gives us an end-to-end view of what’s happening in the environment. Whilst OpsGenie provides a serviceable user interface and mobile tools one thing it lacks is the ability to build dashboards to visualise the information. This week I built a solution using PowerBI.</p>
+<p>There are many ways to do this but I did not want to build something from scratch. Ideally I wanted something that would work with minimal or no code and allow us to easily create new dashboards. Since PowerBI is my go-to for reports and dashboards I wanted to see if there was a way to get it to talk to OpsGenie. Turns out there is, with a little help from PowerAutomate.</p>
+<p>Here’s the plan:</p>
+<iframe frameborder="0" style="width:100%;height:200px;" src="https://viewer.diagrams.net/?highlight=0000ff&nav=1#R1VZNc5swEP01HNsBZLB7rD%2BaZMadZOpDm6MMG1AiECOEgf76LmYxpjROOuNJnJO1Tytp9%2B3bNRZbJNWV5ln8XYUgLdcOK4stLdd1mO3jT4PULTL1Ji0QaRGSUw9sxG8g0Ca0ECHkA0ejlDQiG4KBSlMIzADjWqty6Pag5PDVjEcwAjYBl2P0pwhN3KIzz%2B7xaxBR3L3s2LST8M6ZgDzmoSqPILay2EIrZdpVUi1ANuR1vLTnvj2zewhMQ2pec2AVBPdCOU%2Fxjy%2BpcB4XVTBdf6Ji5KbuEoYQ8ydTaROrSKVcrnp0rlWRhtDcaqPV%2B6yVyhB0EHwEY2oqJi%2BMQig2iaRdDFjXv%2Bj83rhvjM9eZy6r481lTVYbaxPgsxQQlKtCB3Ai705KXEdgTvixQ6FQ4aASwHjwnAbJjdgN4%2BAktejg11cDF1SQ%2FygO3bvjsqCXbrP8ClIBo6qVsTCwyfg%2B6RJbccg4z7O2OR5E1VSOqNyBNlCdJnOcPB2Yka6psVnXseVRmxAUH3VIh52dLf8jSXlv3YEWmDvo8%2BubvVLf3nvqm430fadKZMO1vyLROEAvQufu5MKE7o1o2xgNPBFpZLm%2BxOfnWyTRj5rVkhueowT%2BJhL%2FjbJmGdRSYAtohr4vkLttm2W9PQA8eIr2LXRbGLwGCM%2FbbnG88xRgYr9cgOlbFmD2rpPGuaxJM%2F0Ik2b670kzv7mEAeP5bzZg0Ow%2FOPd7R5%2FtbPUH"></iframe>
+
+<h1 id="Streaming-Datasets"><a href="#Streaming-Datasets" class="headerlink" title="Streaming Datasets"></a>Streaming Datasets</h1><p>You could create this solution by pushing events from OpsGenie to a database but I wanted something simple and real-time. As it happens, PowerBI provides a facility for this in the form of ‘Streaming Datasets’. Essentially this provides an API for you to push events to and then build reports on top of this store. Events can be real-time only or you can retain the history.</p>
+<p>I started by creating a Streaming Dataset with the following fields:</p>
+<img src="og1.png" width="300px"/>
+
+<blockquote>
+<p>You can create your Streaming Dataset from your PowerBI workspace by selecting New…Streaming Dataset and follow the prompts.</p>
+</blockquote>
+<p>Once the Streaming Dataset is created you can post your data my making an API call. For example:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">curl --include \</span><br><span class="line">--request POST \</span><br><span class="line">--header <span class="string">&quot;Content-Type: application/json&quot;</span> \</span><br><span class="line">--data-binary <span class="string">&quot;[</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">\&quot;Integration\&quot; :\&quot;AAAAA555555\&quot;,</span></span><br><span class="line"><span class="string">\&quot;Created\&quot; :\&quot;2023-05-26T11:24:08.057Z\&quot;,</span></span><br><span class="line"><span class="string">\&quot;Severity\&quot; :\&quot;AAAAA555555\&quot;,</span></span><br><span class="line"><span class="string">\&quot;Message\&quot; :\&quot;AAAAA555555\&quot;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">]&quot;</span> \</span><br><span class="line"><span class="string">&quot;https://api.powerbi.com/beta/XXX/datasets/XXX/rows?experience=power-bi&amp;key=XXX&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="Power-Automate"><a href="#Power-Automate" class="headerlink" title="Power Automate"></a>Power Automate</h1><p>The next step was to get OpsGenie to update the Streaming Dataset when a new alert was created. Whilst OpsGenie does provide an HTTP Integration it does not allow you to control the request format. I needed something that could format the request and possibly add some additional logic. Not wanting to build a custom service for this I used Power Automate.</p>
+<p>This turned out to be quite a simple flow to build. It’s an HTTP trigger which in turn calls the built-in PowerBI connector.</p>
+<img src="og2.png"/>
+
+<h1 id="OpsGenie"><a href="#OpsGenie" class="headerlink" title="OpsGenie"></a>OpsGenie</h1><p>Last thing to do was to get OpsGenie to call the Power Automate flow when a new alert is created. This can be done by using the OpsGenie Webhook integration.</p>
+<img src="og3.png"/>
+
+<h1 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h1><p>At this point we have an OpsGenie Webhook integration that will call the Power Automate flow when a new alert is created. This will, in turn, call the PowerBI Streaming Dataset passing a subset of the alert information. Let’s give it a test…</p>
+<p>First thing to do - create a Test Alert.</p>
+<img src="og4.png"/>
+
+<p>Next check if the alert was received in Power Automate.</p>
+<img src="og5.png"/>
+
+<h1 id="Power-BI-Report"><a href="#Power-BI-Report" class="headerlink" title="Power BI Report"></a>Power BI Report</h1><p>At this point the data is waiting in the Streaming Dataset. All that remains is to create a Power BI Report or Dashboard on top of it.</p>
+<p>Here’s a simple one I created showing Alerts over time as well as the details and split by team.</p>
+<img src="og6.png"/>
+
+<h1 id="Next-Steps"><a href="#Next-Steps" class="headerlink" title="Next Steps"></a>Next Steps</h1><p>At present I get a real-time feed as new alerts are created but I would also want to remove alerts once they are closed on OpsGenie. This would allow me to create a Red-Amber-Green view of the various systems. I think this can be done by adding some additional logic to the Power Automate flow and creating a new Streaming Dataset to store the overall status. Will try this next. </p>
+]]></content>
+      <tags>
+        <tag>devops</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Configuring Swagger Security</title>
+    <url>/2023/05/17/swagger-sec/</url>
+    <content><![CDATA[<p>I ran into a challenge getting authentication working in Swagger. I wanted people to be able to use the API directly from Swagger. This meant ensuring that Swagger sends a Bearer token with each request. I thought this would be simple, but it took a bunch of searching to get everything working the way I wanted. Here’s what I learned….</p>
+<h1 id="The-basics"><a href="#The-basics" class="headerlink" title="The basics"></a>The basics</h1><p>To enable a bearer token in OpenApi 3.0 you need to add a definition for the security schema as well as an indication of where to use the schema.</p>
+<p>Here’s the security schema declaration:</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="attr">components:</span></span><br><span class="line">    <span class="attr">schemas:</span></span><br><span class="line">    <span class="attr">securitySchemes:</span></span><br><span class="line">        <span class="attr">BearerAuth:</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">http</span></span><br><span class="line">            <span class="attr">scheme:</span> <span class="string">bearer</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Here is how you indicate it should be used. In this case we are saying that we want all operations to use the ‘BearerAuth’ schema.</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="attr">security:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">BearerAuth:</span> []</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>In theory this is all that should have been necessary to get this to work. With this in place you should be able click ‘Authorize’, provide your Bearer token and use the API.</p>
+<img src='swagger1.png'/>
+
+<img src='swagger2.png'/>
+
+<p>This was the theory but in practice Swagger was not sending the Authorization header for any requests.</p>
+<h1 id="The-context"><a href="#The-context" class="headerlink" title="The context"></a>The context</h1><p>We have a Node Express server which implements multiple OpenApi specifications. We are using swagger-jsdoc (6.2.8) and swagger-ui-express (4.6.3) to generate the Swagger interface.</p>
+<h1 id="Combining-multiple-OpenApi-specifications"><a href="#Combining-multiple-OpenApi-specifications" class="headerlink" title="Combining multiple OpenApi specifications"></a>Combining multiple OpenApi specifications</h1><p>The issue was that were combining multiple OpenApi documents into a single document at runtime. In the process the information that allowed Swagger to determine which security schema to use was being lost. As a result it assumed all operations were anonymous and so failed to send any Authorization headers. </p>
+<p>The fix was to re-add this information when we created to combined OpenApi document.</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">const</span> options = &#123; </span><br><span class="line">    <span class="attr">swaggerOptions</span>: &#123;</span><br><span class="line">      <span class="attr">url</span>: <span class="string">&quot;/docs/swagger.json&quot;</span>, <span class="comment">//Link to serve the full OpenApi doc on</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">definition</span>: &#123;</span><br><span class="line">        <span class="attr">openapi</span>: <span class="string">&#x27;3.0.0&#x27;</span>,</span><br><span class="line">        <span class="attr">info</span>: &#123;</span><br><span class="line">          <span class="attr">title</span>: <span class="string">&#x27;Inovapp Api documentation&#x27;</span>,</span><br><span class="line">          <span class="attr">version</span>: <span class="string">&#x27;1.0.0&#x27;</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">security</span>: [&#123;</span><br><span class="line">          <span class="title class_">BearerAuth</span>: [] <span class="comment">//Set BearerAuth scheme by default. Note that this scheme is already defined in the OpenApi docs so we are not restating it here.</span></span><br><span class="line">        &#125;]</span><br><span class="line">      &#125;,</span><br><span class="line">    <span class="attr">apis</span>: [<span class="string">&#x27;./openapi/*.yaml&#x27;</span>], <span class="comment">//Path to our OpenApi documents.</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> swaggerSpec = <span class="title function_">swaggerJSDoc</span>(options);  </span><br><span class="line"></span><br><span class="line">  app.<span class="title function_">get</span>(<span class="string">&quot;/docs/swagger.json&quot;</span>, <span class="function">(<span class="params">req, res</span>) =&gt;</span> res.<span class="title function_">json</span>(swaggerSpec));</span><br><span class="line">  app.<span class="title function_">use</span>(<span class="string">&#x27;/docs&#x27;</span>, swaggerUi.<span class="title function_">serveFiles</span>(<span class="literal">null</span>, options), swaggerUi.<span class="title function_">setup</span>(<span class="literal">null</span>, options));</span><br><span class="line"></span><br><span class="line">  </span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>OpenApi</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Vestigial Activities</title>
+    <url>/2023/06/07/vestigial-processes/</url>
+    <content><![CDATA[<img src="vp1.png" width="400px" style="float:left;"/>
+
+<p>In biology Vestigial Organs <em>are rudimentary anatomical structures that are retained in a species despite having lost their primary ancestral function</em>. In agile we uncover ‘Vestigial Activities’ - tasks or steps that teams continue to perform without a clear understanding of their original purpose or relevance. This blog post explores the concept of vestigial activities in agile teams, their potential negative impact, and suggests strategies for identifying and addressing them.</p>
+<p>Often steps are added to a process in response to a specific event or need. They also arise organically as part of the team’s retrospective process. In the short term these steps may add value and after a while they become ‘part of the furniture’; something the team has always done. Over time, as people come and go, the reasons for the step being added are forgotten as well as the specific problem being solved. If the activity is still quietly adding value this is well and good - but in many cases it could be actively impeding the team. </p>
+<p>A pernicious form of this situation arises when attempts are made to ‘standardise’ processes across teams in large organisations. Although this is typically done with good intentions, it can inadvertently introduce a set of vestigial activities into the process. The original intent behind these activities becomes obscured, and teams may be hesitant to question or challenge the dogma of the “official” process.</p>
+<p>So what’s to be done?</p>
+<h2 id="Process-Ownership"><a href="#Process-Ownership" class="headerlink" title="Process Ownership"></a>Process Ownership</h2><p>Teams must own their process. I’m all for having organisational standards, principles and guidelines but at the end of the day the experiences and needs of a team are unique. Mandating a one-size-fits-all approach negates this reality. </p>
+<blockquote>
+<p>This does not mean that teams can’t share ideas or good practices. Or even that you can’t have a default template to get new teams started. What you should be wary of is thinking that a single set of steps will work equally well for all teams in all situations.</p>
+</blockquote>
+<h2 id="Continuous-Inspection-and-Improvement"><a href="#Continuous-Inspection-and-Improvement" class="headerlink" title="Continuous Inspection and Improvement"></a>Continuous Inspection and Improvement</h2><p>Owning their process means more than just being able to add and remove steps as they seem fit. It means actively interrogating each step, identifying bottlenecks and striving to improve the overall process.</p>
+<p>When steps are added or removed from a team’s process there should be a specific hypotheses associated with it and a time-box set. For example, a team may hypothesize that moving step X before step Y will increase velocity and reduce rework. They can then commit to running this experiment for a defined period, such as two sprints, before conducting a thorough review.</p>
+<p>If the new step adds the expected value then it can be retained. If not adjust the approach and try again. Once the process has been optimised however it is critical that the team periodically revisit the process. Does each step make sense? Do we all know why this step exists? Are there clear entry and exit conditions from each step? It can also be useful to look at the process from a quantitative perspective - how long does a work item spend in each step? Do we limit the number of items in each step?</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>Vestigial activities can hinder the effectiveness and efficiency of agile teams. By recognizing their presence, taking ownership of the process, and actively interrogating each step, teams can identify and address these activities. Experimentation and time-boxing can help teams evaluate changes and continuously improve their processes. Agile methodologies thrive on adaptability, and by shedding vestigial activities, teams can optimize their workflows and deliver better results.</p>
+]]></content>
+      <tags>
+        <tag>Agile</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Release the KrakenD. Part 1 - Metrics</title>
+    <url>/2023/06/23/release-the-krakend/</url>
+    <content><![CDATA[<img src="./k1.png" />
+
+<p>We are currently looking for a API Gateway. Ideally I’d like something that is Open Source, DevOps friendly and has first class support for OpenApi in addition to its general API Gateway features. Today I’m playing with the excellently named <a href="https://www.krakend.io/">KrakenD</a>…</p>
+<h1 id="The-Scenario"><a href="#The-Scenario" class="headerlink" title="The Scenario"></a>The Scenario</h1><p>To put KrakenD through its paces I’ve got a simple API created in Node that uses JWT for authentication. I’m going to use KrakenD to see how I can add Logging, Metrics, Security and Request&#x2F;Response modification. This will most likely be too much for one post so I’ll split these into a series.</p>
+<h1 id="Running-KrakenD-locally"><a href="#Running-KrakenD-locally" class="headerlink" title="Running KrakenD locally"></a>Running KrakenD locally</h1><p>I’m running KrakenD on my local machine via Docker. Here’s the command:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -p 8080:8080 -v $PWD:/etc/krakend/ devopsfaith/krakend run --config /etc/krakend/krakend.json</span><br></pre></td></tr></table></figure>
+
+<p>Before doing this though you’ll need to create a krakend.json file.</p>
+<h1 id="Basic-Setup"><a href="#Basic-Setup" class="headerlink" title="Basic Setup"></a>Basic Setup</h1><p>KrakenD uses a single json file for its configuration. You can create this manually or via the <a href="https://designer.krakend.io/#!/">designer</a>.</p>
+<p>Here’s my initial setup:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;$schema&quot;: &quot;https://www.krakend.io/schema/v3.json&quot;,</span><br><span class="line">  &quot;version&quot;: 3,</span><br><span class="line">  &quot;name&quot;: &quot;KrakenD - API Gateway&quot;,</span><br><span class="line">  &quot;extra_config&quot;: &#123;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;timeout&quot;: &quot;3000ms&quot;,</span><br><span class="line">  &quot;cache_ttl&quot;: &quot;300s&quot;,</span><br><span class="line">  &quot;output_encoding&quot;: &quot;json&quot;,</span><br><span class="line">  &quot;endpoints&quot;: [</span><br><span class="line">    &#123;</span><br><span class="line">      &quot;endpoint&quot;: &quot;/v1/atms&quot;,</span><br><span class="line">      &quot;method&quot;: &quot;GET&quot;,</span><br><span class="line">      &quot;output_encoding&quot;: &quot;json&quot;,</span><br><span class="line">      &quot;backend&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">          &quot;url_pattern&quot;: &quot;/bank/atms/&quot;,</span><br><span class="line">          &quot;encoding&quot;: &quot;json&quot;,</span><br><span class="line">          &quot;sd&quot;: &quot;static&quot;,</span><br><span class="line">          &quot;method&quot;: &quot;GET&quot;,</span><br><span class="line">          &quot;is_collection&quot;: true,</span><br><span class="line">          &quot;host&quot;: [</span><br><span class="line">            &quot;https://foo.azurewebsites.net&quot;</span><br><span class="line">          ],</span><br><span class="line">          &quot;disable_host_sanitize&quot;: false</span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Note the ‘is_collection’ flag - this is required when the service returns an array. If not present you would receive an error ‘json: cannot unmarshall array into Go value of type map[string]interface {}’.</p>
+</blockquote>
+<p>This is setting up KrakenD to act as a gateway for my Bank Api running in Azure. To test this I hit ‘<a href="http://localhost/v1/atms">http://localhost/v1/atms</a>‘ and I should see the result from ‘<a href="https://foo.azurewebsites.net/bank/atms">https://foo.azurewebsites.net/bank/atms</a>‘.</p>
+<img src="k2.png"/>
+
+
+<h1 id="Metrics"><a href="#Metrics" class="headerlink" title="Metrics"></a>Metrics</h1><p>To configure KrakenD to collect metrics you add the following to the extra_config section.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;extra_config&quot;: &#123;</span><br><span class="line">  &quot;telemetry/metrics&quot;: &#123;</span><br><span class="line">    &quot;collection_time&quot;: &quot;60s&quot;,</span><br><span class="line">    &quot;proxy_disabled&quot;: false,</span><br><span class="line">    &quot;router_disabled&quot;: false,</span><br><span class="line">    &quot;backend_disabled&quot;: false,</span><br><span class="line">    &quot;endpoint_disabled&quot;: false,</span><br><span class="line">    &quot;listen_address&quot;: &quot;:8090&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+<p>  The metrics can then be accessed via the port specified by the listen_address parameter. Hitting <a href="http://localhost:8090/__stats">http://localhost:8090/__stats</a> results in:</p>
+  <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">  &#123;</span><br><span class="line">&quot;cmdline&quot;: [</span><br><span class="line">&quot;krakend&quot;,</span><br><span class="line">&quot;run&quot;,</span><br><span class="line">&quot;--config&quot;,</span><br><span class="line">&quot;/etc/krakend/krakend.json&quot;</span><br><span class="line">],</span><br><span class="line">&quot;krakend.proxy.latency.layer.backend.name./bank/atms/.complete.false.error.false.50-percentile&quot;: 0,</span><br><span class="line">&quot;krakend.proxy.latency.layer.backend.name./bank/atms/.complete.false.error.false.75-percentile&quot;: 0,</span><br><span class="line">&quot;krakend.proxy.latency.layer.backend.name./bank/atms/.complete.false.error.false.95-percentile&quot;: 0,</span><br></pre></td></tr></table></figure>
+
+<p>You can consume these via the endpoint but KrakenD ships out of the box with <a href="https://opencensus.io/">Opencensus</a> support.</p>
+<img src="k3.png" width="500px"/>
+
+<p>To configure Zipkin for example just add the following to extra_config:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;telemetry/opencensus&quot;: &#123;</span><br><span class="line">  &quot;sample_rate&quot;: 100,</span><br><span class="line">  &quot;reporting_period&quot;: 0,</span><br><span class="line">  &quot;exporters&quot;: &#123;</span><br><span class="line">    &quot;zipkin&quot;: &#123;</span><br><span class="line">      &quot;collector_url&quot;: &quot;http://192.168.68.113:9411/api/v2/spans&quot;,</span><br><span class="line">      &quot;service_name&quot;: &quot;krakend&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>You can then view your traces in Zipkin:<br><img src="k4.png"></p>
+<h1 id="Next-Steps"><a href="#Next-Steps" class="headerlink" title="Next Steps"></a>Next Steps</h1><p>So far KrakenD has been a well-behaved sea monster. Set-up was easy and the documentation is clear. The Designer is really cool as it helps you create a mental model of how the json config is structured but also helps you see what features are available without having to read all the docs. At this point I have a simple example working and logging and metrics configured so that I can see what’s happening. In the next article I’m going to play with JWT Token validation and see if I can get the wee beastie to validate our tokens for us.</p>
+]]></content>
+      <categories>
+        <category>Release The KrakenD</category>
+      </categories>
+      <tags>
+        <tag>devops</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>TDD - Triggering Dopamine Development</title>
+    <url>/2023/05/17/tdd-dopamine/</url>
+    <content><![CDATA[<p>The other morning I attended an excellent talk by <a href="https://www.linkedin.com/in/andrew-richardson-b3586819/">Andrew Richardson</a> on the importance of having small goals. One of the points Andrew made was that completing a task, however small, triggers the release of Dopamine - the neurotransmitter associated with feelings of pleasure and satisfaction. This got me thinking about whether or not this could be a factor in Test-Driven Development (TDD).</p>
+<p>One of the things I’ve always liked about TDD is the feeling of constantly making progress. The cycle of Red-Green-Refactor keeps me focused and every time a new test passes I feel like I’m getting somewhere. If one looks at this as a series of small tasks the Dopamine angle makes perfect sense. The process of creating a failing test, making it pass and finally refactoring is essentially setting and achieving small tasks. Dopamine FTW!</p>
+<p>Making constant progress and feel-good chemicals aside there are some other benefits I’ve found with TDD:</p>
+<p><strong>Confidence Building.</strong> TDD allows me to try things and quickly rollback to a working state if they don’t work out as planned. If I see a potential refactor I can make it and get fast feedback about any side-effects. </p>
+<p><strong>Faster ‘Inner Loop’</strong>.  TDD makes my Inner Loop faster because I spend negligible time in the debugger. Spinning up a test environment (taking minutes) to hit a break-point, look at some values, change a line of code and then do it again is painfully slow. With TDD I can generally avoid this.</p>
+<blockquote>
+<p>The ‘Inner Loop’ is “The iterative process of writing, building and debugging code that a single developer performs before sharing the code, either publicly or with their team.”.</p>
+</blockquote>
+<p><strong>Leaves a Rough Edge.</strong> In pottery ‘leaving a rough edge’ means to leave a piece of obviously unfinished work so that you can get back to the flow of creating quickly. If I need to stop coding I will leave a failing test as a ‘rough edge’. When I come back I start the failing test provides an obvious starting point. I also create stubs of failing tests as I go reminding me to cover edge cases. This means I have an executable task list. When all the ‘tasks’ are green then I am done. </p>
+<p><strong>Documentation.</strong> I’m not a big fan of traditional documentation in the form of Confluence, Word Docs or Code Comments. As Ron Jeffries says “Code never lies, comments sometimes do”. TDD creates executable documentation that explains the intended behavior of the code. This helps developers who come after (in many cases ‘future me’) to understand what I was trying to do. </p>
+<p>So if you’re curious about TDD and&#x2F;or want to get your daily Dopamine fix then why not give TDD a go? </p>
+]]></content>
+      <tags>
+        <tag>TDD</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>TDD - Advice for Beginners</title>
+    <url>/2016/03/21/tdd-for-beginners/</url>
+    <content><![CDATA[<p>The other day I read an article by Ian Sommerville describing his experiences with Test Driven Development (TDD) and his ultimate conclusion that TDD is fundamentally flawed. Robert Martin quickly posted an excellent response pointing out that what Sommerville was experiencing was typical of people new to Test Driven Development. Whilst Martin’s response pulls no punches in pointing out the source of Sommerville’s issues it does not really leave any practical advice for someone struggling with learning TDD. </p>
+<p>Sommerville’s article struck a chord with me because what he was describing was so similar to my own experiences whilst learning TDD. Brittle tests and the feeling that somehow I was perverting the code in order to pass a test haunted me to the point that I nearly came to same conclusion as Sommerville. Ultimately though these issues were, as Martin points out, symptoms of being an amateur. I kept going and many, many tests later have got to the point where I am comfortable with TDD.</p>
+<p>My advice for someone struggling with TDD would be as follows:</p>
+<h2 id="Take-Smaller-Steps"><a href="#Take-Smaller-Steps" class="headerlink" title="Take Smaller Steps"></a>Take Smaller Steps</h2><p>Sommerville describes TDD as follows: “Test-first or test-driven driven development (TDD) is an approach to software development where you write the tests before you write the program”. This is not an accurate description of TDD. Many developers reading this will conclude that you need to write the whole test first, before you write any production code. This simple misunderstanding of the process of TDD is at the core of many of the issues people have with TDD. </p>
+<p>When you write the whole test first you are robbing yourself of the ability to learn from the process of TDD. The key phrase here is Test DRIVEN. The Tests DRIVE the development. If you write the whole test first you are making a number of untested assumptions about how the code will play out and then forcing the production code to fit in with those assumptions. This leads to many of the issues that Sommerville describes.</p>
+<h2 id="You-need-to-take-smaller-steps"><a href="#You-need-to-take-smaller-steps" class="headerlink" title="You need to take smaller steps."></a>You need to take smaller steps.</h2><p>Try this: Write enough test code to fail the test (and a compilation error is a failing test). Write enough production code to make the test pass or clear the compilation error. Refactor the code you have just written and repeat the process until the unit test passes completely. For a short description read The Three Rules of TDD. For a detailed one read Kent Beck’s TDD By Example.</p>
+<p>Many developers balk at this process. It feels unnatural. Which, if you have been happily coding for years, it would be. You would not always apply TDD like this but for learning TDD it really helps ingrain the cadence and cognitive processes involved. What I find is that the more uncertain I am of the design the smaller the increment I work in - almost down to a 1:1 ratio of test to production code. As the design emerges and I become more confident I move in larger steps. But never straying from the basic pattern. All production code is written in the service of passing a test. This ensures that I only write code I need. </p>
+<p>When I find people struggling with tests it is often because they have broken out of the pattern and are implementing reams of production code. The impact of this on the TDD process is that by the time you return to the test the production code may be completed. You then need to retrofit the test to match your production code. At this point the Test is not Driving the development it is a Passenger. Tests written in this fashion are typically brittle and the number of tests written for a piece of functionality is generally less. </p>
+<h2 id="Get-a-Coach"><a href="#Get-a-Coach" class="headerlink" title="Get a Coach"></a>Get a Coach</h2><p>Becoming proficient at TDD is not easy. It is a skill and, as with all skills, it takes time and effort to master. This is where I think many developers, especially experienced ones, go wrong. They expect to pick up TDD after reading a couple of articles and looking at some example tests. Their initial enthusiasm is soon extinguished by the frustrations of learning TDD and ultimately they give up all together. </p>
+<p>It makes a huge difference to have someone who has done this before helping you. To point out alternatives or show you how to make the design more testable. It also helps to keep the enthusiasm up. If everyone in the team is new to TDD it is easy for any frustrations to boil over into defeatism. </p>
+<h2 id="Practice-Practice-Practice"><a href="#Practice-Practice-Practice" class="headerlink" title="Practice, Practice, Practice"></a>Practice, Practice, Practice</h2><p>Trying to apply TDD for the first time to your current or new project at work is difficult. There are all sorts of other factors that complicate the process - time, budget and legacy code all conspire against the application of TDD. I often here this: “We started with TDD but it was taking so long our project manager said that we don’t have time for it.”. </p>
+<p>My suggestion is to become proficient at the basic process of TDD before trying to apply it to a real-world scenario. There are hundreds of practice examples, also called Katas, for TDD. If you can’t do a basic kata such as String Calculator then you are not ready to start applying this at work. </p>
+<p>Another great way to learn is at code camps and hackathons. Here you will be exposed to different views and approaches to TDD in a fun and open environment. It’s a great way to confirm and extend your own views.</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>The response to novice frustrations sometimes tends to ‘If it is not working then you are not doing it right’. This is not constructive and, in the absence of any constructive advice, can be construed as zealotry. I’ve outlined here some of the things that helped me with TDD and hope it will help you as well.</p>
+]]></content>
+      <categories>
+        <category>Software Engineering</category>
+      </categories>
+      <tags>
+        <tag>TDD</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Team Topologies Applied</title>
+    <url>/2023/04/18/team-topo/</url>
+    <content><![CDATA[<img src="/images/TT-Logo.png" class="" width="350" title="Team Topologies">
+
+<p>Team size and structure is a common topic of discussion in software engineering at scale, and while the “2 Pizza” team concept popularized by Amazon can be a helpful starting point, it may not be enough. When pizzas are being delivered by the truckload, a different set of tools and strategies is required to manage the complexity and ensure successful outcomes.</p>
+<p>Enter Team Topologies…</p>
+<p>This book introduces a model for thinking about how teams are structured and interact. I see it as providing a Domain Model for thinking about how to structure teams. By aligning on the ubiquitous language provided by the model we can have better conversations about how our teams are structured.</p>
+<p>Team Topologies describes 4 fundamental team types and 3 modes of interaction. Before getting to these, there are three concepts which underpin the model: Team Size, Conway’s Law and Cognitive Load.</p>
+<h1 id="Team-Size"><a href="#Team-Size" class="headerlink" title="Team Size"></a>Team Size</h1><p>The recommended team size discussed is 7-9 people, never exceeding 15. This sizing is based on Dunbar’s Number which describes the number of close, trusted, relationships one may have in a group. Exceeding this number impacts team performance as trust diminishes with scale and the communications overhead increases.</p>
+<h1 id="Reverse-Conway-Manoeuver"><a href="#Reverse-Conway-Manoeuver" class="headerlink" title="Reverse Conway Manoeuver"></a>Reverse Conway Manoeuver</h1><p>Conway’s law states that:</p>
+<blockquote>
+<p>Any organization that designs a system (defined broadly) will produce a design whose structure is a copy of the organization’s communication structure.</p>
+</blockquote>
+<p>I’ve heard this summarised as “You ship your org-chart.” Whilst pithy this is not a precise characterization of the law itself. Instead, Conway’s Law suggests that the way that people communicate and collaborate within an organization has a profound impact on the systems they build, and that organizations should be mindful of this when designing their structures and processes. </p>
+<p><img src="/images/TT-Team.png" alt="Is this the org chart or the architecture?"></p>
+<p>For a more tangible example consider an organisation that has a “Front End Team”, “Services Team”, “Integration Team” and “Core Banking Team”. It would not be surprising to see that the Software Architecture closely models this structure. One could argue that the teams were created this way to serve the architecture - but often it’s the other way around - the architecture is a consequence of the organisation of the people.</p>
+<p>Team Topologies suggests that we hack this relationship - what they call the ‘Reverse Conway Manoeuver’. Design the teams to reflect the architecture you want. Change the people and interactions and the software will follow.</p>
+<h1 id="Cognitive-Load"><a href="#Cognitive-Load" class="headerlink" title="Cognitive Load"></a>Cognitive Load</h1><p>Team Topologies discusses cognitive load in the context of organizing teams for optimal productivity and innovation. Cognitive load refers to the amount of mental effort required to complete a particular task or set of tasks. High cognitive load can lead to reduced productivity and increased errors, while low cognitive load can lead to boredom and disengagement. </p>
+<h1 id="Team-Types"><a href="#Team-Types" class="headerlink" title="Team Types"></a>Team Types</h1><p>Team Topologies categorises teams as one of four types:</p>
+<p><strong>Stream-aligned teams</strong> - focused on delivering business value, work on end-to-end product delivery, and align around a specific value stream or product.</p>
+<p><strong>Enabling teams</strong> - enable and support stream-aligned teams with specific skills and tools needed to achieve their goals.</p>
+<p><strong>Complicated subsystem teams</strong> - specialize in complex or specialized subsystems, which can be shared across multiple stream-aligned teams.</p>
+<p><strong>Platform teams</strong> - build and maintain shared platforms and services that are used by multiple stream-aligned teams.</p>
+<p>These team types are fractal in that a team may be composed of multiple teams. For example a Platform Team could be comprised of an Enabling Team and several Stream-Aligned Teams.</p>
+<h1 id="Interaction-Models"><a href="#Interaction-Models" class="headerlink" title="Interaction Models"></a>Interaction Models</h1><p>Team Topologies describes three Interaction Models for teams:</p>
+<p><strong>Collaboration:</strong> This is a model where teams work closely together, sharing skills and knowledge to achieve a common goal. Collaboration can be useful for teams that need to work together to deliver a particular feature or product. Note that this is this the highest-bandwidth (read costly) communication style.</p>
+<p><strong>X-as-a-Service:</strong> In this model, teams provide a service or capability to other teams, acting as an internal service provider. This model can be useful for teams that specialize in a particular technology or platform and can provide value to other teams.</p>
+<p><strong>Facilitation:</strong> In this model, a team acts as a facilitator, providing a framework or set of tools that enable other teams to work more effectively. This model can be useful for teams that specialize in areas such as DevOps or Agile methodologies, and can provide guidance and support to other teams.</p>
+<h1 id="Team-Topologies-Applied"><a href="#Team-Topologies-Applied" class="headerlink" title="Team Topologies Applied"></a>Team Topologies Applied</h1><p>Team Topologies gives us a model and a language to discuss team structures. This allows us to highlight the presence of team ‘anti-patterns’, for example teams that are too big or have too much cognitive load, and suggests approaches to address them. </p>
+<p>In a future my intention is to discuss some of the ‘anti-patterns’ we’ve identified in our environment and describe our experiences in dealing with them. In the meantime please take a look at Team Topologies - it’s an excellent read.</p>
+]]></content>
+      <categories>
+        <category>Team Topologies</category>
+      </categories>
+      <tags>
+        <tag>Agile</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Sidecar Logging in Openshift with Fluentd and Elasticsearch</title>
+    <url>/2023/08/05/sidecar-logging/</url>
+    <content><![CDATA[<p>We use Elasticsearch for logging in our Openshift environments. This means that each application needs to figure out how to aggregate their logs and ship them to Elasticsearch. This duplication of effort is wasteful and increases maintenance costs as a change at Elasticsearch level must then be absorbed by each application. This approach also amplifies the impact of a security vulnerability such as the recent <a href="https://nvd.nist.gov/vuln/detail/CVE-2021-44228">Log4j</a> vulnerability in that it requires patching in multiple places. One solution would be to have a single ‘certified’ logging library however we would need one for each technology stack we use. There is another way however - the sidecar deployment.</p>
+<p>Kubernetes (k8s) allows for multiple containers to run in the same pod. These containers can share resources and dependencies, communicate with one another, and coordinate when and how they are terminated. In the ‘Sidecar Deployment’ we have one container providing a service for another. In our case what we are looking for is that the main application writes it’s logs to file and the sidecar then manages the process of shipping the logs to Elasticsearch.</p>
+<p>The solution will look like this:</p>
+<iframe frameborder="0" style="width:100%;height:400px;" src="https://viewer.diagrams.net/?highlight=0000ff&nav=1#R1Zddk5owFIZ%2FjZftQPADL%2F3cbWtbZ%2BzMuledLBwhbSRMCAr765tIICCu63bs1L0y581JJO85Dx8dZ7LN7jiOw6%2FMB9pBlp91nGkHIRt1kfxRSl4oA3dYCAEnvk4ywoo8gxYtrabEh6SRKBijgsRN0WNRBJ5oaJhztm%2BmbRht%2FmuMA2gJKw%2FTtvpAfBEWqtuzjH4PJAjLf7YtPbPFZbIWkhD7bF%2BTnFnHmXDGRDHaZhOgyrzSl2Ld%2FIXZ6sI4ROKSBaOpn%2FX5eL1Zfrv%2F%2BeM5%2FzRnnz%2BUNu8wTfWJv7grKSyZry9b5KUXnKWRD2o7u%2BOM9yERsIqxp2b3svpSC8WW6ukdcEGkjyNKgkhqgqmE9kXrc6h0yGqSPsQdsC0InsuUcrZ0WHeU3dfx3tQHuVoLa7VBZdGw7omg2tvYJgfauTe46LasAl92kQ4ZFyELWITpzKhjY6YlI5OzYMqog4W%2FQIhcI4FTwZoGQ0bEujZ%2BVFt97OlomumdD0FeBpE87roe1Fap0Cw7RI11S%2BBE%2BgVciy%2FWMmEp9%2BBc12mQMQ9AnMkbFHnKzLOdwYFiQXZNZK9e5bJTDSoLFgQkCqQ4YZHAJJLeHHfCK5jgJC5uWxuSqW64BiGo3yQEWW1CKorqhFTi1b3r%2Fk9CDBWPtZmbJgRdSIhzU4SgFiGjOL41Omx0c3T0383zQwbHTW6IMZBUnJ0h5u%2FhcC6Ew74pOJxTjw8pzIms53H95ctirIZeToksM3def%2BF6Khpi8VQJ2PsdHNrkeyrkNqD1pOgIu3elp43d5Mmx2zz1T%2BDk%2FiuaBi2jZxQn8mU0Acy98D173UWDo3tXr%2BX18ITXw7d7LUPzbXKYq33hObM%2F"></iframe>
+
+<p>This approach means that we can setup our logging container once and then use it with all of our application containers, regardless of the technology stack. In addition we can inject the sidecar via our Policy Framework when a pod is deployed. So even if the team forget to enable logging it will be there automatically. Lastly this provides isolation so that if the logging process fails the main application can continue working.</p>
+<h1 id="Logging-Container"><a href="#Logging-Container" class="headerlink" title="Logging Container"></a>Logging Container</h1><p>I’m going to use Fluentd to process the logs and send them to Elasticsearch. To do this I need to add the Elasticsearch plugin to the Fluentd Docker image and add my config file.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">FROM fluent/fluentd:edge-debian</span><br><span class="line">USER root</span><br><span class="line">RUN [&quot;gem&quot;, &quot;install&quot;, &quot;fluent-plugin-elasticsearch&quot;, &quot;--no-document&quot;, &quot;--version&quot;, &quot;5.3.0&quot;]</span><br><span class="line"></span><br><span class="line">COPY fluent.conf /fluentd/etc/</span><br><span class="line"></span><br><span class="line">COPY entrypoint.sh /bin/</span><br><span class="line">RUN chmod +x /bin/entrypoint.sh</span><br><span class="line"></span><br><span class="line">USER fluent</span><br></pre></td></tr></table></figure>
+
+<h1 id="Fluentd-Configuration"><a href="#Fluentd-Configuration" class="headerlink" title="Fluentd Configuration"></a>Fluentd Configuration</h1><p>I’m starting with a minimal configuration. We tail the log at ‘var&#x2F;log&#x2F;mcb.log’ and tag the lines with ‘mcb’. Fluent will then match any log tagged with ‘mcb’ and send it to Elasticsearch.</p>
+<p>I ran into some challenges here as I needed a specific index name to be used. Whilst I set the index_name property this did not seem to have any effect. The culprit was the logstash_format property. If this is set to ‘true’ then index_name is ignored. Switching to ‘false’ fixed the problem. </p>
+<blockquote>
+<p>If you do run into problems set the @log_level to debug at plugin level. In addition setting  with_transport_log to true will allow you to see the detailed trace associated with how the data is sent to Elastic.</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;source&gt;</span><br><span class="line">  @type tail</span><br><span class="line">  path /var/log/mcb.log</span><br><span class="line">  pos_file /var/log/td-agent/mcb.log.pos</span><br><span class="line">  tag mcb</span><br><span class="line">  &lt;parse&gt;</span><br><span class="line">    @type none</span><br><span class="line">  &lt;/parse&gt;</span><br><span class="line">&lt;/source&gt;</span><br><span class="line"></span><br><span class="line">&lt;match mcb&gt;</span><br><span class="line">  @type elasticsearch</span><br><span class="line">  @log_level debug</span><br><span class="line">  host es-dev.mcb.local</span><br><span class="line">  port 9200</span><br><span class="line">  user elastic</span><br><span class="line">  password elastic</span><br><span class="line">  scheme https</span><br><span class="line">  ssl_verify false</span><br><span class="line">  logstash_format false</span><br><span class="line">  index_name pfmdevlog</span><br><span class="line">  with_transporter_log true</span><br><span class="line">&lt;/match&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="Configuring-the-sidecar"><a href="#Configuring-the-sidecar" class="headerlink" title="Configuring the sidecar"></a>Configuring the sidecar</h1><p>We start by creating a volume for the containers to share data. This can be added to your K8S Deployment as follows:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">volumes:</span><br><span class="line">  - name: applog</span><br><span class="line">    emptyDir: &#123;&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>An <a href="https://kubernetes.io/docs/concepts/storage/volumes/">emptyDir</a> volume is first created when a Pod is assigned to a node, and exists as long as that Pod is running on that node. </p>
+<p>Next we add the sidecar container to the deployment:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">containers:</span><br><span class="line">  - name: app-container</span><br><span class="line">  ...</span><br><span class="line">  - name: mcb-logger</span><br><span class="line">    image: &gt;-</span><br><span class="line">      docker.digitalfactory.mcb.local/mcb-sre/mcb-logger@sha256:cfd8bdd41f4fa5fbe031856444a1d272a61e7f70d6f1e42d435a61c8f856ba6d</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>Finally we add a volumeMount to both containers:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">volumeMounts:</span><br><span class="line">  - name: applog</span><br><span class="line">    mountPath: /var/log/</span><br></pre></td></tr></table></figure>
+
+<p>In summary we now have 2 containers running in the pod who have a shared directory located at ‘&#x2F;var&#x2F;log’.</p>
+<h1 id="Use-of-Environment-Variables"><a href="#Use-of-Environment-Variables" class="headerlink" title="Use of Environment Variables"></a>Use of Environment Variables</h1><p>To this point I’ve hardcoded the Fluentd settings. This will not work for everyone as we use different indexes for the various applications. I need to allow each application to inject these settings when the pod is started. Fortunately Fluentd allows you to execute arbitrary Ruby code when the configuration file is parsed. This allows us the opportunity to replace values from the local ennvironment. Here’s the updated configuration:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;source&gt;</span><br><span class="line">  @type tail</span><br><span class="line">  path &quot;#&#123;ENV[&#x27;LOG_FILE&#x27;] || &#x27;/var/log/mcb.log&#x27;&#125;&quot;</span><br><span class="line">  pos_file /var/log/td-agent/mcb.log.pos</span><br><span class="line">  tag mcb</span><br><span class="line">  &lt;parse&gt;</span><br><span class="line">    @type none</span><br><span class="line">  &lt;/parse&gt;</span><br><span class="line">&lt;/source&gt;</span><br><span class="line"></span><br><span class="line">&lt;match mcb&gt;</span><br><span class="line">  @type elasticsearch</span><br><span class="line">  @log_level &quot;#&#123;ENV[&#x27;LOG_LEVEL&#x27;] || &#x27;debug&#x27;&#125;&quot;</span><br><span class="line">  host &quot;#&#123;ENV[&#x27;ES_HOST&#x27;] || &#x27;es-dev.mcb.local&#x27;&#125;&quot;</span><br><span class="line">  port &quot;#&#123;ENV[&#x27;ES_PORT&#x27;] || 9200&#125;&quot;</span><br><span class="line">  user &quot;#&#123;ENV[&#x27;ES_USER&#x27;] || &#x27;elastic&#x27;&#125;&quot;</span><br><span class="line">  password &quot;#&#123;ENV[&#x27;ES_PASSWORD&#x27;] || &#x27;elastic&#x27;&#125;&quot;</span><br><span class="line">  scheme https</span><br><span class="line">  ssl_verify false</span><br><span class="line">  logstash_format false</span><br><span class="line">  index_name pfmdevlog</span><br><span class="line">  with_transporter_log true</span><br><span class="line">&lt;/match&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h1><p>Once the pod is started we can now see both containers running:</p>
+<img src="sl1.png"/>
+
+<p>If we then jump to the application container we can test by manually adding a log entry:</p>
+<img src="sl2.png">
+
+<p>The Fluentd running in the logging container takes this log line and sends it to Elasticsearch.</p>
+<img src="sl3.png">
+
+<h1 id="Next-steps"><a href="#Next-steps" class="headerlink" title="Next steps"></a>Next steps</h1><p>At present the Fluentd configuration is minimal so I’ll need to provide more flexibility. The simplest method would be to use a ConfigMap to replace the Fluentd configuration entirely. There may be other options - let me know in the comments if you have a suggestion. I also need to get up our policy framework to automatically inject the sidecar if it’s not part of the applications configuration.</p>
+]]></content>
+      <tags>
+        <tag>devops</tag>
+      </tags>
+  </entry>
+</search>

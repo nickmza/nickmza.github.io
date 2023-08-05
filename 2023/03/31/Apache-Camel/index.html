@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="agile, tdd, software engineering" />
+       
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Riding the Camel: A Practical Guide to TDD with Apache Camel |  nick dot blog</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KXJW9BVBJ4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KXJW9BVBJ4');
+</script>
+
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="nick dot blog" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-Apache-Camel"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Riding the Camel: A Practical Guide to TDD with Apache Camel
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/03/31/Apache-Camel/" class="article-date">
+  <time datetime="2023-03-31T09:57:01.000Z" itemprop="datePublished">2023-03-31</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Software-Engineering/">Software Engineering</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">1.2k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">7 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>Recently I’ve been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to our standard integration platform IBM AppConnect. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evolve our integration code using tests to drive the approach. This is very cool. That said, it’s not been exactly easy so whilst it’s still fresh in my head I thought I would put down some points about how to make this work in your own projects.</p>
+<h1 id="Scenario"><a href="#Scenario" class="headerlink" title="Scenario"></a>Scenario</h1><p>The requirement is quite simple. When specific parts of a Customer’s record are modified in the CBS we need to send a message to the Fraud System. The Fraud System exposes a SOAP Interface so we need to translate the XML Format provided by the CBS into a valid SOAP message. In addition we need to handle various retry and reject semantics. For example if the incoming message is badly formatted, and thus not recoverable, we need to send it to a Poison queue. If the Fraud System is temporarily unavailable we need to send it to a Retry queue. At a high level it looks like this:</p>
+<p><img src="/images/camel-overview.png" alt="A simple diagram of the design"></p>
+<p>The Camel route to achieve this is as follows:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from(<span class="string">&quot;wmq:queue:PFM.CUSTOMER&quot;</span>)</span><br><span class="line">        .routeId(<span class="string">&quot;core-banking-pfm-customer-updates&quot;</span>)</span><br><span class="line">        .log(LoggingLevel.INFO, <span class="string">&quot;Message Received.&quot;</span>)</span><br><span class="line">        .unmarshal().jacksonXml(BatchMultiupdateCustomer.class)</span><br><span class="line">        .process(<span class="built_in">this</span>::createSoapRequest)</span><br><span class="line">        .setHeader(<span class="string">&quot;SOAPAction&quot;</span>, constant(SOAP_Update_Action))</span><br><span class="line">        .setHeader(Exchange.CONTENT_TYPE, constant(<span class="string">&quot;text/xml; charset=utf-8&quot;</span>))</span><br><span class="line">        .to(pfmConfig.getHost() + <span class="string">&quot;?throwExceptionOnFailure=false&quot;</span>)</span><br><span class="line">        .unmarshal().jacksonXml(Envelope.class)</span><br><span class="line">        .process(<span class="built_in">this</span>::checkResult)</span><br><span class="line">        .log(LoggingLevel.INFO, <span class="string">&quot;Message sent to PFM.&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h1><p>In general you follow the same setup procedure as you would for any Springboot test with some additions.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@SpringBootTest</span></span><br><span class="line"><span class="meta">@CamelSpringBootTest</span></span><br><span class="line"><span class="meta">@UseAdviceWith</span></span><br><span class="line"><span class="meta">@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)</span></span><br><span class="line"><span class="meta">@MockEndpointsAndSkip(&quot;https://.*|wmq:.*&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CamelRouteTests</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">protected</span> CamelContext camelContext;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">protected</span> ProducerTemplate producerTemplate;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="UseAdviceWith"><a href="#UseAdviceWith" class="headerlink" title="UseAdviceWith"></a>UseAdviceWith</h2><p>The ‘UseAdviceWith’ attribute tells Camel that we are running in test mode and that we will provide ‘advice’ on how to proceed. If you do not add this attribute Camel will start normally and activate all configured routes. See <a target="_blank" rel="noopener" href="https://www.javadoc.io/static/org.apache.camel/camel-test-spring/2.20.1/org/apache/camel/test/spring/UseAdviceWith.html">here</a> for more details.</p>
+<h2 id="DirtiesConext"><a href="#DirtiesConext" class="headerlink" title="DirtiesConext"></a>DirtiesConext</h2><p>This attribute tells the test framework to reset the application context after each test invocation. This ensures that the results from one test does not pollute the results of another. See <a target="_blank" rel="noopener" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/annotation/DirtiesContext.html">here</a> for more details.</p>
+<h2 id="Camel-Context"><a href="#Camel-Context" class="headerlink" title="Camel Context"></a>Camel Context</h2><p>The Camel Context gives you access to all the routes and services running. This is used to reconfigure routes for testing and gain access to endpoints.</p>
+<h2 id="Producer-Template"><a href="#Producer-Template" class="headerlink" title="Producer Template"></a>Producer Template</h2><p>The Producer Template is used to inject messages into a route.</p>
+<h2 id="Changing-the-entry-point"><a href="#Changing-the-entry-point" class="headerlink" title="Changing the entry-point"></a>Changing the entry-point</h2><p>In the Route defined above the entry-point is a message queue. In order to make testing simpler we would want to be able to submit messages directly into the Route rather than having to queue a message. This can be done by instructing Camel to replace parts of the Route for the duration of the tests. For example:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">AdviceWith.adviceWith(camelContext,</span><br><span class="line">        <span class="string">&quot;core-banking-pfm-customer-updates&quot;</span>,</span><br><span class="line">        rb -&gt; rb.replaceFromWith(<span class="string">&quot;direct:file:start&quot;</span>));</span><br></pre></td></tr></table></figure>
+
+<p>Here we are replacing the original ‘From’ with  ‘direct:file:start’. This allows us to post messages to the route using: </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">producerTemplate.sendBody(<span class="string">&quot;direct:file:start&quot;</span>, request);</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="Mocks"><a href="#Mocks" class="headerlink" title="Mocks"></a>Mocks</h1><p>Mocks allow us to simulate the endpoints of the application so that our tests do not need to connect to real systems. We can make assertions about the mocks to ensure that the system is behaving as expected.</p>
+<h2 id="MockEndpointsAndSkip"><a href="#MockEndpointsAndSkip" class="headerlink" title="MockEndpointsAndSkip"></a>MockEndpointsAndSkip</h2><p>To start mocking using Camel the MockEndpointsAndSkip attribute instructs the framework to create a mock for each endpoint that matches the supplied regex expression. In the example above this means creating a mock for endpoints that start with ‘https:&#x2F;&#x2F;‘ or ‘wmq:&#x2F;&#x2F;‘. </p>
+<p>The ‘Skip’ suffix here indicates that Camel should not pass on the messages to the underlying endpoint. If this is desirable use the ‘MockEndpoints’ annotation instead.</p>
+<h2 id="Accessing-Mocks"><a href="#Accessing-Mocks" class="headerlink" title="Accessing Mocks"></a>Accessing Mocks</h2><p>Mocks can be accessed via injection or directly from the Camel Context.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@EndpointInject(&quot;mock:wmq:queue:PFM.POISON&quot;)</span></span><br><span class="line"><span class="keyword">private</span> MockEndpoint poisonQueue;</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">var</span> <span class="variable">mock</span> <span class="operator">=</span> camelContext.getEndpoint(<span class="string">&quot;mock:wmq:queue:PFM.POISON&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Mock-Naming"><a href="#Mock-Naming" class="headerlink" title="Mock Naming"></a>Mock Naming</h3><p>Each mock created via MockEndpointsAndSkip or MockEndpoints will create a unique mock with it’s own URI. The format of this URI is the original URI prefixed with ‘mock’.</p>
+<p>For example:</p>
+<table>
+<thead>
+<tr>
+<th>URI</th>
+<th>Mock URI</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://example.com/Fraud/DetectionService.svc">https://example.com/Fraud/DetectionService.svc</a></td>
+<td>mock:https:example.com&#x2F;Fraud&#x2F;DetectionService.svc</td>
+</tr>
+<tr>
+<td>wmq:queue:PFM.POISON</td>
+<td>mock:wmq:queue:PFM.POISON</td>
+</tr>
+</tbody></table>
+<p><strong>Note:</strong> Notice that for the HTTP endpoint the forward slashes are removed from the mock name. If you have any doubt Camel outputs the URI of both the original endpoint and the mock endpoint in the logs.</p>
+<h2 id="Asserting-Mock-Behaviour"><a href="#Asserting-Mock-Behaviour" class="headerlink" title="Asserting Mock Behaviour"></a>Asserting Mock Behaviour</h2><p>Once you have a reference to the mock you can set your expectations and then make an assertion in the test.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">validMessageShouldBeProcessed</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">var</span> <span class="variable">request</span> <span class="operator">=</span> createSampleRequest();</span><br><span class="line"></span><br><span class="line">    replaceFromWithMock(); <span class="comment">//Replace the From with &#x27;direct:file:start&#x27;</span></span><br><span class="line"></span><br><span class="line">    camelContext.start(); <span class="comment">//Start Camel</span></span><br><span class="line"></span><br><span class="line">    pfmEndpoint.expectedMessageCount(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    producerTemplate.sendBody(<span class="string">&quot;direct:file:start&quot;</span>, request); <span class="comment">//Send message to the Route...</span></span><br><span class="line"></span><br><span class="line">    pfmEndpoint.assertIsSatisfied();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>In this example we expect the pfmEndpoint queue to have a single message on completion of the test.</p>
+<h2 id="Returning-Values-from-a-Mock"><a href="#Returning-Values-from-a-Mock" class="headerlink" title="Returning Values from a Mock"></a>Returning Values from a Mock</h2><p>In some cases you need to be able to control the specific response from a mock. In these scenarios you can use AdviceWith to replace the original end-point with one that models the specific behaviour you require. For example:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">var</span> <span class="variable">faultContent</span> <span class="operator">=</span> faultResultResource.getContentAsString(StandardCharsets.UTF_8);</span><br><span class="line"></span><br><span class="line"><span class="type">var</span> <span class="variable">header</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleExpression</span>(<span class="string">&quot;500&quot;</span>);</span><br><span class="line">header.setResultType(Integer.class);</span><br><span class="line"></span><br><span class="line">AdviceWith.adviceWith(camelContext,</span><br><span class="line">        <span class="string">&quot;core-banking-pfm-customer-updates&quot;</span>,</span><br><span class="line">        rb -&gt; rb.weaveByToUri(pfmConfig.getHost())</span><br><span class="line">                .replace()</span><br><span class="line">                .setHeader(CAMEL_HTTP_RESPONSE_CODE, header)</span><br><span class="line">                .setBody(<span class="keyword">new</span> <span class="title class_">ConstantExpression</span>(faultContent)));</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Here we are configuring the endpoint to return an HTTP 500 return code and a specific fault payload.</p>
+<p>Here is the full test:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">parseFaultResult</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">var</span> <span class="variable">request</span> <span class="operator">=</span> createSampleRequest();</span><br><span class="line"></span><br><span class="line">    <span class="type">var</span> <span class="variable">faultContent</span> <span class="operator">=</span> faultResultResource.getContentAsString(StandardCharsets.UTF_8);</span><br><span class="line"></span><br><span class="line">    replaceFromWithMock();</span><br><span class="line"></span><br><span class="line">    <span class="type">var</span> <span class="variable">HTTPHeader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleExpression</span>(<span class="string">&quot;400&quot;</span>);</span><br><span class="line">    HTTPHeader.setResultType(Integer.class);</span><br><span class="line"></span><br><span class="line">    AdviceWith.adviceWith(camelContext,</span><br><span class="line">            <span class="string">&quot;core-banking-pfm-customer-updates&quot;</span>,</span><br><span class="line">            rb -&gt; rb.weaveByToUri(pfmConfig.getHost()+<span class="string">&quot;?throwExceptionOnFailure=false&quot;</span>)</span><br><span class="line">                    .replace()</span><br><span class="line">                    .setHeader(CAMEL_HTTP_RESPONSE_CODE, HTTPHeader)</span><br><span class="line">                    .setBody(<span class="keyword">new</span> <span class="title class_">ConstantExpression</span>(faultContent)));</span><br><span class="line"></span><br><span class="line">    poisonQueue.expectedBodiesReceived(faultContent);</span><br><span class="line">    poisonQueue.expectedMessageCount(<span class="number">1</span>);</span><br><span class="line">    retryQueue.expectedMessageCount(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    camelContext.start();</span><br><span class="line"></span><br><span class="line">    producerTemplate.sendBody(<span class="string">&quot;direct:file:start&quot;</span>, request);</span><br><span class="line"></span><br><span class="line">    poisonQueue.assertIsSatisfied();</span><br><span class="line">    retryQueue.assertIsSatisfied();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Here the test is ensuring that in the event of a HTTP 400 Error that the message is not retried and sent to the poison queue.</p>
+<h1 id="Results"><a href="#Results" class="headerlink" title="Results"></a>Results</h1><p><img src="/images/camel-code-coverage.png" alt="Camel Code Coverage"></p>
+<p>TDD with Camel works really well. There is some initial setup in terms of creating the various request&#x2F;response pairs and you need to be sure to keep your tests clean and tidy. It’s great that when we find a problem we add the suspect message into the project and run the tests. If the tests pass then we know we have a bug and so the first step is to create a failing tests. Once this passes we can be pretty sure that the bug is addressed. </p>
+<p>Code Coverage works as expected and is great to make sure that the tests are exercising the expected aspects of the application.</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Camel/" rel="tag">Camel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/TDD/" rel="tag">TDD</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2023/04/18/team-topo/" class="article-nav-link">
+        <strong class="article-nav-caption">Previous Post</strong>
+        <div class="article-nav-title">
+          
+            Team Topologies Applied
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2016/11/04/agile-does-not-work/" class="article-nav-link">
+        <strong class="article-nav-caption">Next Post</strong>
+        <div class="article-nav-title">Agile does not work but agile does</div>
+      </a>
+    
+  </nav>
+
+  
+   
+<div class="gitalk" id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.7.2/gitalk.min.css">
+
+
+<script src="https://cdn.staticfile.org/gitalk/1.7.2/gitalk.min.js"></script>
+
+
+<script src="https://cdn.staticfile.org/blueimp-md5/2.19.0/js/md5.min.js"></script>
+
+<script type="text/javascript">
+  var gitalk = new Gitalk({
+    clientID: '8318211c28156a054b60',
+    clientSecret: 'a3e7c2c22e61867951cbca3c52fbcc22f43dcfb8',
+    repo: 'BlogComments',
+    owner: 'nickmza',
+    admin: ['nickmza'],
+    // id: location.pathname,      // Ensure uniqueness and length less than 50
+    id: md5(location.pathname),
+    distractionFreeMode: false,  // Facebook-like distraction free mode
+    pagerDirection: 'last'
+  })
+
+  gitalk.render('gitalk-container')
+</script>
+
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> Nick Mckenzie
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/goober.png" alt="nick dot blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">Categories</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">Tags</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/Resources">Resources</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>

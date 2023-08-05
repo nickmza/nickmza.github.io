@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="agile, tdd, software engineering" />
+       
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Request/Response Shaping with KrakenD |  nick dot blog</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KXJW9BVBJ4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KXJW9BVBJ4');
+</script>
+
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="nick dot blog" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-krakend-response"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Request/Response Shaping with KrakenD
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/07/16/krakend-response/" class="article-date">
+  <time datetime="2023-07-16T03:11:14.000Z" itemprop="datePublished">2023-07-16</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Release-The-KrakenD/">Release The KrakenD</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">1.2k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">7 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>I wrote previously about <a target="_blank" rel="noopener" href="https://nickmck.net/2023/06/23/release-the-krakend/">configuring logging</a> on KrakenD as well as setting up <a target="_blank" rel="noopener" href="https://nickmck.net/2023/07/08/kraken-auth/">JWT Security</a>. This week I’m looking at how KrakenD can shape Requests and Responses from back-end systems.</p>
+<p>KrakenD provides multiple facilities for Request&#x2F;Response Shaping:</p>
+<ul>
+<li>Filtering. Removing specific fields from the response.</li>
+<li>Grouping. Placing a response within a specific tag.</li>
+<li>Mapping. Renaming certain fields.</li>
+<li>Collection Manipulation. Move, delete or append items in arrays.</li>
+<li>Plugins. Completely rewrite requests&#x2F;reponses using custom code. Maximum performance but requires you to build and deploy the plugin.</li>
+<li>Lua. Same as for Plugins but via the Lua scripting language. You take a (potentially negligible) performance hit but gain the flexibility of scripting.</li>
+</ul>
+<p>My requirement is to format the response from our Core Banking system into JSON. The challenging part is that our Core Banking response format looks like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;</span><br><span class="line">&lt;T24 xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">    xmlns=&quot;http://www.temenos.com/T24/OFSML/130&quot; xsi:schemaLocation=&quot;http://www.temenos.com/T24/OFSML/130 ofsml13.xsd&quot;&gt;</span><br><span class="line">    &lt;serviceResponse&gt;</span><br><span class="line">        &lt;ofsStandardEnquiry name=&quot;E.CUST.FIN.SUMMARY.6.MCB.MU&quot; status=&quot;OK&quot;&gt;</span><br><span class="line">            &lt;enquiryColumn id=&quot;RETURN.CODE&quot; label=&quot;RETURN.CODE&quot; type=&quot;ALPHANUMERIC&quot;/&gt;</span><br><span class="line"></span><br><span class="line">            &lt;!--List of Enquiry Columns&gt;</span><br><span class="line"></span><br><span class="line">            &lt;enquiryRecord&gt;</span><br><span class="line">                &lt;column&gt;0&lt;/column&gt;</span><br><span class="line"></span><br><span class="line">                &lt;!--List of Result Columns&gt;</span><br><span class="line"></span><br><span class="line">            &lt;/enquiryRecord&gt;</span><br><span class="line">        &lt;/ofsStandardEnquiry&gt;</span><br><span class="line">    &lt;/serviceResponse&gt;</span><br><span class="line">&lt;/T24&gt;</span><br></pre></td></tr></table></figure>
+
+<p>For each column in the response table there will be an ‘enquiryColumn’ record and an associated enquiryRecord&#x2F;column record. The association is based on the index. So the enquiryColumn at position 0 will describe the column at position 0 in the enquiryRecord. For extra fun, if the response contains more than one row the values will be separated by a | delimiter.</p>
+<p>The only options that could achieve all of this were either a Plugin or Lua. I opted for the Lua route. Only problem with that was I didn’t know Lua… </p>
+<h1 id="Lua"><a href="#Lua" class="headerlink" title="Lua"></a>Lua</h1><p>From the website: <a target="_blank" rel="noopener" href="https://www.lua.org/">Lua</a> is a powerful, efficient, lightweight, embeddable scripting language. It supports procedural programming, object-oriented programming, functional programming, data-driven programming, and data description.</p>
+<p>I found it really easy to pick up. Some pointers:</p>
+<p><strong>Everything is a table</strong><br>Seriously - everything! Want an array? Create a table with an integer as its first column. </p>
+<p><strong>Invoke methods with :</strong><br>For example:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(t:len())</span><br></pre></td></tr></table></figure>
+<p>Invokes the len method of t. In this case printing the length of the table t.</p>
+<p><strong>Creating new tables</strong><br>Like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local result = &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Setting&#x2F;Getting Values</strong><br>Like this:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">result[&quot;ResponseStatus&quot;] = &quot;foo&quot;</span><br><span class="line">print(result[&quot;ResponseStatus&quot;])</span><br></pre></td></tr></table></figure>
+<p><strong>String Manipulation</strong><br>This was a little tricky. I think C# has spoiled me a little. Here’s the code to split up a pipe-delimited string.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">function split(value)</span><br><span class="line"></span><br><span class="line">    if(string.sub(value,1,1) == &quot;|&quot;) then</span><br><span class="line">        value = &quot; &quot;..value</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    local t=&#123;&#125;</span><br><span class="line">    for str in string.gmatch(value, &quot;([^|]+)&quot;) do</span><br><span class="line">        local k = string.gsub(str, &quot;[ ]+$&quot;, &quot;&quot;)</span><br><span class="line">        table.insert(t, k)</span><br><span class="line">    end</span><br><span class="line">    return t</span><br><span class="line">end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>Here’s what this does:</p>
+<ul>
+<li>Start by appending an empty string to the start of the string. The .. is the concatenation operator.</li>
+<li>Create a new table, t, to store the results.</li>
+<li>Use a regex passed to the gsub method to find each part of the string.</li>
+<li>Use a regex passed to gsub to trim spaces.</li>
+<li>Add the resultant string to the table with table.insert.</li>
+</ul>
+<blockquote>
+<p>It’s entirely likely that an experienced Lua practitioner is recoiling in horror at this right now. Feel free to correct my poor Lua in the comments.</p>
+</blockquote>
+<h1 id="Shaping-the-Response"><a href="#Shaping-the-Response" class="headerlink" title="Shaping the Response"></a>Shaping the Response</h1><p>Armed with my rudimentary understanding of Lua I was able to put together a working map between the Core Banking XML and Json. I won’t reproduce the entire script but here are the highlights:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">function post_proxy( resp )</span><br><span class="line"> </span><br><span class="line">    local r = resp.load()</span><br><span class="line">    local responseData = r:data()</span><br><span class="line">    local enquiryColumn = responseData:get(&quot;T24&quot;):get(&quot;serviceResponse&quot;):get(&quot;ofsStandardEnquiry&quot;):get(&quot;enquiryColumn&quot;)</span><br><span class="line">    local dataColumn = responseData:get(&quot;T24&quot;):get(&quot;serviceResponse&quot;):get(&quot;ofsStandardEnquiry&quot;):get(&quot;enquiryRecord&quot;):get(&quot;column&quot;)</span><br><span class="line">    local size = enquiryColumn:len()</span><br><span class="line">     </span><br><span class="line">    local result = &#123;&#125;</span><br><span class="line">    for i=0,size-1 do</span><br><span class="line">      local key = enquiryColumn:get(i):get(&quot;-id&quot;)</span><br><span class="line">      local value = dataColumn:get(i)</span><br><span class="line">      result[key] = value;</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    local response = &#123;&#125;</span><br><span class="line">    response[&quot;ResponseStatus&quot;] = &#123;&#125;</span><br><span class="line">    response[&quot;ResponseStatus&quot;][&quot;ReturnCode&quot;] = 0</span><br><span class="line"></span><br><span class="line">    response[&quot;ResponseData&quot;] = &#123;&#125;</span><br><span class="line">    local rd = response[&quot;ResponseData&quot;]</span><br><span class="line"></span><br><span class="line">    rd[&quot;Exception&quot;] = getException(result)</span><br><span class="line"></span><br><span class="line">    local items = luaList.new()</span><br><span class="line">    gfs[&quot;Ac_Contracts&quot;] = items</span><br><span class="line"></span><br><span class="line">    local contractList = split(result[&quot;AC.CONTRACT.NO&quot;])</span><br><span class="line"></span><br><span class="line">    local contractCount = 1</span><br><span class="line">    for k,v in pairs(contractList) do</span><br><span class="line">        local acrData = getContractRecord(contractCount, result)</span><br><span class="line">        items:set(contractCount-1,acrData)</span><br><span class="line">        contractCount = contractCount + 1</span><br><span class="line">    end</span><br><span class="line"></span><br><span class="line">    responseData:set(&quot;response&quot;, response)</span><br><span class="line">    responseData:del(&quot;T24&quot;)</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>Here are the highlights:</p>
+<ul>
+<li>Access the backend response via resp.load()</li>
+<li>We then get the enquiryColumn and dataColumn</li>
+<li>We can then loop through the enquiryColum and populate the results table. We can then treat the response as key-value pairs rather than 2 disconnected arrays. </li>
+<li>We build up our response object by pulling values from the results array.<ul>
+<li>Note the use of lualist.new() this is a KrakenD helper to allow you to model a JSON array.</li>
+</ul>
+</li>
+<li>Finally we remove the original response via the del function.</li>
+</ul>
+<h1 id="Wiring-it-up"><a href="#Wiring-it-up" class="headerlink" title="Wiring it up"></a>Wiring it up</h1><p>As with all things KrakenD it’s just a matter of updating the endpoint definition:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&quot;endpoints&quot;: [</span><br><span class="line">&#123;</span><br><span class="line">    &quot;endpoint&quot;: &quot;/v1/getfinancialsummary&quot;,</span><br><span class="line">    &quot;method&quot;: &quot;POST&quot;,</span><br><span class="line">    &quot;output_encoding&quot;: &quot;json&quot;,</span><br><span class="line">    &quot;backend&quot;: [</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;extra_config&quot;: &#123;</span><br><span class="line">        &quot;modifier/lua-backend&quot;: &#123;</span><br><span class="line">            &quot;sources&quot;: [&quot;formatT24.lua&quot;],</span><br><span class="line">            &quot;live&quot;: true,</span><br><span class="line">            &quot;allow_open_libs&quot;: true,</span><br><span class="line">            &quot;post&quot;: post_proxy(response);&quot;</span><br><span class="line">        &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;url_pattern&quot;: &quot;/getfinancialsummary&quot;,</span><br><span class="line">        &quot;encoding&quot;: &quot;xml&quot;,</span><br><span class="line">        &quot;sd&quot;: &quot;static&quot;,</span><br><span class="line">        &quot;method&quot;: &quot;POST&quot;,</span><br><span class="line">        &quot;disable_host_sanitize&quot;: true,</span><br><span class="line">        &quot;host&quot;: [</span><br><span class="line">            &quot;http://demo.mock.pstmn.io&quot;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;    </span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>Here’s how it works:</p>
+<ul>
+<li>sources - defines the list of Lua script files to load. It looks for them in the same directory as your krakend.json file.</li>
+<li>live - tells Krakend to reload the script when it is changed. Super-handy for development.</li>
+<li>allow_open_libs - allows Lua to pull in libraries from other sources.</li>
+<li>post - this is the entry point for our script. In this case we want to invoke our script after the response has been received from the backend.</li>
+</ul>
+<h1 id="That’s-all-folks…"><a href="#That’s-all-folks…" class="headerlink" title="That’s all folks…"></a>That’s all folks…</h1><p>This worked really well. Even with mock data hosted in Postman we are getting a 400ms response time on a large response. The bulk of this is network latency. I’m not sure what voodoo has been worked on the Lua side to make this work but it’s impressive. I’m also secure in the knowledge that if the performance ever becomes an issue I can drop to a dedicated plugin (would just need to learn Go first…)</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/devops/" rel="tag">devops</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2023/08/05/sidecar-logging/" class="article-nav-link">
+        <strong class="article-nav-caption">Previous Post</strong>
+        <div class="article-nav-title">
+          
+            Sidecar Logging in Openshift with Fluentd and Elasticsearch
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2023/07/08/kraken-auth/" class="article-nav-link">
+        <strong class="article-nav-caption">Next Post</strong>
+        <div class="article-nav-title">Authenticate the KrakenD!</div>
+      </a>
+    
+  </nav>
+
+  
+   
+<div class="gitalk" id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.7.2/gitalk.min.css">
+
+
+<script src="https://cdn.staticfile.org/gitalk/1.7.2/gitalk.min.js"></script>
+
+
+<script src="https://cdn.staticfile.org/blueimp-md5/2.19.0/js/md5.min.js"></script>
+
+<script type="text/javascript">
+  var gitalk = new Gitalk({
+    clientID: '8318211c28156a054b60',
+    clientSecret: 'a3e7c2c22e61867951cbca3c52fbcc22f43dcfb8',
+    repo: 'BlogComments',
+    owner: 'nickmza',
+    admin: ['nickmza'],
+    // id: location.pathname,      // Ensure uniqueness and length less than 50
+    id: md5(location.pathname),
+    distractionFreeMode: false,  // Facebook-like distraction free mode
+    pagerDirection: 'last'
+  })
+
+  gitalk.render('gitalk-container')
+</script>
+
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> Nick Mckenzie
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/goober.png" alt="nick dot blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">Categories</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">Tags</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/Resources">Resources</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
