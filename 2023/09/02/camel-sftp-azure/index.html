@@ -13,7 +13,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
-      <title>Sidecar Logging in Openshift with Fluentd and Elasticsearch |  nick dot blog</title>
+      <title>Integrating Azure Storage and SFTP with Apache Camel |  nick dot blog</title>
   <meta name="generator" content="hexo-theme-ayer">
       
       <link rel="shortcut icon" href="/favicon.ico" />
@@ -65,7 +65,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-sidecar-logging"
+  id="post-camel-sftp-azure"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -76,7 +76,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  Sidecar Logging in Openshift with Fluentd and Elasticsearch
+  Integrating Azure Storage and SFTP with Apache Camel
 </h1>
  
 
@@ -84,15 +84,19 @@
     </header>
      
     <div class="article-meta">
-      <a href="/2023/08/05/sidecar-logging/" class="article-date">
-  <time datetime="2023-08-05T06:13:24.000Z" itemprop="datePublished">2023-08-05</time>
-</a>   
+      <a href="/2023/09/02/camel-sftp-azure/" class="article-date">
+  <time datetime="2023-09-02T05:14:15.000Z" itemprop="datePublished">2023-09-02</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Software-Engineering/">Software Engineering</a>
+  </div>
+  
 <div class="word_count">
     <span class="post-time">
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">964</span>
+            <span class="post-count">545</span>
         </span>
     </span>
 
@@ -101,7 +105,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">6 min</span>
+            <span class="post-count">3 min</span>
         </span>
     </span>
 </div>
@@ -116,43 +120,34 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <p>We use Elasticsearch for logging in our Openshift environments. This means that each application needs to figure out how to aggregate their logs and ship them to Elasticsearch. This duplication of effort is wasteful and increases maintenance costs as a change at Elasticsearch level must then be absorbed by each application. This approach also amplifies the impact of a security vulnerability such as the recent <a target="_blank" rel="noopener" href="https://nvd.nist.gov/vuln/detail/CVE-2021-44228">Log4j</a> vulnerability in that it requires patching in multiple places. One solution would be to have a single ‘certified’ logging library however we would need one for each technology stack we use. There is another way however - the sidecar deployment.</p>
-<p>Kubernetes (k8s) allows for multiple containers to run in the same pod. These containers can share resources and dependencies, communicate with one another, and coordinate when and how they are terminated. In the ‘Sidecar Deployment’ we have one container providing a service for another. In our case what we are looking for is that the main application writes it’s logs to file and the sidecar then manages the process of shipping the logs to Elasticsearch.</p>
-<p>The solution will look like this:</p>
-<iframe frameborder="0" style="width:100%;height:400px;" src="https://viewer.diagrams.net/?highlight=0000ff&nav=1#R1Zddk5owFIZ%2FjZftQPADL%2F3cbWtbZ%2BzMuledLBwhbSRMCAr765tIICCu63bs1L0y581JJO85Dx8dZ7LN7jiOw6%2FMB9pBlp91nGkHIRt1kfxRSl4oA3dYCAEnvk4ywoo8gxYtrabEh6SRKBijgsRN0WNRBJ5oaJhztm%2BmbRht%2FmuMA2gJKw%2FTtvpAfBEWqtuzjH4PJAjLf7YtPbPFZbIWkhD7bF%2BTnFnHmXDGRDHaZhOgyrzSl2Ld%2FIXZ6sI4ROKSBaOpn%2FX5eL1Zfrv%2F%2BeM5%2FzRnnz%2BUNu8wTfWJv7grKSyZry9b5KUXnKWRD2o7u%2BOM9yERsIqxp2b3svpSC8WW6ukdcEGkjyNKgkhqgqmE9kXrc6h0yGqSPsQdsC0InsuUcrZ0WHeU3dfx3tQHuVoLa7VBZdGw7omg2tvYJgfauTe46LasAl92kQ4ZFyELWITpzKhjY6YlI5OzYMqog4W%2FQIhcI4FTwZoGQ0bEujZ%2BVFt97OlomumdD0FeBpE87roe1Fap0Cw7RI11S%2BBE%2BgVciy%2FWMmEp9%2BBc12mQMQ9AnMkbFHnKzLOdwYFiQXZNZK9e5bJTDSoLFgQkCqQ4YZHAJJLeHHfCK5jgJC5uWxuSqW64BiGo3yQEWW1CKorqhFTi1b3r%2Fk9CDBWPtZmbJgRdSIhzU4SgFiGjOL41Omx0c3T0383zQwbHTW6IMZBUnJ0h5u%2FhcC6Ew74pOJxTjw8pzIms53H95ctirIZeToksM3def%2BF6Khpi8VQJ2PsdHNrkeyrkNqD1pOgIu3elp43d5Mmx2zz1T%2BDk%2FiuaBi2jZxQn8mU0Acy98D173UWDo3tXr%2BX18ITXw7d7LUPzbXKYq33hObM%2F"></iframe>
+  <p>This week I needed to get data from a Power Automate flow to an internal SFTP server. We are evaluating a couple of options for this but here’s how you would do it with Apache Camel.</p>
+<iframe frameborder="0" style="width:100%;height:200px;" src="https://viewer.diagrams.net/?highlight=0000ff&nav=1&title=Camel-Azure-SFTP#R3ZZRb5swEMc%2FDY%2BTwFDSPbZpuklbp2xsmvrohgt4MxxyjgD99DPlgCDUKJOmJeoT%2BHdnzv77f8iOv8zqD0YW6QPGoB3hxrXj3zlCeCIQ9tGSpiOL6%2FcdSIyKOWkEkXoGhi7TUsWwmyQSoiZVTOEG8xw2NGHSGKymaVvU06qFTGAGoo3Uc%2FpTxZR29PrKHflHUEnaV%2FZcjmSyT2awS2WM1QHyV46%2FNIjUvWX1EnQrXq9LN%2B%2F%2BleiwMAM5nTJBNV%2B%2Bhb%2B3xeP6x93Xp8Wnh4Xx3vndV%2FZSl7xhXiw1vQIQW0F4iIZSTDCXejXSW4NlHkNbxrWjMeczYmGhZ%2BEvIGr4dGVJaFFKmeZoV7Mt9OreGO2wNBs4sqHeI9IkQEfyxHAC1rqAGZBp7DwDWpLaT9ch2UPJkDfKbF9Y6b9Q3ZupvsYKjEU3VhvrHJidQpUqgqiQL5uvbK9NFZS7onP%2FVtXtSbCkezAE9XFR5yIMzcvO5db1Qh5XB43AKD3ogZ79c9mu3ppZxYlmDc5pVjFT%2Fea5NNahbkRo2t%2BncG81Pl2CZQfvXYplF2%2FNssGJlg3PadlgpvpSZu3F5PwODYILc2g40yq6%2F76%2BBKlC979JZYfjRewldnCd9Vd%2FAA%3D%3D"></iframe>
 
-<p>This approach means that we can setup our logging container once and then use it with all of our application containers, regardless of the technology stack. In addition we can inject the sidecar via our Policy Framework when a pod is deployed. So even if the team forget to enable logging it will be there automatically. Lastly this provides isolation so that if the logging process fails the main application can continue working.</p>
-<h1 id="Logging-Container"><a href="#Logging-Container" class="headerlink" title="Logging Container"></a>Logging Container</h1><p>I’m going to use Fluentd to process the logs and send them to Elasticsearch. To do this I need to add the Elasticsearch plugin to the Fluentd Docker image and add my config file.</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">FROM fluent/fluentd:edge-debian</span><br><span class="line">USER root</span><br><span class="line">RUN [&quot;gem&quot;, &quot;install&quot;, &quot;fluent-plugin-elasticsearch&quot;, &quot;--no-document&quot;, &quot;--version&quot;, &quot;5.3.0&quot;]</span><br><span class="line"></span><br><span class="line">COPY fluent.conf /fluentd/etc/</span><br><span class="line"></span><br><span class="line">COPY entrypoint.sh /bin/</span><br><span class="line">RUN chmod +x /bin/entrypoint.sh</span><br><span class="line"></span><br><span class="line">USER fluent</span><br></pre></td></tr></table></figure>
+<h1 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h1><p>To simplify testing I wanted a local SFTP instance to work with. I used the atmoz&#x2F;sftp image to bring up one using Docker.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 22:22 -d atmoz/sftp foo:pass:::upload</span><br></pre></td></tr></table></figure>
 
-<h1 id="Fluentd-Configuration"><a href="#Fluentd-Configuration" class="headerlink" title="Fluentd Configuration"></a>Fluentd Configuration</h1><p>I’m starting with a minimal configuration. We tail the log at ‘var&#x2F;log&#x2F;mcb.log’ and tag the lines with ‘mcb’. Fluent will then match any log tagged with ‘mcb’ and send it to Elasticsearch.</p>
-<p>I ran into some challenges here as I needed a specific index name to be used. Whilst I set the index_name property this did not seem to have any effect. The culprit was the logstash_format property. If this is set to ‘true’ then index_name is ignored. Switching to ‘false’ fixed the problem. </p>
-<blockquote>
-<p>If you do run into problems set the @log_level to debug at plugin level. In addition setting  with_transport_log to true will allow you to see the detailed trace associated with how the data is sent to Elastic.</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;source&gt;</span><br><span class="line">  @type tail</span><br><span class="line">  path /var/log/mcb.log</span><br><span class="line">  pos_file /var/log/td-agent/mcb.log.pos</span><br><span class="line">  tag mcb</span><br><span class="line">  &lt;parse&gt;</span><br><span class="line">    @type none</span><br><span class="line">  &lt;/parse&gt;</span><br><span class="line">&lt;/source&gt;</span><br><span class="line"></span><br><span class="line">&lt;match mcb&gt;</span><br><span class="line">  @type elasticsearch</span><br><span class="line">  @log_level debug</span><br><span class="line">  host es-dev.mcb.local</span><br><span class="line">  port 9200</span><br><span class="line">  user elastic</span><br><span class="line">  password elastic</span><br><span class="line">  scheme https</span><br><span class="line">  ssl_verify false</span><br><span class="line">  logstash_format false</span><br><span class="line">  index_name pfmdevlog</span><br><span class="line">  with_transporter_log true</span><br><span class="line">&lt;/match&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h1 id="Configuring-the-sidecar"><a href="#Configuring-the-sidecar" class="headerlink" title="Configuring the sidecar"></a>Configuring the sidecar</h1><p>We start by creating a volume for the containers to share data. This can be added to your K8S Deployment as follows:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">volumes:</span><br><span class="line">  - name: applog</span><br><span class="line">    emptyDir: &#123;&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>An <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/storage/volumes/">emptyDir</a> volume is first created when a Pod is assigned to a node, and exists as long as that Pod is running on that node. </p>
-<p>Next we add the sidecar container to the deployment:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">containers:</span><br><span class="line">  - name: app-container</span><br><span class="line">  ...</span><br><span class="line">  - name: mcb-logger</span><br><span class="line">    image: &gt;-</span><br><span class="line">      docker.digitalfactory.mcb.local/mcb-sre/mcb-logger@sha256:cfd8bdd41f4fa5fbe031856444a1d272a61e7f70d6f1e42d435a61c8f856ba6d</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>Finally we add a volumeMount to both containers:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">volumeMounts:</span><br><span class="line">  - name: applog</span><br><span class="line">    mountPath: /var/log/</span><br></pre></td></tr></table></figure>
+<p>Once this is running you can log into the local sftp as follows:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sftp -P 22 foo@127.0.0.1  </span><br></pre></td></tr></table></figure>
 
-<p>In summary we now have 2 containers running in the pod who have a shared directory located at ‘&#x2F;var&#x2F;log’.</p>
-<h1 id="Use-of-Environment-Variables"><a href="#Use-of-Environment-Variables" class="headerlink" title="Use of Environment Variables"></a>Use of Environment Variables</h1><p>To this point I’ve hardcoded the Fluentd settings. This will not work for everyone as we use different indexes for the various applications. I need to allow each application to inject these settings when the pod is started. Fortunately Fluentd allows you to execute arbitrary Ruby code when the configuration file is parsed. This allows us the opportunity to replace values from the local ennvironment. Here’s the updated configuration:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;source&gt;</span><br><span class="line">  @type tail</span><br><span class="line">  path &quot;#&#123;ENV[&#x27;LOG_FILE&#x27;] || &#x27;/var/log/mcb.log&#x27;&#125;&quot;</span><br><span class="line">  pos_file /var/log/td-agent/mcb.log.pos</span><br><span class="line">  tag mcb</span><br><span class="line">  &lt;parse&gt;</span><br><span class="line">    @type none</span><br><span class="line">  &lt;/parse&gt;</span><br><span class="line">&lt;/source&gt;</span><br><span class="line"></span><br><span class="line">&lt;match mcb&gt;</span><br><span class="line">  @type elasticsearch</span><br><span class="line">  @log_level &quot;#&#123;ENV[&#x27;LOG_LEVEL&#x27;] || &#x27;debug&#x27;&#125;&quot;</span><br><span class="line">  host &quot;#&#123;ENV[&#x27;ES_HOST&#x27;] || &#x27;es-dev.mcb.local&#x27;&#125;&quot;</span><br><span class="line">  port &quot;#&#123;ENV[&#x27;ES_PORT&#x27;] || 9200&#125;&quot;</span><br><span class="line">  user &quot;#&#123;ENV[&#x27;ES_USER&#x27;] || &#x27;elastic&#x27;&#125;&quot;</span><br><span class="line">  password &quot;#&#123;ENV[&#x27;ES_PASSWORD&#x27;] || &#x27;elastic&#x27;&#125;&quot;</span><br><span class="line">  scheme https</span><br><span class="line">  ssl_verify false</span><br><span class="line">  logstash_format false</span><br><span class="line">  index_name pfmdevlog</span><br><span class="line">  with_transporter_log true</span><br><span class="line">&lt;/match&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="Azure-Storage-Blob"><a href="#Azure-Storage-Blob" class="headerlink" title="Azure Storage Blob"></a>Azure Storage Blob</h1><p>Connecting to Azure Storage is straight-forward. Add a reference to the <a target="_blank" rel="noopener" href="https://camel.apache.org/components/4.0.x/azure-storage-blob-component.html#_message_headers">Azure Storage Blob Component</a>.</p>
+<p>Then in your route configure the Blob Client:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">private void configureBlobClient() &#123;</span><br><span class="line">    StorageSharedKeyCredential credential = new StorageSharedKeyCredential(config.getStorageAccountName(), config.getAccessKey());</span><br><span class="line">    String uri = String.format(&quot;https://%s.blob.core.windows.net&quot;, config.getStorageAccountName());</span><br><span class="line"></span><br><span class="line">    BlobServiceClient client = new BlobServiceClientBuilder()</span><br><span class="line">            .endpoint(uri)</span><br><span class="line">            .credential(credential)</span><br><span class="line">            .buildClient();</span><br><span class="line"></span><br><span class="line">    context.getRegistry().bind(&quot;client&quot;, client);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Once this is done you can receive Blobs as follows:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">from(&quot;azure-storage-blob://your_storage_account/your_folder?serviceClient=#client&quot;)</span><br><span class="line">    .log(LoggingLevel.INFO, &quot;File Received: $simple&#123;in.header.CamelAzureStorageBlobBlobName&#125;&quot;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>The code above receives all Blobs added to the ‘your_folder’ container in ‘your_storage_account’. You can specify the filename or a Regex pattern to further refine which blobs are received. See the <a target="_blank" rel="noopener" href="https://camel.apache.org/components/4.0.x/azure-storage-blob-component.html#_component_options">Component Details</a> section.</p>
+<h1 id="SFTP"><a href="#SFTP" class="headerlink" title="SFTP"></a>SFTP</h1><p>To enable SFTP add a reference to the <a target="_blank" rel="noopener" href="https://camel.apache.org/components/4.0.x/sftp-component.html#_more_information">SFTP</a> component.</p>
+<p>You can then add configuration at Component or Endpoint level. Here’s our endpoint:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.to(&quot;sftp:1.1.1.1/files/sharepoint?username=myuser&amp;password=mypassword&quot;)</span><br></pre></td></tr></table></figure>
+<p>This works fine but we’d probably want to tighten up on how we handle the password and host verification for production. </p>
+<p>An additional step is to configure the Filename we want to use for the file. By default Camel will auto-generate one. We wanted to use the same name as the blob. This can be done by setting the appropriate header values:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.process(exchange -&gt; &#123;</span><br><span class="line">    String filename = exchange.getIn().getHeader(BlobConstants.BLOB_NAME, String.class);</span><br><span class="line">    exchange.getIn().setHeader(FtpConstants.FILE_NAME, filename);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h1 id="Cleaning-up-the-Blob"><a href="#Cleaning-up-the-Blob" class="headerlink" title="Cleaning up the Blob"></a>Cleaning up the Blob</h1><p>Once we have uploaded the file to SFTP we need to delete the original blob - otherwise Camel will continue to receive it. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.to(config.getSourceUri() + &quot;&amp;operation=deleteBlob&quot;)</span><br></pre></td></tr></table></figure>
+<p>The Blob component figures out which Blob to delete based on the BlobConstants.BLOB_NAME header. You can also specify which Blob to delete in the route itself.</p>
+<h1 id="Bringing-it-all-together"><a href="#Bringing-it-all-together" class="headerlink" title="Bringing it all together."></a>Bringing it all together.</h1><p>Here’s the final route:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from(config.getSourceUri()) </span><br><span class="line">    .routeId(FUSION_GL_UPDATE) </span><br><span class="line">    .log(LoggingLevel.INFO, &quot;File Received: $simple&#123;in.header.CamelAzureStorageBlobBlobName&#125;&quot;) </span><br><span class="line">    .log(LoggingLevel.DEBUG, &quot;Contents: $&#123;body&#125;&quot;) </span><br><span class="line">    .process(exchange -&gt; &#123; </span><br><span class="line">        String filename = exchange.getIn().getHeader(BlobConstants.BLOB_NAME, String.class); </span><br><span class="line">        exchange.getIn().setHeader(FtpConstants.FILE_NAME, filename); </span><br><span class="line">    &#125;) </span><br><span class="line">    .to(config.getDestinationUri()) </span><br><span class="line">    .to(config.getSourceUri() + &quot;&amp;blobName=blob&amp;operation=deleteBlob&quot;) </span><br><span class="line">    .log(LoggingLevel.INFO, &quot;File delivered.&quot;); </span><br></pre></td></tr></table></figure>
 
-<h1 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h1><p>Once the pod is started we can now see both containers running:</p>
-<img src="sl1.png"/>
-
-<p>If we then jump to the application container we can test by manually adding a log entry:</p>
-<img src="sl2.png">
-
-<p>The Fluentd running in the logging container takes this log line and sends it to Elasticsearch.</p>
-<img src="sl3.png">
-
-<h1 id="Next-steps"><a href="#Next-steps" class="headerlink" title="Next steps"></a>Next steps</h1><p>At present the Fluentd configuration is minimal so I’ll need to provide more flexibility. The simplest method would be to use a ConfigMap to replace the Fluentd configuration entirely. There may be other options - let me know in the comments if you have a suggestion. I also need to get up our policy framework to automatically inject the sidecar if it’s not part of the applications configuration.</p>
+<h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><p>This is a great example of how Camel simplifies common integration patterns and flows. There’s still some work to do in terms of hardening and we may want to add some logic to prevent duplicate uploads but the core of this was up and running in about an hour or so.</p>
  
       <!-- reward -->
       
@@ -175,7 +170,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/devops/" rel="tag">devops</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Camel/" rel="tag">Camel</a></li></ul>
 
     </footer>
   </div>
@@ -183,19 +178,10 @@
    
   <nav class="article-nav">
     
-      <a href="/2023/09/02/camel-sftp-azure/" class="article-nav-link">
-        <strong class="article-nav-caption">Previous Post</strong>
-        <div class="article-nav-title">
-          
-            Integrating Azure Storage and SFTP with Apache Camel
-          
-        </div>
-      </a>
     
-    
-      <a href="/2023/07/16/krakend-response/" class="article-nav-link">
+      <a href="/2023/08/05/sidecar-logging/" class="article-nav-link">
         <strong class="article-nav-caption">Next Post</strong>
-        <div class="article-nav-title">Request/Response Shaping with KrakenD</div>
+        <div class="article-nav-title">Sidecar Logging in Openshift with Fluentd and Elasticsearch</div>
       </a>
     
   </nav>

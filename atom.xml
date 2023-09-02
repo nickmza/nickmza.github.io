@@ -6,7 +6,7 @@
   <link href="https://nickmza.github.io/atom.xml" rel="self"/>
   
   <link href="https://nickmza.github.io/"/>
-  <updated>2023-08-05T06:13:24.426Z</updated>
+  <updated>2023-09-02T05:14:15.171Z</updated>
   <id>https://nickmza.github.io/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Integrating Azure Storage and SFTP with Apache Camel</title>
+    <link href="https://nickmza.github.io/2023/09/02/camel-sftp-azure/"/>
+    <id>https://nickmza.github.io/2023/09/02/camel-sftp-azure/</id>
+    <published>2023-09-02T05:14:15.000Z</published>
+    <updated>2023-09-02T05:14:15.171Z</updated>
+    
+    
+    <summary type="html">This week I needed to get data from a Power Automate flow to an internal SFTP server. We are evaluating a couple of options for this but here&#39;s how you would do it with Apache Camel...</summary>
+    
+    
+    
+    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    
+    
+    <category term="Camel" scheme="https://nickmza.github.io/tags/Camel/"/>
+    
+  </entry>
   
   <entry>
     <title>Sidecar Logging in Openshift with Fluentd and Elasticsearch</title>
