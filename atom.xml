@@ -6,7 +6,7 @@
   <link href="https://nickmza.github.io/atom.xml" rel="self"/>
   
   <link href="https://nickmza.github.io/"/>
-  <updated>2023-09-06T13:50:57.478Z</updated>
+  <updated>2023-09-06T13:52:37.891Z</updated>
   <id>https://nickmza.github.io/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://nickmza.github.io/2023/09/06/python1/"/>
     <id>https://nickmza.github.io/2023/09/06/python1/</id>
     <published>2023-09-06T13:46:55.000Z</published>
-    <updated>2023-09-06T13:50:57.478Z</updated>
+    <updated>2023-09-06T13:52:37.891Z</updated>
     
     
     <summary type="html">I learned a bit of Python this week. Mostly though I felt like I was just figuring out how to translate between Java or C# to the Python equivalent. It was really interesting to see how certain concepts play out across the languages. It was a lot of fun and I wanted to take it a little further. I&#39;m going to do this by implementing some of the TDD Katas I&#39;ve been using for Java and C# into Python. First up Mars Rover...</summary>
