@@ -6,7 +6,7 @@
   <link href="https://nickmza.github.io/atom.xml" rel="self"/>
   
   <link href="https://nickmza.github.io/"/>
-  <updated>2023-09-02T05:14:15.171Z</updated>
+  <updated>2023-09-06T13:46:55.980Z</updated>
   <id>https://nickmza.github.io/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Adventures in Python- Mars Rover</title>
+    <link href="https://nickmza.github.io/2023/09/06/python1/"/>
+    <id>https://nickmza.github.io/2023/09/06/python1/</id>
+    <published>2023-09-06T13:46:55.000Z</published>
+    <updated>2023-09-06T13:46:55.980Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;I learned a bit of Python this week. Mostly though I felt like I was just figuring out how to translate between Java or C# to the Python</summary>
+        
+      
+    
+    
+    
+    
+    <category term="python" scheme="https://nickmza.github.io/tags/python/"/>
+    
+  </entry>
   
   <entry>
     <title>Integrating Azure Storage and SFTP with Apache Camel</title>
