@@ -1,12 +1,16 @@
 ---
 title: Integrating Azure Storage and SFTP with Apache Camel
-tags: 
-    - Camel
+tags:
+  - Camel
 category: Software Engineering
 ogimage: csa-1.png
-excerpt:
-    This week I needed to get data from a Power Automate flow to an internal SFTP server. We are evaluating a couple of options for this but here's how you would do it with Apache Camel...
+excerpt: >-
+  This week I needed to get data from a Power Automate flow to an internal SFTP
+  server. We are evaluating a couple of options for this but here's how you
+  would do it with Apache Camel...
+date: 2023-09-02 09:14:15
 ---
+
 
 This week I needed to get data from a Power Automate flow to an internal SFTP server. We are evaluating a couple of options for this but here's how you would do it with Apache Camel.
 
@@ -19,12 +23,12 @@ To simplify testing I wanted a local SFTP instance to work with. I used the atmo
 docker run -p 22:22 -d atmoz/sftp foo:pass:::upload
 ```
 
-Once this is runnung you can log into the local sftp as follows:
+Once this is running you can log into the local sftp as follows:
 ```
 sftp -P 22 foo@127.0.0.1  
 ```
 
-# Azure Storage Blob
+# Azure Storage Blob    
 
 Connecting to Azure Storage is straight-forward. Add a reference to the [Azure Storage Blob Component](https://camel.apache.org/components/4.0.x/azure-storage-blob-component.html#_message_headers).
 
@@ -75,20 +79,20 @@ Once we have uploaded the file to SFTP we need to delete the original blob - oth
 ```
 The Blob component figures out which Blob to delete based on the BlobConstants.BLOB_NAME header. You can also specify which Blob to delete in the route itself.
 
-# Tying it all tegether.
+# Bringing it all together.
 Here's the final route:
 ```
-    from(config.getSourceUri())
-        .routeId(FUSION_GL_UPDATE)
-        .log(LoggingLevel.INFO, "File Received: $simple{in.header.CamelAzureStorageBlobBlobName}")
-        .log(LoggingLevel.DEBUG, "Contents: ${body}")
-        .process(exchange -> {
-            String filename = exchange.getIn().getHeader(BlobConstants.BLOB_NAME, String.class);
-            exchange.getIn().setHeader(FtpConstants.FILE_NAME, filename);
-        })
-        .to(config.getDestinationUri())
-        .to(config.getSourceUri() + "&blobName=blob&operation=deleteBlob")
-        .log(LoggingLevel.INFO, "File delivered.");
+    from(config.getSourceUri()) 
+        .routeId(FUSION_GL_UPDATE) 
+        .log(LoggingLevel.INFO, "File Received: $simple{in.header.CamelAzureStorageBlobBlobName}") 
+        .log(LoggingLevel.DEBUG, "Contents: ${body}") 
+        .process(exchange -> { 
+            String filename = exchange.getIn().getHeader(BlobConstants.BLOB_NAME, String.class); 
+            exchange.getIn().setHeader(FtpConstants.FILE_NAME, filename); 
+        }) 
+        .to(config.getDestinationUri()) 
+        .to(config.getSourceUri() + "&blobName=blob&operation=deleteBlob") 
+        .log(LoggingLevel.INFO, "File delivered."); 
 ```
 
 # Conclusion

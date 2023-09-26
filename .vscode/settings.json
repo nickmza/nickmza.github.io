@@ -1,5 +1,62 @@
 {
     "cSpell.words": [
         "XAAS"
-    ]
+    ],
+    "cSpell.enableFiletypes": [
+        "md"
+    ],
+    "cSpell.enabledLanguageIds": [
+        "asciidoc",
+        "c",
+        "cpp",
+        "csharp",
+        "css",
+        "elixir",
+        "erlang",
+        "git-commit",
+        "go",
+        "graphql",
+        "handlebars",
+        "haskell",
+        "html",
+        "jade",
+        "java",
+        "javascript",
+        "javascriptreact",
+        "json",
+        "jsonc",
+        "jupyter",
+        "latex",
+        "less",
+        "markdown",
+        "php",
+        "plaintext",
+        "python",
+        "pug",
+        "restructuredtext",
+        "rust",
+        "scala",
+        "scss",
+        "scminput",
+        "swift",
+        "text",
+        "typescript",
+        "typescriptreact",
+        "vue",
+        "yaml",
+        "yml",
+        "md"
+    ],
+    "cSpell.allowedSchemas": [
+        "file",
+        "gist",
+        "repo",
+        "sftp",
+        "untitled",
+        "vscode-notebook-cell",
+        "vscode-scm",
+        "vscode-userdata",
+        "md"
+    ],
+    "cSpell.enabled": true
 }
