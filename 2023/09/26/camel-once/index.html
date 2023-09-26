@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="agile, tdd, software engineering" />
+       
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      
+        <meta property="og:image" content="cm1.png"/>
+        <meta property="og:description" content="In Enterprise Integration the Idempotent Receiver Pattern ensures that regardless of how many times a message is received the same result is produced. I wanted to see how Camel implements this pattern and explore some of the edge cases."/>
+        
+      <title>Idempotent message processing with Camel |  nick dot blog</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KXJW9BVBJ4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KXJW9BVBJ4');
+</script>
+
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="nick dot blog" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-camel-once"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Idempotent message processing with Camel
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/09/26/camel-once/" class="article-date">
+  <time datetime="2023-09-26T10:48:22.000Z" itemprop="datePublished">2023-09-26</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Software-Engineering/">Software Engineering</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">755</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">4 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>In Enterprise Integration the <a target="_blank" rel="noopener" href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/IdempotentReceiver.html">Idempotent Receiver Pattern</a> ensures that regardless of how many times a message is received the same result is produced. I wanted to see how Camel implements this pattern and explore some of the edge cases.</p>
+<p>The setup is below. I have a single queue containing duplicate messages. In order to scale horizontally I want to have multiple receivers but I also want to ensure that the duplicate messages are not processed twice. I’ll be using Redis to store the shared state between the two receivers. </p>
+<iframe frameborder="0" style="width:100%;height:413px;" src="https://viewer.diagrams.net/?tags=%7B%7D&highlight=0000ff&edit=_blank&layers=1&nav=1&title=camel-once.drawio#R1Vhdc6IwFP01PHaHEPHjcf3obmdqx10fWh9Tc4V0kDAxKvjrNywXAam1tnWwT%2Bae3CQ351wODhYdLONfikX%2BWHIILMfmsUWHluMQp%2BWYnxRJMqTT7WWApwTHpAKYih0gaCO6FhxWlUQtZaBFVAXnMgxhrisYU0puq2kLGVRPjZgHNWA6Z0EdfRRc%2Bxnade0C%2Fw3C8%2FOTiY0zS5YnI7DyGZfbEkRHFh0oKXU2WsYDCFLycl6ydbdHZveFKQj1exbwnfMwvPvp9m4992XHw9b9wr3BXTYsWOOF%2FwIXK6xYJzkNW19omEZsnsZbI7VF%2B75eBiYiZshWUUb%2BQsRgzuvjtqA0xEfrJXsWTPuAXIJWiUnBBbSLxGHn0JzZbUkHhPySBDnGUHlvv3NBjhkgP2dw1a2xAtz0CoZSaV96MmTBqED7Sq5DnjIytE1U5NxLGSF3L6B1go3P1lpWmYVY6Cdcno5n6fiHi9EwLk0NEwyyOtPi3qbe3EWu1RzeuDM%2BvZopD%2FSpPqpLqSBgWmyqdXy5MMRpVJm9GrPSzOvKGP5V8pSnpUFJzzQslv2PmlTUblJSp%2BZLE8kNUFe6AWdyr82ZOk32P2nGmei3cCbSpDIfcia7MWd6t6KNOhM94kx1pRtwJnJtzuR%2Bm%2F43wQSUMNcGdXZvn%2BxZ%2BsmWxaUTKczJpb%2FIbkVu0jnQMXvmcNWBlPsyPq5u%2B3rUtc9Wt3C8wuRm5blPO97JrnAu0hWtdrNd0as55F1%2FbIDxn3Mt8gsckbarjkhadUckziuW2L6UJeZfNkr8PMKzAaagNsIwcQXvkUNjaXUu9h4xYfENJGvB4ksSHf0D"></iframe>
+
+<h1 id="The-test"><a href="#The-test" class="headerlink" title="The test"></a>The test</h1><p>I started by creating a unit test to describe the behaviour that I am looking for. Basically, regardless of how many times the same message is submitted I only expect it to be processed once.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line">void Messages_should_only_be_processed_once() throws Exception &#123;</span><br><span class="line"></span><br><span class="line">    Random rand = new Random();</span><br><span class="line">    var id = rand.nextInt(9999);</span><br><span class="line"></span><br><span class="line">    receiver.expectedMessageCount(1);</span><br><span class="line">    receiver.expectedBodiesReceived(id);</span><br><span class="line"></span><br><span class="line">    camelContext.start();</span><br><span class="line"></span><br><span class="line">    producerTemplate.asyncSendBody(endpoint, id);</span><br><span class="line">    producerTemplate.asyncSendBody(endpoint, id);</span><br><span class="line">    producerTemplate.asyncSendBody(endpoint, id);</span><br><span class="line">    producerTemplate.asyncSendBody(endpoint, id);</span><br><span class="line"></span><br><span class="line">    receiver.assertIsSatisfied();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Idempotent-Receiver"><a href="#Idempotent-Receiver" class="headerlink" title="Idempotent Receiver"></a>Idempotent Receiver</h1><p>Here’s the route needed to pass the test. The route is set up to receive asynchronously (up to 10 threads). When a message is received a log message is generated and then we enter the Idempotent Consumer block. We are using Redis to store state and evaluating uniqueness based on the body() of the message. If the message is deemed to be unique it is allowed into the block for processing. If not, it is discarded.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from(receiver_queue)</span><br><span class="line">    .routeId(ROUTE_ID)</span><br><span class="line">    .threads(10)</span><br><span class="line">    .log(LoggingLevel.INFO, &quot;Message Received&quot;)</span><br><span class="line">    .idempotentConsumer( body(), RedisIdempotentRepository.redisIdempotentRepository(redisTemplate,&quot;some-redis&quot;))</span><br><span class="line">    .process(this::doWork)</span><br><span class="line">    .log(LoggingLevel.INFO, &quot;Contents: $&#123;body&#125;&quot;)</span><br><span class="line">    .to(destination_queue)</span><br><span class="line">    .log(LoggingLevel.INFO, &quot;File delivered.&quot;);</span><br></pre></td></tr></table></figure>
+
+<h1 id="Edge-cases"><a href="#Edge-cases" class="headerlink" title="Edge cases"></a>Edge cases</h1><p>As is often the case with Camel a simple route hides a fair amount of complexity. In this case the complexity stems from a combination of when items are registered with the the idempotentConsumer, when they are removed from the queue and how errors are handled. </p>
+<p>Fortunately Camel offers a fair amount of configurability in how this scenario is handled. </p>
+<p>On the Idempotent Comsumer front there are a number of options:</p>
+<ul>
+<li>eager - controls whether the item is registered as soon as it enters the block or on completion of the exchange. Defaults to True.</li>
+<li>completionEager - controls whether the item is marked as processed on completion of the block or whole exchange. The implication of this is that the item will be marked as complete regardless of the outcome of subsequent actions.</li>
+<li>skipDuplicate - By default duplicates are rejected however you can opt to process them with an additional header marking that they are duplicate.</li>
+<li>removeOnFailure - By default items are removed from the Idempotent Consumer on failure of the route.</li>
+</ul>
+<p>On the queuing front the JMS component allows us 2 forms of message acknowledgement: Automatic and Manual. Automatic does what it says on the tin - when the message is received in the route it is marked as received on the queue and removed. In Manual mode the message is only removed on successful completion of the route. If the route fails, the message would not be removed.</p>
+<p>How you adjust these settings will have significant impact on the behaviour of your route. Here are some examples:</p>
+<ul>
+<li><p>If you set eager to false you could receive duplicates if 2 duplicate messages arrive in the queue at the same time and are each picked up by a separate processor. </p>
+</li>
+<li><p>If completionEager is set and the message fails after the Idempotent Consumer block you need to manually handle retrying the message. A duplicate message later will not be processed as it has already been registered.</p>
+</li>
+<li><p>If you are in Manual JMS mode you need to ensure that poison messages are handled otherwise all processing will stop if a message causes an error.</p>
+</li>
+<li><p>If you combine Manual JMS mode with completionEager you could create the situation where the item is registered as having been processed with the Idempotent Consumer, but not removed from the queue. On retry the message would be treated as a duplicate as discarded.</p>
+</li>
+</ul>
+<h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><p>Idempotent message semantics can be complicated. You need to look at the specific use case, design and performance considerations to figure out the correct way forward. The Camel Idempotent Consumer is effectively providing a de-duping service but as seen above there are edge cases where a duplicate could arise.  You may need to add additional logic to ensure that if a duplicate message does get through that the downstream systems handle it effectively. </p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Camel/" rel="tag">Camel</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2023/09/06/python1/" class="article-nav-link">
+        <strong class="article-nav-caption">Next Post</strong>
+        <div class="article-nav-title">Adventures in Python- Mars Rover</div>
+      </a>
+    
+  </nav>
+
+  
+   
+<div class="gitalk" id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.7.2/gitalk.min.css">
+
+
+<script src="https://cdn.staticfile.org/gitalk/1.7.2/gitalk.min.js"></script>
+
+
+<script src="https://cdn.staticfile.org/blueimp-md5/2.19.0/js/md5.min.js"></script>
+
+<script type="text/javascript">
+  var gitalk = new Gitalk({
+    clientID: '8318211c28156a054b60',
+    clientSecret: 'a3e7c2c22e61867951cbca3c52fbcc22f43dcfb8',
+    repo: 'BlogComments',
+    owner: 'nickmza',
+    admin: ['nickmza'],
+    // id: location.pathname,      // Ensure uniqueness and length less than 50
+    id: md5(location.pathname),
+    distractionFreeMode: false,  // Facebook-like distraction free mode
+    pagerDirection: 'last'
+  })
+
+  gitalk.render('gitalk-container')
+</script>
+
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> Nick Mckenzie
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/goober.png" alt="nick dot blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">Categories</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">Tags</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/Resources">Resources</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
