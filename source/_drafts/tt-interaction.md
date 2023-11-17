@@ -25,6 +25,7 @@ Another common scenario is where one team is dependent on another due to access 
 
 In this approach one team coaches the other to build the capabilities to make the other independent. This would typically require training, documentation, tooling and QA activities. If successful you will have managed to largely remove a dependency between teams which will allow each to be more efficient.
 
+I would recommend that you take an iterative approach to this rather than trying to make a team totally independent in one go. Identify the simple use-cases first and then hand these over. Once the team has built competency and confidence with the simple scenarios you can gradually add complexity.
 
 
 # The results
