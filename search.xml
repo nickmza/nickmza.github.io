@@ -978,4 +978,120 @@
         <tag>design</tag>
       </tags>
   </entry>
+  <entry>
+    <title>JWT User Assertion with Oracle Integration Cloud</title>
+    <url>/2023/11/17/oicjwt/</url>
+    <content><![CDATA[<p>Nothing brings out the blogger in me like spending a couple of days wrestling with a problem. This weeks’ challenge has been configuring OAuth 2 User Assertion on the Oracle Integration Cloud (OIC). It’s taken a couple of days of trial and error but it’s finally working! So in the hope of saving future generations some time and frustration here’s how it’s done…</p>
+<h1 id="The-scenario"><a href="#The-scenario" class="headerlink" title="The scenario"></a>The scenario</h1><p>We want to push data from our O365 Sharepoint environment into our Oracle ERP system via a Power Automate Flow. We have used Oracle Integration Cloud to create a REST Trigger that receives the payload and processes it. We want to use the JWT User Assertion flow so that the client does not need to have access to any credentials.</p>
+<h1 id="About-the-JWT-User-Assertion-Flow"><a href="#About-the-JWT-User-Assertion-Flow" class="headerlink" title="About the JWT User Assertion Flow"></a>About the JWT User Assertion Flow</h1><p>The OAuth 2.0 “JWT Assertion Grant” or “JWT Bearer Token Grant” allows a client to use a JWT as an assertion to obtain an access token from an authorization server.</p>
+<p>Here’s a basic overview of the flow:</p>
+<ol>
+<li><p>Client Creates JWT Assertion:</p>
+<ul>
+<li>The client creates a JWT (JSON Web Token) containing relevant information, such as its identity, requested scope, and any other necessary claims.</li>
+</ul>
+</li>
+<li><p>Client Sends Assertion to Authorization Server:</p>
+<ul>
+<li>The client sends the JWT as an assertion to the authorization server, typically in the assertion parameter of the token request.</li>
+</ul>
+</li>
+<li><p>Authorization Server Validates JWT:</p>
+<ul>
+<li>The authorization server validates the JWT, checking its signature, expiration, and any other relevant claims.</li>
+</ul>
+</li>
+<li><p>Token Issuance:</p>
+<ul>
+<li>If the JWT is valid, the authorization server responds with an access token.</li>
+</ul>
+</li>
+<li><p>Client Uses Access Token:</p>
+<ul>
+<li>The client can now use the obtained access token to access protected resources on behalf of the user.</li>
+</ul>
+</li>
+</ol>
+<p>This flow is useful in scenarios where the client can provide a signed assertion (JWT) to prove its identity and request access without going through the typical user authorization process involving redirects and user interactions.</p>
+<h1 id="Create-and-export-your-certificate"><a href="#Create-and-export-your-certificate" class="headerlink" title="Create and export your certificate"></a>Create and export your certificate</h1><p>Generate the self-signed key pair</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">keytool -genkey -keyalg RSA -alias assert -keystore sampleKeystore.jks -storepass samplePasswd -validity 365 -keysize 2048</span><br></pre></td></tr></table></figure>
+
+<p>Export the public key for signing the JWT assertion</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">keytool -exportcert -alias assert -file assert.cer -keystore sampleKeystore.jks -storepass samplePasswd</span><br></pre></td></tr></table></figure>
+
+<p>Convert the keystore to P12 format</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">keytool -importkeystore -srckeystore sampleKeystore.jks -srcstorepass samplePasswd -srckeypass samplePasswd -srcalias assert -destalias assert -destkeystore assert.p12 -deststoretype PKCS12 -deststorepass samplePasswd -destkeypass samplePasswd</span><br></pre></td></tr></table></figure>
+
+<p>Export the private key from the P12 keystore</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">openssl pkcs12 -in assert.p12 -nodes -nocerts -out private_key.pem</span><br></pre></td></tr></table></figure>
+
+<h1 id="Create-your-Client-Application"><a href="#Create-your-Client-Application" class="headerlink" title="Create your Client Application"></a>Create your Client Application</h1><p>From the Oracle Identity Cloud Applications panel choose ‘Add’.<br><img src="jwt1.png"/></p>
+<p>Choose ‘Confidential Application’<br><img src="jwt2.png"/></p>
+<p>Under the ‘Client Configuration’ set the ‘Allowed Grant Types’ to ‘Client Credentials’ and ‘JWT Assertion’.<br><img src="jwt3.png"/></p>
+<p>Under ‘Security’ choose ‘Trusted Client’ and upload the .cer file you created earlier. Set the alias for the certificate and keep track of this value as you will need it later.<br><img src="jwt4.png"/></p>
+<img src="jwt5.png"/>
+
+<p>Under ‘Token Issuance Policy’ select ‘Specific’ and then ‘Add Scope’ under the ‘Resources’ section.</p>
+<img src="jwt6.png"/>
+
+<p>Find the OIC application that you want to provide access to and click the ‘&gt;’ symbol.</p>
+<img src="jwt7.png"/>
+
+<p>Select the scope that ends in ‘urn:opc:resource:consumer::all’. Keep track of this value as you will need it later.</p>
+<img src="jwt8.png"/>
+
+<p>You can accept the defaults for the remaining steps and save your application. Don’t forget to Activate it afterwards. Take note of the Client Id and Secret.</p>
+<img src="jwt10.png"/>
+
+<h1 id="Create-Trusted-Partner"><a href="#Create-Trusted-Partner" class="headerlink" title="Create Trusted Partner"></a>Create Trusted Partner</h1><p>Even though we added the certificate to the application we also need to add it as a Truster Partner. In Oracle Identity Cloud navigate to Settings, Partner Settings and click ‘Import’ under ‘Partner Settings’.<br><img src="jwt9.png"/></p>
+<p>Upload the .cer file you created earlier and set the alias to the same value you used when creating the application.</p>
+<h1 id="Generate-the-JWT-User-Assertion"><a href="#Generate-the-JWT-User-Assertion" class="headerlink" title="Generate the JWT User Assertion"></a>Generate the JWT User Assertion</h1><p>You now need to create and sign a JWT token that describes the user and scope you want access to. You then submit this token to Oracle to retrieve a Bearer token that can be used to access your OIC resource.</p>
+<p>The relevant fields in the JWT Payload are:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>sub</td>
+<td>the user name for whom user assertion is generated.</td>
+</tr>
+<tr>
+<td>aud</td>
+<td><a href="https://identity.oracle.com/">https://identity.oracle.com/</a></td>
+</tr>
+<tr>
+<td>kid</td>
+<td>The id of the key to use to verify the signature. Set this to the alias you used when uploading the certificate.</td>
+</tr>
+<tr>
+<td>iss</td>
+<td>The client id.</td>
+</tr>
+<tr>
+<td>alg</td>
+<td>Must be RS256</td>
+</tr>
+</tbody></table>
+<p>Once you have your JWT token you can submit it to Oracle as follows:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl -L -X POST &lt;Oracle Identity Cloud&gt;/oauth2/v1/token </span><br><span class="line">    -H &#x27;Content-Type: application/x-www-form-urlencoded&#x27; </span><br><span class="line">    -H &#x27;Authorization: Basic &lt;Base64 encoded client id and secret&gt;&#x27; </span><br><span class="line">    --data-urlencode grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer</span><br><span class="line">    --data-urlencode assertion=&lt;your JWT Token&gt;</span><br><span class="line">    --data-urlencode scope=&lt;your scope&gt;</span><br></pre></td></tr></table></figure>
+<p>See <a href="https://docs.oracle.com/en/cloud/paas/identity-cloud/rest-api/op-oauth2-v1-token-post.html">here</a> for the API Documentation.</p>
+<p>Alternatively you can use <a href="https://orasites-prodapp.ocecdn.oraclecloud.com/content/published/api/v1.1/assets/CONT89581F004ECA48BC9FDF023E6BA5EBD9/native/generateJWTUserAssertion.sh?channelToken=842764f99b9a4a06a862ebc785ac9897">this</a> Oracle-supplied script.</p>
+<p>You will need to edit the following parameters in the script:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">APP_ID=&quot;&lt;your client id&gt;&quot;</span><br><span class="line">AUD=&quot;https://identity.oraclecloud.com/&quot;</span><br><span class="line">SUB=&quot;&lt;user name&gt;&quot;</span><br><span class="line">JTI=&quot;8c7df446-bfae-40be-be09-0ab55c655436&quot;</span><br><span class="line">KID=&quot;&lt;certificate alias&gt;&quot;</span><br><span class="line"></span><br><span class="line">ClientID=&quot;&lt;your client id&gt;&quot;</span><br><span class="line">ClientSecret=&quot;&lt;your client secret&gt;&quot;</span><br><span class="line">Scope=&quot;&lt;your OIC scope recorded earlier&gt;urn:opc:resource:consumer::all&quot;</span><br></pre></td></tr></table></figure>
+
+<p>Either way Oracle will respond with a Bearer token. Pass this in the Authentication Header when calling your OIC flow in order to authenticate.</p>
+<img src="jwt11.png"/>
+
+<h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><p>There you go! At this point you are successfully authenticating against your OIC Rest Service using a JWT Bearer token. </p>
+]]></content>
+      <categories>
+        <category>Software Engineering</category>
+      </categories>
+      <tags>
+        <tag>oauth</tag>
+      </tags>
+  </entry>
 </search>

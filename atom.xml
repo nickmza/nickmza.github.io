@@ -6,7 +6,7 @@
   <link href="https://nickmza.github.io/atom.xml" rel="self"/>
   
   <link href="https://nickmza.github.io/"/>
-  <updated>2023-10-27T06:27:17.053Z</updated>
+  <updated>2023-12-28T07:04:26.164Z</updated>
   <id>https://nickmza.github.io/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JWT User Assertion with Oracle Integration Cloud</title>
+    <link href="https://nickmza.github.io/2023/11/17/oicjwt/"/>
+    <id>https://nickmza.github.io/2023/11/17/oicjwt/</id>
+    <published>2023-11-17T07:04:00.000Z</published>
+    <updated>2023-12-28T07:04:26.164Z</updated>
+    
+    
+    <summary type="html">Nothing brings out the blogger in me like spending a couple of days wrestling with a problem. This weeks&#39; challenge has been configuring OAuth 2 User Assertion on the Oracle Integration Cloud (OIC). It&#39;s taken a couple of days of trial and error but it&#39;s finally working! So in the hope of saving future generations some time and frustration here&#39;s how it&#39;s done...</summary>
+    
+    
+    
+    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    
+    
+    <category term="oauth" scheme="https://nickmza.github.io/tags/oauth/"/>
+    
+  </entry>
   
   <entry>
     <title>Testable Architecture with ArchUnit</title>
@@ -358,25 +377,6 @@
     <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
     
     <category term="Camel" scheme="https://nickmza.github.io/tags/Camel/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Agile does not work but agile does</title>
-    <link href="https://nickmza.github.io/2016/11/04/agile-does-not-work/"/>
-    <id>https://nickmza.github.io/2016/11/04/agile-does-not-work/</id>
-    <published>2016-11-03T20:00:00.000Z</published>
-    <updated>2023-07-27T06:02:28.025Z</updated>
-    
-    
-    <summary type="html">In his article ‘[Agile Does Not Work](https://www.linkedin.com/pulse/agile-does-work-oleg-vishnepolsky?trk=hp-feed-article-title-like)’ Oleg Vishnepolsky makes several observations based on his experiences with Agile development (note the big ‘A’, it&#39;s my emphasis, not his). Specifically, he cites issues with quality, predictability, poor strategic alignment, monolithic architecture due to poor design, complex and costing infrastructure and challenges managing stakeholders.</summary>
-    
-    
-    
-    <category term="Agile" scheme="https://nickmza.github.io/categories/Agile/"/>
-    
-    
-    <category term="Agile" scheme="https://nickmza.github.io/tags/Agile/"/>
     
   </entry>
   
