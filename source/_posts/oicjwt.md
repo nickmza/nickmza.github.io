@@ -1,9 +1,19 @@
 ---
 title: JWT User Assertion with Oracle Integration Cloud
-tags:
+tags: oauth
+category:
+  - Software Engineering
+excerpt: >-
+  Nothing brings out the blogger in me like spending a couple of days wrestling
+  with a problem. This weeks' challenge has been configuring OAuth 2 User
+  Assertion on the Oracle Integration Cloud (OIC). It's taken a couple of days
+  of trial and error but it's finally working! So in the hope of saving future
+  generations some time and frustration here's how it's done...
+date: 2023-11-17 09:04:00
 ---
 
-Nothing brings out the blogger in me like spending a couple of days wrestling with a problem. This weeks' challenge has been configuring OAuth 2 User Assertion on the Oracle Integration Cloud (OIC). It's taken a couple of days of trial and error but it's finally working! So to hopefully save future generations some time and frustration here's how it's done...
+
+Nothing brings out the blogger in me like spending a couple of days wrestling with a problem. This weeks' challenge has been configuring OAuth 2 User Assertion on the Oracle Integration Cloud (OIC). It's taken a couple of days of trial and error but it's finally working! So in the hope of saving future generations some time and frustration here's how it's done...
 
 # The scenario
 We want to push data from our O365 Sharepoint environment into our Oracle ERP system via a Power Automate Flow. We have used Oracle Integration Cloud to create a REST Trigger that receives the payload and processes it. We want to use the JWT User Assertion flow so that the client does not need to have access to any credentials.
@@ -82,7 +92,7 @@ Select the scope that ends in 'urn:opc:resource:consumer::all'. Keep track of th
 
 <img src="jwt8.png"/>
 
-You can accept the defaults for the remaining steps and Save your application. Don't forget to Activate it afterwards. Take note of the Client Id and Secret.
+You can accept the defaults for the remaining steps and save your application. Don't forget to Activate it afterwards. Take note of the Client Id and Secret.
 
 <img src="jwt10.png"/>
 
@@ -98,7 +108,8 @@ You now need to create and sign a JWT token that describes the user and scope yo
 
 The relevant fields in the JWT Payload are:
 
-| Field | Description |
+|Field|Description|
+| ----------- | ----------- |
 | sub | the user name for whom user assertion is generated. |
 | aud | https://identity.oracle.com/ |
 | kid | The id of the key to use to verify the signature. Set this to the alias you used when uploading the certificate. |
@@ -134,5 +145,9 @@ Scope="<your OIC scope recorded earlier>urn:opc:resource:consumer::all"
 Either way Oracle will respond with a Bearer token. Pass this in the Authentication Header when calling your OIC flow in order to authenticate.
 
 <img src="jwt11.png"/>
+
+# Conclusion
+
+There you go! At this point you are successfully authenticating against your OIC Rest Service using a JWT Bearer token. 
 
 
