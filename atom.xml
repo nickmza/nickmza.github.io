@@ -6,7 +6,7 @@
   <link href="https://nickmza.github.io/atom.xml" rel="self"/>
   
   <link href="https://nickmza.github.io/"/>
-  <updated>2023-12-28T07:04:26.164Z</updated>
+  <updated>2024-02-22T04:36:48.748Z</updated>
   <id>https://nickmza.github.io/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Improving Camunda UI with Form.io</title>
+    <link href="https://nickmza.github.io/2024/02/21/camunda-forms/"/>
+    <id>https://nickmza.github.io/2024/02/21/camunda-forms/</id>
+    <published>2024-02-20T20:00:00.000Z</published>
+    <updated>2024-02-22T04:36:48.748Z</updated>
+    
+    
+    <summary type="html">I wanted to see if I could leverage the Form.io Form Renderer from within a Camunda Embedded Form. Turns out you can...</summary>
+    
+    
+    
+    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    
+    
+    <category term="workflow" scheme="https://nickmza.github.io/tags/workflow/"/>
+    
+    <category term="camunda" scheme="https://nickmza.github.io/tags/camunda/"/>
+    
+  </entry>
   
   <entry>
     <title>JWT User Assertion with Oracle Integration Cloud</title>
@@ -356,27 +377,6 @@
     
     
     <category term="Agile" scheme="https://nickmza.github.io/tags/Agile/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Riding the Camel: A Practical Guide to TDD with Apache Camel</title>
-    <link href="https://nickmza.github.io/2023/03/31/Apache-Camel/"/>
-    <id>https://nickmza.github.io/2023/03/31/Apache-Camel/</id>
-    <published>2023-03-31T09:57:01.000Z</published>
-    <updated>2023-07-27T06:02:28.009Z</updated>
-    
-    
-    <summary type="html">Recently I&#39;ve been working with a team integrating Fraud Detection software into our Core Banking System (CBS). This involves sending messages asynchronously between the systems. We are using Apache Camel for this as opposed to our standard integration platform IBM AppConnect. One of the things that make Camel attractive is its first-class support for a Test Driven Development approach. Camel allows us to incrementally evolve our integration code using tests to drive the approach. This is very cool. That said, it&#39;s not been exactly easy so whilst it&#39;s still fresh in my head I thought I would put down some points about how to make this work in your own projects.</summary>
-    
-    
-    
-    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
-    
-    
-    <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
-    
-    <category term="Camel" scheme="https://nickmza.github.io/tags/Camel/"/>
     
   </entry>
   

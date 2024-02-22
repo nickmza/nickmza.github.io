@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="agile, tdd, software engineering" />
+       
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      
+      <title>Improving Camunda UI with Form.io |  nick dot blog</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KXJW9BVBJ4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KXJW9BVBJ4');
+</script>
+
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="nick dot blog" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-camunda-forms"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Improving Camunda UI with Form.io
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2024/02/21/camunda-forms/" class="article-date">
+  <time datetime="2024-02-20T20:00:00.000Z" itemprop="datePublished">2024-02-21</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Software-Engineering/">Software Engineering</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">1.4k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">8 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>In the Camunda space there are several options for adding a user interface to your workflow. On the one extreme is the Camunda Tasklist with its Forms Modeller or Embedded Forms. On the other is a bespoke User Interface created using the technology of your choice. There are benefits and challenges with both. Whilst Tasklist allows for rapid prototyping and validation of your workflow it comes at the expense of User Experience. The Forms Modeller is not sufficient for anything but the simplest of forms. Embedded forms allow for more flexibility but creating complex forms can be time consuming. A custom application gives you full control over the user experience - but at the cost of more development effort and the added complexity of building a truely data-driven application. This last part is crucial to get right otherwise when your workflow changes your application’s UI will need to be changed. </p>
+<p>My preference is that we always start with the simplest UI in Tasklist and rapidly iterate so that we can get the workflow and integrations in place. If at that time the UI is adequate we can move on. If not we can then try to address any UI concerns via Embedded Forms. If this fails though we are looking at having to create a fully-custom UI. The challenge we face is that the effort to create a better experience with Embedded Forms is often significant. This leads to pressure to jump straight to the fully-custom option. I wanted to see if there was a way to get a better experience out of Tasklist by addressing some of the issues with Embedded Forms.</p>
+<p>After some searching online I came across <a target="_blank" rel="noopener" href="https://form.io/">Form.io</a> - a javascript-based forms engine.</p>
+<h1 id="Form-io"><a href="#Form-io" class="headerlink" title="Form.io"></a>Form.io</h1><p>Form.io is designed to render forms from a JSON definition and submit them to the Form.io backend for processing. However it also allows you to simply capture the data and then implement the backend yourself. In this case I wanted to use Form.io to capture my data and then pass this to Camunda. </p>
+<p>I started by designing a simple form using the Form.io Form Builder:<br><img src="cf1.png"/></p>
+<p>This results in the following JSON:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;display&quot;</span><span class="punctuation">:</span> <span class="string">&quot;form&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;components&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;label&quot;</span><span class="punctuation">:</span> <span class="string">&quot;First Name&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;applyMaskOn&quot;</span><span class="punctuation">:</span> <span class="string">&quot;change&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;tableView&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;validate&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;required&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;maxLength&quot;</span><span class="punctuation">:</span> <span class="number">15</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;key&quot;</span><span class="punctuation">:</span> <span class="string">&quot;firstName&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;textfield&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;input&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;label&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Last Name&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;applyMaskOn&quot;</span><span class="punctuation">:</span> <span class="string">&quot;change&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;tableView&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;validate&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;required&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;maxWords&quot;</span><span class="punctuation">:</span> <span class="number">20</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;key&quot;</span><span class="punctuation">:</span> <span class="string">&quot;lastName&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;textfield&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;input&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="Adding-Form-io-to-Camunda-Tasklist"><a href="#Adding-Form-io-to-Camunda-Tasklist" class="headerlink" title="Adding Form.io to Camunda Tasklist"></a>Adding Form.io to Camunda Tasklist</h1><p>The first thing you need to do is to add the Form.io scripts to the Tasklist. You can do this by adding the reference as a &lt; script &#x2F;&gt; tag in the Embedded Form but this will cause issues as the script will be loaded asynchronously potentially causing a race condition. Also adding the script in this manner means that Camunda will reload the script every time the form us accessed. A better way is to provide the script to all forms. To do this create a new directory at ‘<Camunda>&#x2F;app&#x2F;tasklist&#x2F;scripts&#x2F;formio’ and add the formio.full.min.js script. Then edit the config.js in the scripts directory as follows:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">export default <span class="punctuation">&#123;</span></span><br><span class="line">    ...</span><br><span class="line">   customScripts<span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">      &#x27;scripts/formio/formio.full.min.js&#x27;</span><br><span class="line">   <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">   ...</span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="Creating-the-Embedded-Form"><a href="#Creating-the-Embedded-Form" class="headerlink" title="Creating the Embedded Form"></a>Creating the Embedded Form</h1><p>Start by adding the Form.io stylesheets and creating a div to render the form into. Next create a function to return your JSON. You can load this from your Deployment or code it in your form. Lastly use createForm method of the Formio object to render the form.</p>
+<p>Here is the mark&#x3D;up:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">role</span>=<span class="string">&quot;form&quot;</span> <span class="attr">name</span>=<span class="string">&quot;form&quot;</span>&gt;</span></span><br><span class="line">  </span><br><span class="line">  <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">href</span>=<span class="string">&quot;https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css&quot;</span> <span class="attr">crossorigin</span>=<span class="string">&quot;anonymous&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">href</span>=<span class="string">&quot;https://cdn.form.io/formiojs/formio.form.min.css&quot;</span> <span class="attr">crossorigin</span>=<span class="string">&quot;anonymous&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">href</span>=<span class="string">&quot;https://cdn.form.io/formiojs/formio.full.min.css&quot;</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;formio&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">    <span class="keyword">function</span> <span class="title function_">getFormData</span>(<span class="params"></span>)&#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="comment">//return your Form.io JSON</span></span></span><br><span class="line"><span class="language-javascript">    &#125;</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">    <span class="title class_">Formio</span>.<span class="title function_">createForm</span>(<span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;formio&#x27;</span>), <span class="title function_">getFormData</span>());</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure> 
+
+<p>Here is the form in Tasklist:<br><img src="cf2.png"/></p>
+<h1 id="Submitting-the-form"><a href="#Submitting-the-form" class="headerlink" title="Submitting the form"></a>Submitting the form</h1><p>To submit the form we need to get the values from the Form.io form and save them as Camunda variables. I’ve implemented this code in the CamScript submit function as follows:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">camForm.<span class="title function_">on</span>(<span class="string">&#x27;submit&#x27;</span>, <span class="keyword">function</span>(<span class="params">evt</span>) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> form = <span class="title class_">Object</span>.<span class="title function_">values</span>(<span class="title class_">Formio</span>.<span class="property">forms</span>)[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> firstName = form.<span class="title function_">getComponent</span>(<span class="string">&#x27;firstName&#x27;</span>).<span class="title function_">getValue</span>();</span><br><span class="line">    <span class="keyword">var</span> lastName = form.<span class="title function_">getComponent</span>(<span class="string">&#x27;lastName&#x27;</span>).<span class="title function_">getValue</span>();</span><br><span class="line">  </span><br><span class="line">    camForm.<span class="property">variableManager</span>.<span class="title function_">createVariable</span>(&#123;</span><br><span class="line">        <span class="attr">name</span>: <span class="string">&#x27;firstName&#x27;</span>,</span><br><span class="line">        <span class="attr">type</span>: <span class="string">&#x27;String&#x27;</span>,</span><br><span class="line">        <span class="attr">value</span>: firstName</span><br><span class="line">    &#125;);</span><br><span class="line">  </span><br><span class="line">    camForm.<span class="property">variableManager</span>.<span class="title function_">createVariable</span>(&#123;</span><br><span class="line">        <span class="attr">name</span>: <span class="string">&#x27;lastName&#x27;</span>,</span><br><span class="line">        <span class="attr">type</span>: <span class="string">&#x27;String&#x27;</span>,</span><br><span class="line">        <span class="attr">value</span>: lastName</span><br><span class="line">    &#125;);</span><br><span class="line">    </span><br><span class="line">  &#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="Triggering-validation"><a href="#Triggering-validation" class="headerlink" title="Triggering validation"></a>Triggering validation</h1><p>As you can see in the screenshot above both fields are required. Form.io will validate the fields if you edit their contents but we need a way to trigger the form validation if the user clicks the ‘Complete’ button directly. This turned out to be a lot trickier than I expected…</p>
+<p>To trigger Form.io validation you can simply call the ‘submit’ method of the ‘form’ object. This will throw an error detailing any validation errors and trigger rendering of those errors on the form. For example:</p>
+<img src="cf3.png"/>
+
+<p>The first challenge here is that ‘submit’ returns a promise, so we need to make so changes to accommodate this.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">camForm.<span class="title function_">on</span>(<span class="string">&#x27;submit&#x27;</span>, <span class="keyword">async</span> <span class="keyword">function</span>(<span class="params">evt</span>) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> form = <span class="title class_">Object</span>.<span class="title function_">values</span>(<span class="title class_">Formio</span>.<span class="property">forms</span>)[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        <span class="keyword">await</span> form.<span class="title function_">submit</span>();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> firstName = form.<span class="title function_">getComponent</span>(<span class="string">&#x27;firstName&#x27;</span>).<span class="title function_">getValue</span>();</span><br><span class="line">        <span class="keyword">var</span> lastName = form.<span class="title function_">getComponent</span>(<span class="string">&#x27;lastName&#x27;</span>).<span class="title function_">getValue</span>();</span><br><span class="line">  </span><br><span class="line">        camForm.<span class="property">variableManager</span>.<span class="title function_">createVariable</span>(&#123;</span><br><span class="line">            <span class="attr">name</span>: <span class="string">&#x27;firstName&#x27;</span>,</span><br><span class="line">            <span class="attr">type</span>: <span class="string">&#x27;String&#x27;</span>,</span><br><span class="line">            <span class="attr">value</span>: firstName</span><br><span class="line">        &#125;);</span><br><span class="line">  </span><br><span class="line">        camForm.<span class="property">variableManager</span>.<span class="title function_">createVariable</span>(&#123;</span><br><span class="line">            <span class="attr">name</span>: <span class="string">&#x27;lastName&#x27;</span>,</span><br><span class="line">            <span class="attr">type</span>: <span class="string">&#x27;String&#x27;</span>,</span><br><span class="line">            <span class="attr">value</span>: lastName</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span>(e)&#123;</span><br><span class="line">        evt.<span class="property">submitPrevented</span> = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">  &#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>I’ve added the async keyword to the event handler declaration and called ‘submit’ using await. If ‘submit’ throws an error we cancel the submit by setting ‘submitPrevented’ to true.</p>
+<p>Only one problem… this does not work. Regardless of how or where I set ‘submitPrevented’ Camunda would not cancel the submit and move the workflow to the next activity.</p>
+<p>The culprit is the introduction of the promise-based ‘submit’ method. It seems that regardless of what is inside the camForm event it is processed synchronously. I found a support article which references this behaviour and suggested a possible solution - call the event recursively. This works,  I am really not happy with it, but until I find a better solution here it is:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt; script cam-script type=<span class="string">&quot;text/form-script&quot;</span>&gt;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> blockSubmit = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">  camForm.<span class="title function_">on</span>(<span class="string">&#x27;submit&#x27;</span>, <span class="keyword">async</span> <span class="keyword">function</span>(<span class="params">evt</span>) &#123;</span><br><span class="line"></span><br><span class="line">    evt.<span class="property">submitPrevented</span> = blockSubmit;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> form = <span class="title class_">Object</span>.<span class="title function_">values</span>(<span class="title class_">Formio</span>.<span class="property">forms</span>)[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">      <span class="keyword">await</span> form.<span class="title function_">submit</span>();</span><br><span class="line"></span><br><span class="line">      blockSubmit = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">var</span> firstName = form.<span class="title function_">getComponent</span>(<span class="string">&#x27;firstName&#x27;</span>).<span class="title function_">getValue</span>();</span><br><span class="line">      <span class="keyword">var</span> lastName = form.<span class="title function_">getComponent</span>(<span class="string">&#x27;lastName&#x27;</span>).<span class="title function_">getValue</span>();</span><br><span class="line"></span><br><span class="line">      <span class="title function_">createVariable</span>(<span class="string">&#x27;firstName&#x27;</span>, firstName);</span><br><span class="line">      <span class="title function_">createVariable</span>(<span class="string">&#x27;lastName&#x27;</span>, lastName);</span><br><span class="line"></span><br><span class="line">      $scope.<span class="title function_">complete</span>();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span>(e)&#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(e);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">  &#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>By default ‘blockSubmit’ is false which means that Camunda will not process the submit. When we run the ‘form.submit()’ if there are no issues we set ‘blockSubmit’ to true and then force another submit via ‘$scope.complete()’.</p>
+<blockquote>
+<p>Open to suggestions on how to make this less cringe-inducing. Let me know in the comments.</p>
+</blockquote>
+<h1 id="Next-Steps"><a href="#Next-Steps" class="headerlink" title="Next Steps"></a>Next Steps</h1><p>This took a bit of reading and tinkering to get working but the result is a powerful forms engine running within Embedded Forms for a handful of lines of code. This should provide us more headroom in our Workflow projects between the default Tasklist experiences and needing a full-blown custom application. I’m going to try implement one of our more complex forms using Form.io and see how it goes. Will save that for another post…</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/camunda/" rel="tag">camunda</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/workflow/" rel="tag">workflow</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2023/11/17/oicjwt/" class="article-nav-link">
+        <strong class="article-nav-caption">Next Post</strong>
+        <div class="article-nav-title">JWT User Assertion with Oracle Integration Cloud</div>
+      </a>
+    
+  </nav>
+
+  
+   
+<div class="gitalk" id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.7.2/gitalk.min.css">
+
+
+<script src="https://cdn.staticfile.org/gitalk/1.7.2/gitalk.min.js"></script>
+
+
+<script src="https://cdn.staticfile.org/blueimp-md5/2.19.0/js/md5.min.js"></script>
+
+<script type="text/javascript">
+  var gitalk = new Gitalk({
+    clientID: '8318211c28156a054b60',
+    clientSecret: 'a3e7c2c22e61867951cbca3c52fbcc22f43dcfb8',
+    repo: 'BlogComments',
+    owner: 'nickmza',
+    admin: ['nickmza'],
+    // id: location.pathname,      // Ensure uniqueness and length less than 50
+    id: md5(location.pathname),
+    distractionFreeMode: false,  // Facebook-like distraction free mode
+    pagerDirection: 'last'
+  })
+
+  gitalk.render('gitalk-container')
+</script>
+
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2024
+        <i class="ri-heart-fill heart_icon"></i> Nick Mckenzie
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/goober.png" alt="nick dot blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">Home</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">Archives</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">Categories</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">Tags</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/Resources">Resources</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">About</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
