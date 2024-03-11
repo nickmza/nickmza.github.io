@@ -1,14 +1,17 @@
 ---
-title: Improving Camunda UI with Form.io 
-tags: 
+title: Improving Camunda UI with Form.io
+tags:
   - workflow
   - camunda
 category:
   - Software Engineering
 excerpt: >-
-  I wanted to see if I could leverage the Form.io Form Renderer from within a Camunda Embedded Form. Turns out you can...
-date: 2024-02-21
+  I wanted to see if I could leverage the Form.io Form Renderer from within a
+  Camunda Embedded Form. Turns out you can...
+date: 2024-02-21 00:00:00
+ogimage: cf4.png
 ---
+
 
 In the Camunda space there are several options for adding a user interface to your workflow. On the one extreme is the Camunda Tasklist with its Forms Modeller or Embedded Forms. On the other is a bespoke User Interface created using the technology of your choice. There are benefits and challenges with both. Whilst Tasklist allows for rapid prototyping and validation of your workflow it comes at the expense of User Experience. The Forms Modeller is not sufficient for anything but the simplest of forms. Embedded forms allow for more flexibility but creating complex forms can be time consuming. A custom application gives you full control over the user experience - but at the cost of more development effort and the added complexity of building a truely data-driven application. This last part is crucial to get right otherwise when your workflow changes your application's UI will need to be changed. 
 
