@@ -6,7 +6,7 @@
   <link href="https://nickmza.github.io/atom.xml" rel="self"/>
   
   <link href="https://nickmza.github.io/"/>
-  <updated>2024-02-22T04:56:49.110Z</updated>
+  <updated>2024-03-11T09:07:32.304Z</updated>
   <id>https://nickmza.github.io/</id>
   
   <author>
@@ -17,14 +17,14 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Improving Camunda UI with Form.io</title>
-    <link href="https://nickmza.github.io/2024/02/21/camunda-forms/"/>
-    <id>https://nickmza.github.io/2024/02/21/camunda-forms/</id>
-    <published>2024-02-20T20:00:00.000Z</published>
-    <updated>2024-02-22T04:56:49.110Z</updated>
+    <title>Custom filters in Camunda Tasklist</title>
+    <link href="https://nickmza.github.io/2024/03/10/camunda-filters/"/>
+    <id>https://nickmza.github.io/2024/03/10/camunda-filters/</id>
+    <published>2024-03-09T20:00:00.000Z</published>
+    <updated>2024-03-11T09:07:32.304Z</updated>
     
     
-    <summary type="html">I wanted to see if I could leverage the Form.io Form Renderer from within a Camunda Embedded Form. Turns out you can...</summary>
+    <summary type="html">How to add custom filters to the Camunda Tasklist.</summary>
     
     
     
@@ -38,14 +38,14 @@
   </entry>
   
   <entry>
-    <title>Custom filters in Camunda Tasklist</title>
-    <link href="https://nickmza.github.io/2024/02/21/camunda-filters/"/>
-    <id>https://nickmza.github.io/2024/02/21/camunda-filters/</id>
+    <title>Improving Camunda UI with Form.io</title>
+    <link href="https://nickmza.github.io/2024/02/21/camunda-forms/"/>
+    <id>https://nickmza.github.io/2024/02/21/camunda-forms/</id>
     <published>2024-02-20T20:00:00.000Z</published>
-    <updated>2024-03-11T07:58:44.962Z</updated>
+    <updated>2024-02-22T04:56:49.110Z</updated>
     
     
-    <summary type="html">How to add custom filters to the Camunda Tasklist.</summary>
+    <summary type="html">I wanted to see if I could leverage the Form.io Form Renderer from within a Camunda Embedded Form. Turns out you can...</summary>
     
     
     
