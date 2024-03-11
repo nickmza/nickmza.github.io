@@ -38,6 +38,27 @@
   </entry>
   
   <entry>
+    <title>Custom filters in Camunda Tasklist</title>
+    <link href="https://nickmza.github.io/2024/02/21/camunda-filters/"/>
+    <id>https://nickmza.github.io/2024/02/21/camunda-filters/</id>
+    <published>2024-02-20T20:00:00.000Z</published>
+    <updated>2024-03-11T07:58:44.962Z</updated>
+    
+    
+    <summary type="html">How to add custom filters to the Camunda Tasklist.</summary>
+    
+    
+    
+    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    
+    
+    <category term="workflow" scheme="https://nickmza.github.io/tags/workflow/"/>
+    
+    <category term="camunda" scheme="https://nickmza.github.io/tags/camunda/"/>
+    
+  </entry>
+  
+  <entry>
     <title>JWT User Assertion with Oracle Integration Cloud</title>
     <link href="https://nickmza.github.io/2023/11/17/oicjwt/"/>
     <id>https://nickmza.github.io/2023/11/17/oicjwt/</id>
@@ -358,25 +379,6 @@
     <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
     
     <category term="Postman" scheme="https://nickmza.github.io/tags/Postman/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Team Topologies Applied</title>
-    <link href="https://nickmza.github.io/2023/04/18/team-topo/"/>
-    <id>https://nickmza.github.io/2023/04/18/team-topo/</id>
-    <published>2023-04-18T04:03:05.000Z</published>
-    <updated>2023-07-27T06:02:28.051Z</updated>
-    
-    
-    <summary type="html">Team size and structure is a common topic of discussion in software engineering at scale, and while the &quot;2 Pizza&quot; team concept popularized by Amazon can be a helpful starting point, it may not be enough. When pizzas are being delivered by the truckload, a different set of tools and strategies is required to manage the complexity and ensure successful outcomes.</summary>
-    
-    
-    
-    <category term="Team Topologies" scheme="https://nickmza.github.io/categories/Team-Topologies/"/>
-    
-    
-    <category term="Agile" scheme="https://nickmza.github.io/tags/Agile/"/>
     
   </entry>
   

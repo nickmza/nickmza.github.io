@@ -1142,4 +1142,30 @@
         <tag>camunda</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Custom filters in Camunda Tasklist</title>
+    <url>/2024/02/21/camunda-filters/</url>
+    <content><![CDATA[<p>Camunda Tasklist allows you to create filters allowing you to group tasks based on specific criteria. For example you could create a filter for ‘Expense Approvals that are older than 5 days’ or ‘Any task that is assigned to me’. Whilst there are numerous options when creating filters via the UI it has one specific gap: creating filters based on Process Variables. Here is how you can accomplish this via code. </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FilterBuilder</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    TaskService taskService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    FilterService filterService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    AuthorizationService authorizationService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@EventListener(ApplicationReadyEvent.class)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">createCustomFilter</span><span class="params">()</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">TaskQuery</span> <span class="variable">myTasksQuery</span> <span class="operator">=</span> taskService.createTaskQuery()</span><br><span class="line">                .processVariableValueEquals(<span class="string">&quot;MyCustomKey&quot;</span>,<span class="string">&quot;Custom&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">Filter</span> <span class="variable">myTasksFilter</span> <span class="operator">=</span> createFilter(<span class="string">&quot;My Custom Tasks&quot;</span>, myTasksQuery);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Filter <span class="title function_">createFilter</span><span class="params">(String filterName, TaskQuery myTasksQuery)</span> &#123;</span><br><span class="line">        <span class="type">Filter</span> <span class="variable">myTasksFilter</span> <span class="operator">=</span> filterService.newTaskFilter(filterName);</span><br><span class="line">        myTasksFilter.setOwner(<span class="string">&quot;mcbcam&quot;</span>);</span><br><span class="line">        myTasksFilter.setQuery(myTasksQuery);</span><br><span class="line">        filterService.saveFilter(myTasksFilter);</span><br><span class="line">        <span class="keyword">return</span> myTasksFilter;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>In your Camunda project create a new Component. Add a method to create your custom filter and decorate it with the ‘ApplicationReadyEvent’ Event Listener. This will trigger your code once the SpringBoot application has fully started and all the dependencies are available for injection.</p>
+<p>Start by describing the filter’s criteria. Here I am selecting for processes where the ‘MyCustomKey’ Process Variable has the value of ‘Custom’. </p>
+<blockquote>
+<p>For a full list of options to create a filter see the <a href="https://docs.camunda.org/javadoc/camunda-bpm-platform/7.3/org/camunda/bpm/engine/task/TaskQuery.html">TaskQuery</a> documentation.</p>
+</blockquote>
+<p>Then use the resulting TaskQuery object to create a new Task Filter.</p>
+<p>At this point you will have a new filter displayed in your Tasklist.</p>
+<p>What if you want to do this for everyone though? This can be done by creating a new Authorization for the filer that gives everyone Read permissions. Here’s the code…</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">configureSecurity</span><span class="params">(Filter filter)</span> &#123;</span><br><span class="line">    <span class="type">var</span> <span class="variable">authorization</span> <span class="operator">=</span> authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GLOBAL);</span><br><span class="line"></span><br><span class="line">    authorization.setUserId(Authorization.ANY);</span><br><span class="line">    authorization.setResource(Resources.FILTER);</span><br><span class="line">    authorization.addPermission(Permissions.READ);</span><br><span class="line">    authorization.setResourceId(filter.getId());</span><br><span class="line"></span><br><span class="line">    authorizationService.saveAuthorization(authorization);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>There you have it. Custom filters based on Process Variables.</p>
+]]></content>
+      <categories>
+        <category>Software Engineering</category>
+      </categories>
+      <tags>
+        <tag>workflow</tag>
+        <tag>camunda</tag>
+      </tags>
+  </entry>
 </search>
