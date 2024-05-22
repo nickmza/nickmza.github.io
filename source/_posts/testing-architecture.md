@@ -80,7 +80,7 @@ Architecture Violation [Priority: MEDIUM] - Rule 'classes that reside in a packa
 Class <mcb.camel.template.routes.GetAccountsRoute> is not assignable to mcb.camel.template.routes.RouteBuilderBase in (GetAccountsRoute.java:0)
 ```
  
-## A picture is work a thousand asserts
+## A picture is worth a thousand asserts
 
 As an alternative to describing your rules using code ArchUnit allows you to describe your rules using UML via PlantUML. Here's a simple component diagram for my solution.
 

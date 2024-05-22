@@ -3,12 +3,12 @@ title: Optimizing Pull Request Effectiveness- A Metrics-Driven Approach
 tags:
 ---
 
-> Disclaimer: In this post I will be talking about metrics related to the Pull Request process. These metrics cannot, and should never be used to, infer anything about the quality of the underlying code or the author. Furthermore teams should avoid setting targets against any of these metrics. <a href="https://en.wikipedia.org/wiki/Goodhart%27s_law">Doing so would distort any meaning or value that could be inferred from them</a>.
+> Disclaimer: In this post I will be talking about metrics related to the Pull Request process. These metrics cannot, and should never, be used to infer anything about the quality of the underlying code or the author. Furthermore teams should avoid setting targets against any of these metrics. <a href="https://en.wikipedia.org/wiki/Goodhart%27s_law">Doing so would distort any meaning or value that could be inferred from them</a>.
 
 # Pull Requests
 Pull Requests are used in some teams to control the flow of code from one branch to another. Typically a developer will complete a piece of work on one branch and then create a Pull Request to merge this work into a branch which contains the shared work of the team. At this point automated checks and tests can be run and the code is reviewed by one or more members of the team. Once everyone is satisfied the code is merged.
 
-Pull Requests help to enforce the team's standards and identify issues withing the code. Having multiple team members review the changes aids with collaboration and knowledge sharing. There are some short comings however. Pull Requests are a bottleneck. The author of the Pull Request needs to wait until one or more reviewers are available to have to code merged. This imposes a 'speed limit' on the team as a whole as changes cannot be released faster than the time it takes to complete the Pull Request process.
+Pull Requests help to enforce the team's standards and identify issues within the code. Having multiple team members review the changes aids with collaboration and knowledge sharing. There are some short comings however. Pull Requests are a bottleneck. The author of the Pull Request needs to wait until one or more reviewers are available to have the code merged. This imposes a 'speed limit' on the team as a whole as changes cannot be released faster than the time it takes to complete the Pull Request process.
 
 Given these issues it is crucial that teams employing Pull Requests are receiving the maximum value from the practice and minimise the associated context-switching and delays. In the following sections, we'll explore key metrics that can provide teams with actionable insights to enhance their Pull Request process, ensuring efficient collaboration and timely code integration.
 

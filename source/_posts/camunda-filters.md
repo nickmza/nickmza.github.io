@@ -6,7 +6,7 @@ tags:
 category:
   - Software Engineering
 excerpt: How to add custom filters to the Camunda Tasklist.
-date: 2024-02-21 00:00:00
+date: 2024-03-10 00:00:00
 ---
 
 
