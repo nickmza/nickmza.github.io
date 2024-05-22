@@ -6,7 +6,7 @@
   <link href="https://nickmza.github.io/atom.xml" rel="self"/>
   
   <link href="https://nickmza.github.io/"/>
-  <updated>2024-03-11T09:07:32.304Z</updated>
+  <updated>2024-05-22T03:42:06.393Z</updated>
   <id>https://nickmza.github.io/</id>
   
   <author>
@@ -17,9 +17,28 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Deploying Backstage on Openshift in a Corporate environment.</title>
+    <link href="https://nickmza.github.io/2024/05/22/backstage-openshift/"/>
+    <id>https://nickmza.github.io/2024/05/22/backstage-openshift/</id>
+    <published>2024-05-22T03:42:06.000Z</published>
+    <updated>2024-05-22T03:42:06.393Z</updated>
+    
+    
+    <summary type="html">Some tips on deploying Backstage on Openshift.</summary>
+    
+    
+    
+    <category term="Backstage" scheme="https://nickmza.github.io/categories/Backstage/"/>
+    
+    
+    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Custom filters in Camunda Tasklist</title>
-    <link href="https://nickmza.github.io/2024/03/10/camunda-filters/"/>
-    <id>https://nickmza.github.io/2024/03/10/camunda-filters/</id>
+    <link href="https://nickmza.github.io/2024/03/09/camunda-filters/"/>
+    <id>https://nickmza.github.io/2024/03/09/camunda-filters/</id>
     <published>2024-03-09T20:00:00.000Z</published>
     <updated>2024-03-11T09:07:32.304Z</updated>
     
@@ -39,8 +58,8 @@
   
   <entry>
     <title>Improving Camunda UI with Form.io</title>
-    <link href="https://nickmza.github.io/2024/02/21/camunda-forms/"/>
-    <id>https://nickmza.github.io/2024/02/21/camunda-forms/</id>
+    <link href="https://nickmza.github.io/2024/02/20/camunda-forms/"/>
+    <id>https://nickmza.github.io/2024/02/20/camunda-forms/</id>
     <published>2024-02-20T20:00:00.000Z</published>
     <updated>2024-02-22T04:56:49.110Z</updated>
     
@@ -358,27 +377,6 @@
     
     
     <category term="OpenApi" scheme="https://nickmza.github.io/tags/OpenApi/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Contract Testing with Postman</title>
-    <link href="https://nickmza.github.io/2023/04/20/contract-testing-postman/"/>
-    <id>https://nickmza.github.io/2023/04/20/contract-testing-postman/</id>
-    <published>2023-04-20T04:17:02.000Z</published>
-    <updated>2023-07-27T06:02:28.026Z</updated>
-    
-    
-    <summary type="html">I’m giving some training next week on Contract Driven Development using Postman. There’s been a couple of hurdles to overcome to get to a workflow that I feel is efficient so I thought I’d share in the hopes that a) this might help someone else or b) someone could point out a better way to do this!</summary>
-    
-    
-    
-    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
-    
-    
-    <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
-    
-    <category term="Postman" scheme="https://nickmza.github.io/tags/Postman/"/>
     
   </entry>
   
