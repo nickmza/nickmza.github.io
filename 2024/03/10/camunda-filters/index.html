@@ -14,7 +14,7 @@
         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
       
-      <title>Agile does not work but agile does |  nick dot blog</title>
+      <title>Custom filters in Camunda Tasklist |  nick dot blog</title>
   <meta name="generator" content="hexo-theme-ayer">
       
       <link rel="shortcut icon" href="/favicon.ico" />
@@ -66,7 +66,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-agile-does-not-work"
+  id="post-camunda-filters"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -77,7 +77,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  Agile does not work but agile does
+  Custom filters in Camunda Tasklist
 </h1>
  
 
@@ -85,11 +85,11 @@
     </header>
      
     <div class="article-meta">
-      <a href="/2016/11/03/agile-does-not-work/" class="article-date">
-  <time datetime="2016-11-03T20:00:00.000Z" itemprop="datePublished">2016-11-03</time>
+      <a href="/2024/03/10/camunda-filters/" class="article-date">
+  <time datetime="2024-03-09T20:00:00.000Z" itemprop="datePublished">2024-03-10</time>
 </a> 
   <div class="article-category">
-    <a class="article-category-link" href="/categories/Agile/">Agile</a>
+    <a class="article-category-link" href="/categories/Software-Engineering/">Software Engineering</a>
   </div>
   
 <div class="word_count">
@@ -97,7 +97,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">669</span>
+            <span class="post-count">320</span>
         </span>
     </span>
 
@@ -106,7 +106,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">4 min</span>
+            <span class="post-count">2 min</span>
         </span>
     </span>
 </div>
@@ -119,25 +119,20 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <p>In his article ‘<a target="_blank" rel="noopener" href="https://www.linkedin.com/pulse/agile-does-work-oleg-vishnepolsky?trk=hp-feed-article-title-like">Agile Does Not Work</a>’ Oleg Vishnepolsky makes several observations based on his experiences with Agile development (note the big ‘A’, it’s my emphasis, not his). Specifically, he cites issues with quality, predictability, poor strategic alignment, monolithic architecture due to poor design, complex and costing infrastructure and challenges managing stakeholders.</p>
-<p>A response frequently heard to such accusations is that “If Agile is not working for you then you are not doing it right”. This response is the last defence of an Agile consultant or coach that has nothing left to offer. Sadly, In many cases this is all many coaches have to offer in the first place.</p>
-<p>Oleg is quite correct when he talks about the lack of understanding of the principles underpinning agile development and the hordes of consultants trying to make a quick buck packaging principles and techniques as dogma and selling them wholesale. How can he not be when anyone could be proclaimed a Scrum MASTER after attending a  trivial 2-day training course?</p>
-<p>Sadly. what Oleg is describing will ring true for many teams that have attempted to go Agile. I have heard the same criticisms from many teams and the conclusion is always the same: We tried Agile and it did not work for us.</p>
-<p>When teams go Agile and it fails they are left in a difficult situation. The populist view is that Waterfall &#x3D; Bad and Agile &#x3D; Good. To say otherwise would be heresy and result in hordes of Agilistas storming your team area with pitchforks and sticky notes! But, if Agile failed for you then what? Most teams end up where Oleg seems to have landed – “Common Sense Development” or just “Built it till it works”.</p>
-<p>The tragedy here is that the (agile) baby has been thrown out with the (Agile) bathwater. Whilst there may still be value for the team in agile principles and techniques the team are now totally switched off to the notion and are left to fend for themselves. They now have to re-discover many of the lessons that have already been learned in the broader agile community.  </p>
-<p>Ultimately they will learn that “Common Sense development” is actually just agile development.</p>
-<p>If your team is struggling with the issues listed above or if your experience of applying agile is more of religious, dogmatic exercise heavily reliant on faith and light on results then you have more than likely been sold Agile with a big A. Agile is the dogmatic, fast food, saccharin flavour of agile concocted by the consultants and peddled to the masses. It does not work and will add little value. As Oleg will attest.</p>
-<p>So where to from here?</p>
-<p>Let’s start by sticking a large pin that overinflated A and get Agile back to plan old agile. Let’s stop doing things because someone told us that if we don’t we are not Agile. Rather let’s start doing things because they add value, because they make sense and because they help the team move faster.</p>
-<p>Look at what you are doing in the name of ‘being Agile’ and ask yourself and your team the following questions:</p>
-<ul>
-<li>Do we know why we are doing this and the value it should add?</li>
-<li>Is what we are doing adding the expected value?</li>
-<li>If we stopped doing this would anyone notice or care?</li>
-<li>Did we learn something from this activity that changed what we originally planned to do or thought?</li>
-</ul>
-<p>If you answered NO to more than a couple of these, you should really re-evaluate whether you need it. Start by looking at why you are doing something and the value you expect to extract. Agile will fill your days with arcane rituals that add little value. Use common sense here – do more of the things that add value and less of things that don’t.</p>
-<p>There are some specific pitfalls that result in the issues that Oleg identified I’ll address each of these in an upcoming post.</p>
+  <p>Camunda Tasklist allows you to create filters allowing you to group tasks based on specific criteria. For example you could create a filter for ‘Expense Approvals that are older than 5 days’ or ‘Any task that is assigned to me’. Whilst there are numerous options when creating filters via the UI it has one specific gap: creating filters based on Process Variables. Here is how you can accomplish this via code. </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FilterBuilder</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    TaskService taskService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    FilterService filterService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    AuthorizationService authorizationService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@EventListener(ApplicationReadyEvent.class)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">createCustomFilter</span><span class="params">()</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">TaskQuery</span> <span class="variable">myTasksQuery</span> <span class="operator">=</span> taskService.createTaskQuery()</span><br><span class="line">                .processVariableValueEquals(<span class="string">&quot;MyCustomKey&quot;</span>,<span class="string">&quot;Custom&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">Filter</span> <span class="variable">myTasksFilter</span> <span class="operator">=</span> createFilter(<span class="string">&quot;My Custom Tasks&quot;</span>, myTasksQuery);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Filter <span class="title function_">createFilter</span><span class="params">(String filterName, TaskQuery myTasksQuery)</span> &#123;</span><br><span class="line">        <span class="type">Filter</span> <span class="variable">myTasksFilter</span> <span class="operator">=</span> filterService.newTaskFilter(filterName);</span><br><span class="line">        myTasksFilter.setOwner(<span class="string">&quot;mcbcam&quot;</span>);</span><br><span class="line">        myTasksFilter.setQuery(myTasksQuery);</span><br><span class="line">        filterService.saveFilter(myTasksFilter);</span><br><span class="line">        <span class="keyword">return</span> myTasksFilter;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>In your Camunda project create a new Component. Add a method to create your custom filter and decorate it with the ‘ApplicationReadyEvent’ Event Listener. This will trigger your code once the SpringBoot application has fully started and all the dependencies are available for injection.</p>
+<p>Start by describing the filter’s criteria. Here I am selecting for processes where the ‘MyCustomKey’ Process Variable has the value of ‘Custom’. </p>
+<blockquote>
+<p>For a full list of options to create a filter see the <a target="_blank" rel="noopener" href="https://docs.camunda.org/javadoc/camunda-bpm-platform/7.3/org/camunda/bpm/engine/task/TaskQuery.html">TaskQuery</a> documentation.</p>
+</blockquote>
+<p>Then use the resulting TaskQuery object to create a new Task Filter.</p>
+<p>At this point you will have a new filter displayed in your Tasklist.</p>
+<p>What if you want to do this for everyone though? This can be done by creating a new Authorization for the filer that gives everyone Read permissions. Here’s the code…</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">configureSecurity</span><span class="params">(Filter filter)</span> &#123;</span><br><span class="line">    <span class="type">var</span> <span class="variable">authorization</span> <span class="operator">=</span> authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GLOBAL);</span><br><span class="line"></span><br><span class="line">    authorization.setUserId(Authorization.ANY);</span><br><span class="line">    authorization.setResource(Resources.FILTER);</span><br><span class="line">    authorization.addPermission(Permissions.READ);</span><br><span class="line">    authorization.setResourceId(filter.getId());</span><br><span class="line"></span><br><span class="line">    authorizationService.saveAuthorization(authorization);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>There you have it. Custom filters based on Process Variables.</p>
  
       <!-- reward -->
       
@@ -160,7 +155,7 @@
     
     <footer class="article-footer">
        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Agile/" rel="tag">Agile</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/camunda/" rel="tag">camunda</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/workflow/" rel="tag">workflow</a></li></ul>
 
     </footer>
   </div>
@@ -168,19 +163,19 @@
    
   <nav class="article-nav">
     
-      <a href="/2023/03/31/Apache-Camel/" class="article-nav-link">
+      <a href="/2024/05/22/backstage-openshift/" class="article-nav-link">
         <strong class="article-nav-caption">Previous Post</strong>
         <div class="article-nav-title">
           
-            Riding the Camel: A Practical Guide to TDD with Apache Camel
+            Deploying Backstage on Openshift in a Corporate environment.
           
         </div>
       </a>
     
     
-      <a href="/2016/03/21/tdd-for-beginners/" class="article-nav-link">
+      <a href="/2024/02/21/camunda-forms/" class="article-nav-link">
         <strong class="article-nav-caption">Next Post</strong>
-        <div class="article-nav-title">TDD - Advice for Beginners</div>
+        <div class="article-nav-title">Improving Camunda UI with Form.io</div>
       </a>
     
   </nav>

@@ -6,7 +6,7 @@
   <link href="https://nickmza.github.io/atom.xml" rel="self"/>
   
   <link href="https://nickmza.github.io/"/>
-  <updated>2024-05-22T03:42:06.393Z</updated>
+  <updated>2024-06-19T12:11:22.326Z</updated>
   <id>https://nickmza.github.io/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Building Developer Portals with Backstage</title>
+    <link href="https://nickmza.github.io/2024/06/19/backstage/"/>
+    <id>https://nickmza.github.io/2024/06/19/backstage/</id>
+    <published>2024-06-19T12:11:22.000Z</published>
+    <updated>2024-06-19T12:11:22.326Z</updated>
+    
+    
+    <summary type="html">We&#39;ve just completed a proof of concept on Backstage - an Internal Developer Portal from Spotify. Here&#39;s what we learned...</summary>
+    
+    
+    
+    <category term="Backstage" scheme="https://nickmza.github.io/categories/Backstage/"/>
+    
+    
+    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    
+  </entry>
   
   <entry>
     <title>Deploying Backstage on Openshift in a Corporate environment.</title>
@@ -37,8 +56,8 @@
   
   <entry>
     <title>Custom filters in Camunda Tasklist</title>
-    <link href="https://nickmza.github.io/2024/03/09/camunda-filters/"/>
-    <id>https://nickmza.github.io/2024/03/09/camunda-filters/</id>
+    <link href="https://nickmza.github.io/2024/03/10/camunda-filters/"/>
+    <id>https://nickmza.github.io/2024/03/10/camunda-filters/</id>
     <published>2024-03-09T20:00:00.000Z</published>
     <updated>2024-03-11T09:07:32.304Z</updated>
     
@@ -58,8 +77,8 @@
   
   <entry>
     <title>Improving Camunda UI with Form.io</title>
-    <link href="https://nickmza.github.io/2024/02/20/camunda-forms/"/>
-    <id>https://nickmza.github.io/2024/02/20/camunda-forms/</id>
+    <link href="https://nickmza.github.io/2024/02/21/camunda-forms/"/>
+    <id>https://nickmza.github.io/2024/02/21/camunda-forms/</id>
     <published>2024-02-20T20:00:00.000Z</published>
     <updated>2024-02-22T04:56:49.110Z</updated>
     
@@ -360,23 +379,6 @@
     
     
     <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Configuring Swagger Security</title>
-    <link href="https://nickmza.github.io/2023/05/17/swagger-sec/"/>
-    <id>https://nickmza.github.io/2023/05/17/swagger-sec/</id>
-    <published>2023-05-17T06:35:57.000Z</published>
-    <updated>2023-07-27T06:02:28.050Z</updated>
-    
-    
-    <summary type="html">Having issues with getting Swagger to send an Auth header? Merging multiple OpenApi documents at runtime using Node Express? This could help.</summary>
-    
-    
-    
-    
-    <category term="OpenApi" scheme="https://nickmza.github.io/tags/OpenApi/"/>
     
   </entry>
   
