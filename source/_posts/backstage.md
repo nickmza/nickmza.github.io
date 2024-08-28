@@ -13,7 +13,7 @@ date: 2024-06-19 16:11:22
 
 We've just completed a proof of concept on Backstage. Here's what we learned...
 
-Backstage is an Internal Developer Platform (IDP) originally created at Spotify and then open-sourced to the Cloud Native Computing Foundation. Out of the box it provides a Software Catalog, Developer Documentation and Software Templates. There is also a thriving plugin ecosystem that expands Backstage's capabilities even further.
+Backstage is an Internal Developer Portal (IDP) originally created at Spotify and then open-sourced to the Cloud Native Computing Foundation. Out of the box it provides a Software Catalog, Developer Documentation and Software Templates. There is also a thriving plugin ecosystem that expands Backstage's capabilities even further.
 
 # What problem are we solving here?
 
@@ -78,7 +78,7 @@ Any OpsGenie alerts or incidents related to the component can be seen in context
 
 <img src='bs6.png'/>
 
-## Initial Impressions
+# Initial Impressions
 
 ## Single Pane of Glass
 
@@ -93,7 +93,7 @@ Backstage allows teams to model their own software in terms of how it is structu
 One of the things I really like about Backstage is that it does not require us to create new data via it's UI. Rather a yaml file is added to the repo and this is automatically picked up. This has been a sticking point for us in the past - where information is stored separately it means people need to remember (or more often be mercilessly nagged) to update these systems. With this approach the yaml is maintained as part of the application's source code. 
 
 ## Challenges
-Whilst Backstage makes it easy to import your information you still need to ensure that team's create their catalog entries in the first place and that these entries reflect reality.  Since the information in Backstage links to other systems it is easy to spot missing or broken links but getting the modelling right could be a significant challenges. One specific concern I have is in the level of granularity. Modelling at too coarse a level means you would miss important details. Modelling at too fine a level would create potentially hundreds of artifacts and obscure important information. 
+Whilst Backstage makes it easy to import your information you still need to ensure that team's create their catalog entries in the first place and that these entries reflect reality.  Since the information in Backstage links to other systems it is easy to spot missing or broken links but getting the modelling right could be a significant challenge. One specific concern I have is in the level of granularity. Modelling at too coarse a level means you would miss important details. Modelling at too fine a level would create potentially hundreds of artifacts and obscure important information. 
 
 Lastly, Backstage is not a packaged application when running on-prem. There is a steep learning curve in terms of how plugins are added and configured. If you are not familiar with modern web development this could be a significant challenge. Fortunately, there is a cloud-based version of Backstage available which could be a better option for some. Documentation is generally good but we have had some challenges which I have written about [here](https://nickmck.net/2024/05/22/backstage-openshift/).
 
