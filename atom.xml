@@ -6,7 +6,7 @@
   <link href="https://nickmza.github.io/atom.xml" rel="self"/>
   
   <link href="https://nickmza.github.io/"/>
-  <updated>2024-06-25T03:44:36.565Z</updated>
+  <updated>2024-09-04T10:56:48.691Z</updated>
   <id>https://nickmza.github.io/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Adventures in Nifi</title>
+    <link href="https://nickmza.github.io/2024/09/04/nifi/"/>
+    <id>https://nickmza.github.io/2024/09/04/nifi/</id>
+    <published>2024-09-04T10:50:40.000Z</published>
+    <updated>2024-09-04T10:56:48.691Z</updated>
+    
+    
+    <summary type="html">We are currently using a proprietary ETL tool. Whilst it is very capable, skills and support in the market are scarce. I wanted to see what Open Source alternatives are available and see if they could be used to simplify some of our ETL flows.</summary>
+    
+    
+    
+    <category term="ETL" scheme="https://nickmza.github.io/categories/ETL/"/>
+    
+    
+    <category term="integration" scheme="https://nickmza.github.io/tags/integration/"/>
+    
+    <category term="Nifi" scheme="https://nickmza.github.io/tags/Nifi/"/>
+    
+    <category term="OSS" scheme="https://nickmza.github.io/tags/OSS/"/>
+    
+  </entry>
   
   <entry>
     <title>Building Developer Portals with Backstage</title>
@@ -362,23 +385,6 @@
     <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
     
     <category term="Camel" scheme="https://nickmza.github.io/tags/Camel/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>TDD - Triggering Dopamine Development</title>
-    <link href="https://nickmza.github.io/2023/05/17/tdd-dopamine/"/>
-    <id>https://nickmza.github.io/2023/05/17/tdd-dopamine/</id>
-    <published>2023-05-17T08:44:16.000Z</published>
-    <updated>2023-07-27T06:02:28.051Z</updated>
-    
-    
-    <summary type="html">The other morning I attended an excellent talk by Andrew Richardson on the importance of having small goals. One of the points Andrew made was that completing a task, however small,  triggers a hit of Dopamine - the neurotransmitter associated with feelings of pleasure and satisfaction. The way Andrew described the feedback loop involved reminded me  of Test-Driven Development (TDD). This got me thinking - maybe this is why I like it so much?</summary>
-    
-    
-    
-    
-    <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
     
   </entry>
   
