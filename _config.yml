@@ -13,7 +13,7 @@ timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: https://nickmza.github.io/
+url: https://nickmck.net/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -104,7 +104,7 @@ theme: ayer
 deploy:
   type: git
   repo: https://github.com/nickmza/nickmza.github.io
-  token: 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
+  token: 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
   branch: prod
 
 feed:
