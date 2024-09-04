@@ -3,11 +3,11 @@
   <title>nick dot blog</title>
   
   
-  <link href="https://nickmza.github.io/atom.xml" rel="self"/>
+  <link href="https://nickmck.net/atom.xml" rel="self"/>
   
-  <link href="https://nickmza.github.io/"/>
+  <link href="https://nickmck.net/"/>
   <updated>2024-09-04T10:56:48.691Z</updated>
-  <id>https://nickmza.github.io/</id>
+  <id>https://nickmck.net/</id>
   
   <author>
     <name>Nick Mckenzie</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>Adventures in Nifi</title>
-    <link href="https://nickmza.github.io/2024/09/04/nifi/"/>
-    <id>https://nickmza.github.io/2024/09/04/nifi/</id>
+    <link href="https://nickmck.net/2024/09/04/nifi/"/>
+    <id>https://nickmck.net/2024/09/04/nifi/</id>
     <published>2024-09-04T10:50:40.000Z</published>
     <updated>2024-09-04T10:56:48.691Z</updated>
     
@@ -28,21 +28,21 @@
     
     
     
-    <category term="ETL" scheme="https://nickmza.github.io/categories/ETL/"/>
+    <category term="ETL" scheme="https://nickmck.net/categories/ETL/"/>
     
     
-    <category term="integration" scheme="https://nickmza.github.io/tags/integration/"/>
+    <category term="integration" scheme="https://nickmck.net/tags/integration/"/>
     
-    <category term="Nifi" scheme="https://nickmza.github.io/tags/Nifi/"/>
+    <category term="Nifi" scheme="https://nickmck.net/tags/Nifi/"/>
     
-    <category term="OSS" scheme="https://nickmza.github.io/tags/OSS/"/>
+    <category term="OSS" scheme="https://nickmck.net/tags/OSS/"/>
     
   </entry>
   
   <entry>
     <title>Building Developer Portals with Backstage</title>
-    <link href="https://nickmza.github.io/2024/06/19/backstage/"/>
-    <id>https://nickmza.github.io/2024/06/19/backstage/</id>
+    <link href="https://nickmck.net/2024/06/19/backstage/"/>
+    <id>https://nickmck.net/2024/06/19/backstage/</id>
     <published>2024-06-19T12:11:22.000Z</published>
     <updated>2024-06-25T03:44:36.565Z</updated>
     
@@ -51,17 +51,17 @@
     
     
     
-    <category term="Backstage" scheme="https://nickmza.github.io/categories/Backstage/"/>
+    <category term="Backstage" scheme="https://nickmck.net/categories/Backstage/"/>
     
     
-    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    <category term="devops" scheme="https://nickmck.net/tags/devops/"/>
     
   </entry>
   
   <entry>
     <title>Deploying Backstage on Openshift in a Corporate environment.</title>
-    <link href="https://nickmza.github.io/2024/05/22/backstage-openshift/"/>
-    <id>https://nickmza.github.io/2024/05/22/backstage-openshift/</id>
+    <link href="https://nickmck.net/2024/05/22/backstage-openshift/"/>
+    <id>https://nickmck.net/2024/05/22/backstage-openshift/</id>
     <published>2024-05-22T03:42:06.000Z</published>
     <updated>2024-05-22T03:42:06.393Z</updated>
     
@@ -70,17 +70,17 @@
     
     
     
-    <category term="Backstage" scheme="https://nickmza.github.io/categories/Backstage/"/>
+    <category term="Backstage" scheme="https://nickmck.net/categories/Backstage/"/>
     
     
-    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    <category term="devops" scheme="https://nickmck.net/tags/devops/"/>
     
   </entry>
   
   <entry>
     <title>Custom filters in Camunda Tasklist</title>
-    <link href="https://nickmza.github.io/2024/03/10/camunda-filters/"/>
-    <id>https://nickmza.github.io/2024/03/10/camunda-filters/</id>
+    <link href="https://nickmck.net/2024/03/10/camunda-filters/"/>
+    <id>https://nickmck.net/2024/03/10/camunda-filters/</id>
     <published>2024-03-09T20:00:00.000Z</published>
     <updated>2024-03-11T09:07:32.304Z</updated>
     
@@ -89,19 +89,19 @@
     
     
     
-    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    <category term="Software Engineering" scheme="https://nickmck.net/categories/Software-Engineering/"/>
     
     
-    <category term="workflow" scheme="https://nickmza.github.io/tags/workflow/"/>
+    <category term="workflow" scheme="https://nickmck.net/tags/workflow/"/>
     
-    <category term="camunda" scheme="https://nickmza.github.io/tags/camunda/"/>
+    <category term="camunda" scheme="https://nickmck.net/tags/camunda/"/>
     
   </entry>
   
   <entry>
     <title>Improving Camunda UI with Form.io</title>
-    <link href="https://nickmza.github.io/2024/02/21/camunda-forms/"/>
-    <id>https://nickmza.github.io/2024/02/21/camunda-forms/</id>
+    <link href="https://nickmck.net/2024/02/21/camunda-forms/"/>
+    <id>https://nickmck.net/2024/02/21/camunda-forms/</id>
     <published>2024-02-20T20:00:00.000Z</published>
     <updated>2024-02-22T04:56:49.110Z</updated>
     
@@ -110,19 +110,19 @@
     
     
     
-    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    <category term="Software Engineering" scheme="https://nickmck.net/categories/Software-Engineering/"/>
     
     
-    <category term="workflow" scheme="https://nickmza.github.io/tags/workflow/"/>
+    <category term="workflow" scheme="https://nickmck.net/tags/workflow/"/>
     
-    <category term="camunda" scheme="https://nickmza.github.io/tags/camunda/"/>
+    <category term="camunda" scheme="https://nickmck.net/tags/camunda/"/>
     
   </entry>
   
   <entry>
     <title>JWT User Assertion with Oracle Integration Cloud</title>
-    <link href="https://nickmza.github.io/2023/11/17/oicjwt/"/>
-    <id>https://nickmza.github.io/2023/11/17/oicjwt/</id>
+    <link href="https://nickmck.net/2023/11/17/oicjwt/"/>
+    <id>https://nickmck.net/2023/11/17/oicjwt/</id>
     <published>2023-11-17T07:04:00.000Z</published>
     <updated>2023-12-28T07:04:26.164Z</updated>
     
@@ -131,17 +131,17 @@
     
     
     
-    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    <category term="Software Engineering" scheme="https://nickmck.net/categories/Software-Engineering/"/>
     
     
-    <category term="oauth" scheme="https://nickmza.github.io/tags/oauth/"/>
+    <category term="oauth" scheme="https://nickmck.net/tags/oauth/"/>
     
   </entry>
   
   <entry>
     <title>Testable Architecture with ArchUnit</title>
-    <link href="https://nickmza.github.io/2023/10/27/testing-architecture/"/>
-    <id>https://nickmza.github.io/2023/10/27/testing-architecture/</id>
+    <link href="https://nickmck.net/2023/10/27/testing-architecture/"/>
+    <id>https://nickmck.net/2023/10/27/testing-architecture/</id>
     <published>2023-10-27T06:27:17.000Z</published>
     <updated>2024-03-14T12:19:13.482Z</updated>
     
@@ -151,14 +151,14 @@
     
     
     
-    <category term="design" scheme="https://nickmza.github.io/tags/design/"/>
+    <category term="design" scheme="https://nickmck.net/tags/design/"/>
     
   </entry>
   
   <entry>
     <title>Idempotent message processing with Camel</title>
-    <link href="https://nickmza.github.io/2023/09/26/camel-once/"/>
-    <id>https://nickmza.github.io/2023/09/26/camel-once/</id>
+    <link href="https://nickmck.net/2023/09/26/camel-once/"/>
+    <id>https://nickmck.net/2023/09/26/camel-once/</id>
     <published>2023-09-26T10:48:22.000Z</published>
     <updated>2023-09-26T13:42:53.424Z</updated>
     
@@ -167,17 +167,17 @@
     
     
     
-    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    <category term="Software Engineering" scheme="https://nickmck.net/categories/Software-Engineering/"/>
     
     
-    <category term="Camel" scheme="https://nickmza.github.io/tags/Camel/"/>
+    <category term="Camel" scheme="https://nickmck.net/tags/Camel/"/>
     
   </entry>
   
   <entry>
     <title>Adventures in Python- Mars Rover</title>
-    <link href="https://nickmza.github.io/2023/09/06/python1/"/>
-    <id>https://nickmza.github.io/2023/09/06/python1/</id>
+    <link href="https://nickmck.net/2023/09/06/python1/"/>
+    <id>https://nickmck.net/2023/09/06/python1/</id>
     <published>2023-09-06T13:46:55.000Z</published>
     <updated>2023-09-06T13:52:37.891Z</updated>
     
@@ -187,14 +187,14 @@
     
     
     
-    <category term="python" scheme="https://nickmza.github.io/tags/python/"/>
+    <category term="python" scheme="https://nickmck.net/tags/python/"/>
     
   </entry>
   
   <entry>
     <title>Integrating Azure Storage and SFTP with Apache Camel</title>
-    <link href="https://nickmza.github.io/2023/09/02/camel-sftp-azure/"/>
-    <id>https://nickmza.github.io/2023/09/02/camel-sftp-azure/</id>
+    <link href="https://nickmck.net/2023/09/02/camel-sftp-azure/"/>
+    <id>https://nickmck.net/2023/09/02/camel-sftp-azure/</id>
     <published>2023-09-02T05:14:15.000Z</published>
     <updated>2023-09-02T05:14:15.171Z</updated>
     
@@ -203,17 +203,17 @@
     
     
     
-    <category term="Software Engineering" scheme="https://nickmza.github.io/categories/Software-Engineering/"/>
+    <category term="Software Engineering" scheme="https://nickmck.net/categories/Software-Engineering/"/>
     
     
-    <category term="Camel" scheme="https://nickmza.github.io/tags/Camel/"/>
+    <category term="Camel" scheme="https://nickmck.net/tags/Camel/"/>
     
   </entry>
   
   <entry>
     <title>Sidecar Logging in Openshift with Fluentd and Elasticsearch</title>
-    <link href="https://nickmza.github.io/2023/08/05/sidecar-logging/"/>
-    <id>https://nickmza.github.io/2023/08/05/sidecar-logging/</id>
+    <link href="https://nickmck.net/2023/08/05/sidecar-logging/"/>
+    <id>https://nickmck.net/2023/08/05/sidecar-logging/</id>
     <published>2023-08-05T06:13:24.000Z</published>
     <updated>2023-08-05T06:13:24.426Z</updated>
     
@@ -223,14 +223,14 @@
     
     
     
-    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    <category term="devops" scheme="https://nickmck.net/tags/devops/"/>
     
   </entry>
   
   <entry>
     <title>Request/Response Shaping with KrakenD</title>
-    <link href="https://nickmza.github.io/2023/07/16/krakend-response/"/>
-    <id>https://nickmza.github.io/2023/07/16/krakend-response/</id>
+    <link href="https://nickmck.net/2023/07/16/krakend-response/"/>
+    <id>https://nickmck.net/2023/07/16/krakend-response/</id>
     <published>2023-07-16T03:11:14.000Z</published>
     <updated>2023-07-27T06:02:28.034Z</updated>
     
@@ -239,17 +239,17 @@
     
     
     
-    <category term="Release The KrakenD" scheme="https://nickmza.github.io/categories/Release-The-KrakenD/"/>
+    <category term="Release The KrakenD" scheme="https://nickmck.net/categories/Release-The-KrakenD/"/>
     
     
-    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    <category term="devops" scheme="https://nickmck.net/tags/devops/"/>
     
   </entry>
   
   <entry>
     <title>Authenticate the KrakenD!</title>
-    <link href="https://nickmza.github.io/2023/07/08/kraken-auth/"/>
-    <id>https://nickmza.github.io/2023/07/08/kraken-auth/</id>
+    <link href="https://nickmck.net/2023/07/08/kraken-auth/"/>
+    <id>https://nickmck.net/2023/07/08/kraken-auth/</id>
     <published>2023-07-08T03:04:50.000Z</published>
     <updated>2023-07-27T06:02:28.028Z</updated>
     
@@ -258,17 +258,17 @@
     
     
     
-    <category term="Release The KrakenD" scheme="https://nickmza.github.io/categories/Release-The-KrakenD/"/>
+    <category term="Release The KrakenD" scheme="https://nickmck.net/categories/Release-The-KrakenD/"/>
     
     
-    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    <category term="devops" scheme="https://nickmck.net/tags/devops/"/>
     
   </entry>
   
   <entry>
     <title>eKYC with Azure Face API &amp; Cognitive Services</title>
-    <link href="https://nickmza.github.io/2023/07/01/adventures-in-facial-recognition/"/>
-    <id>https://nickmza.github.io/2023/07/01/adventures-in-facial-recognition/</id>
+    <link href="https://nickmck.net/2023/07/01/adventures-in-facial-recognition/"/>
+    <id>https://nickmck.net/2023/07/01/adventures-in-facial-recognition/</id>
     <published>2023-07-01T04:04:56.000Z</published>
     <updated>2023-07-27T06:02:28.009Z</updated>
     
@@ -278,14 +278,14 @@
     
     
     
-    <category term="azure" scheme="https://nickmza.github.io/tags/azure/"/>
+    <category term="azure" scheme="https://nickmck.net/tags/azure/"/>
     
   </entry>
   
   <entry>
     <title>Release the KrakenD. Part 1 - Metrics</title>
-    <link href="https://nickmza.github.io/2023/06/23/release-the-krakend/"/>
-    <id>https://nickmza.github.io/2023/06/23/release-the-krakend/</id>
+    <link href="https://nickmck.net/2023/06/23/release-the-krakend/"/>
+    <id>https://nickmck.net/2023/06/23/release-the-krakend/</id>
     <published>2023-06-23T08:39:31.000Z</published>
     <updated>2023-07-27T06:02:28.046Z</updated>
     
@@ -294,17 +294,17 @@
     
     
     
-    <category term="Release The KrakenD" scheme="https://nickmza.github.io/categories/Release-The-KrakenD/"/>
+    <category term="Release The KrakenD" scheme="https://nickmck.net/categories/Release-The-KrakenD/"/>
     
     
-    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    <category term="devops" scheme="https://nickmck.net/tags/devops/"/>
     
   </entry>
   
   <entry>
     <title>How I hire</title>
-    <link href="https://nickmza.github.io/2023/06/21/how-I-hire/"/>
-    <id>https://nickmza.github.io/2023/06/21/how-I-hire/</id>
+    <link href="https://nickmck.net/2023/06/21/how-I-hire/"/>
+    <id>https://nickmck.net/2023/06/21/how-I-hire/</id>
     <published>2023-06-21T06:31:33.000Z</published>
     <updated>2023-07-27T06:02:28.028Z</updated>
     
@@ -313,17 +313,17 @@
     
     
     
-    <category term="School of Hard Knocks" scheme="https://nickmza.github.io/categories/School-of-Hard-Knocks/"/>
+    <category term="School of Hard Knocks" scheme="https://nickmck.net/categories/School-of-Hard-Knocks/"/>
     
     
-    <category term="Engineering Management" scheme="https://nickmza.github.io/tags/Engineering-Management/"/>
+    <category term="Engineering Management" scheme="https://nickmck.net/tags/Engineering-Management/"/>
     
   </entry>
   
   <entry>
     <title>Vestigial Activities</title>
-    <link href="https://nickmza.github.io/2023/06/07/vestigial-processes/"/>
-    <id>https://nickmza.github.io/2023/06/07/vestigial-processes/</id>
+    <link href="https://nickmck.net/2023/06/07/vestigial-processes/"/>
+    <id>https://nickmck.net/2023/06/07/vestigial-processes/</id>
     <published>2023-06-07T11:39:47.000Z</published>
     <updated>2023-07-27T06:02:28.051Z</updated>
     
@@ -333,14 +333,14 @@
     
     
     
-    <category term="Agile" scheme="https://nickmza.github.io/tags/Agile/"/>
+    <category term="Agile" scheme="https://nickmck.net/tags/Agile/"/>
     
   </entry>
   
   <entry>
     <title>Adding Link Preview to your Hexo Blog</title>
-    <link href="https://nickmza.github.io/2023/06/03/link-preview/"/>
-    <id>https://nickmza.github.io/2023/06/03/link-preview/</id>
+    <link href="https://nickmck.net/2023/06/03/link-preview/"/>
+    <id>https://nickmck.net/2023/06/03/link-preview/</id>
     <published>2023-06-03T11:09:05.000Z</published>
     <updated>2023-07-27T06:02:28.034Z</updated>
     
@@ -354,8 +354,8 @@
   
   <entry>
     <title>Real-time Dashboards with OpsGenie and PowerBI</title>
-    <link href="https://nickmza.github.io/2023/06/02/opsgenie-dashboard/"/>
-    <id>https://nickmza.github.io/2023/06/02/opsgenie-dashboard/</id>
+    <link href="https://nickmck.net/2023/06/02/opsgenie-dashboard/"/>
+    <id>https://nickmck.net/2023/06/02/opsgenie-dashboard/</id>
     <published>2023-06-02T10:54:55.000Z</published>
     <updated>2023-07-27T06:02:28.037Z</updated>
     
@@ -365,14 +365,14 @@
     
     
     
-    <category term="devops" scheme="https://nickmza.github.io/tags/devops/"/>
+    <category term="devops" scheme="https://nickmck.net/tags/devops/"/>
     
   </entry>
   
   <entry>
     <title>Unit Testing Camel - A simple example</title>
-    <link href="https://nickmza.github.io/2023/05/18/camel-simple/"/>
-    <id>https://nickmza.github.io/2023/05/18/camel-simple/</id>
+    <link href="https://nickmck.net/2023/05/18/camel-simple/"/>
+    <id>https://nickmck.net/2023/05/18/camel-simple/</id>
     <published>2023-05-18T14:10:04.000Z</published>
     <updated>2023-07-27T06:02:28.025Z</updated>
     
@@ -382,9 +382,9 @@
     
     
     
-    <category term="TDD" scheme="https://nickmza.github.io/tags/TDD/"/>
+    <category term="TDD" scheme="https://nickmck.net/tags/TDD/"/>
     
-    <category term="Camel" scheme="https://nickmza.github.io/tags/Camel/"/>
+    <category term="Camel" scheme="https://nickmck.net/tags/Camel/"/>
     
   </entry>
   
