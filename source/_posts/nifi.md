@@ -1,14 +1,19 @@
 ---
 title: Adventures in Nifi
 tags:
-- integration
-- Nifi
-- OSS
+  - integration
+  - Nifi
+  - OSS
 category: ETL
 ogimage: NifiLogo.png
-excerpt:
-    We are currently using a proprietary ETL tool. Whilst it is very capable, skills and support in the market are scarce. I wanted to see what Open Source alternatives are available and see if they could be used to simplify some of our ETL flows.
+excerpt: >-
+  We are currently using a proprietary ETL tool. Whilst it is very capable,
+  skills and support in the market are scarce. I wanted to see what Open Source
+  alternatives are available and see if they could be used to simplify some of
+  our ETL flows.
+date: 2024-09-04 14:50:40
 ---
+
 
 We are currently using a proprietary ETL tool. Whilst it is very capable, skills and support in the market are scarce. I wanted to see what Open Source alternatives are available and see if they could be used to simplify some of our ETL flows. A cursory search revealed a few names and after some more reading I decided to give [Apache Nifi](https://nifi.apache.org/) a go.
 

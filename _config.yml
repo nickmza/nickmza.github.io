@@ -116,3 +116,8 @@ feed:
     content_limit: 140
     content_limit_delim: ' '
     order_by: -date
+
+sitemap:
+    path: sitemap.xml
+    tag: false
+    category: false
