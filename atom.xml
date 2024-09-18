@@ -6,7 +6,7 @@
   <link href="https://nickmck.net/atom.xml" rel="self"/>
   
   <link href="https://nickmck.net/"/>
-  <updated>2024-09-04T10:56:48.691Z</updated>
+  <updated>2024-09-18T04:12:34.136Z</updated>
   <id>https://nickmck.net/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Building a custom Backstage Plugin</title>
+    <link href="https://nickmck.net/2024/09/18/BackstagePluginDemo/"/>
+    <id>https://nickmck.net/2024/09/18/BackstagePluginDemo/</id>
+    <published>2024-09-18T04:12:34.000Z</published>
+    <updated>2024-09-18T04:12:34.136Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;I gave a talk last weekend at the &lt;a href=&quot;https://www.linkedin.com/groups/5033639/&quot;&gt;Mauritius Software Craftsmanship Community&lt;/a&gt;</summary>
+        
+      
+    
+    
+    
+    <category term="Backstage" scheme="https://nickmck.net/categories/Backstage/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>Adventures in Nifi</title>
@@ -366,25 +389,6 @@
     
     
     <category term="devops" scheme="https://nickmck.net/tags/devops/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Unit Testing Camel - A simple example</title>
-    <link href="https://nickmck.net/2023/05/18/camel-simple/"/>
-    <id>https://nickmck.net/2023/05/18/camel-simple/</id>
-    <published>2023-05-18T14:10:04.000Z</published>
-    <updated>2023-07-27T06:02:28.025Z</updated>
-    
-    
-    <summary type="html">In a previous post I wrote about taking a Test-Driven approach to Camel development. I&#39;ve been asked to share the code and explain some of the steps in more detail so here we go...</summary>
-    
-    
-    
-    
-    <category term="TDD" scheme="https://nickmck.net/tags/TDD/"/>
-    
-    <category term="Camel" scheme="https://nickmck.net/tags/Camel/"/>
     
   </entry>
   
