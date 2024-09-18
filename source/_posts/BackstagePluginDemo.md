@@ -2,7 +2,10 @@
 title: Building a custom Backstage Plugin
 category:
   - Backstage
+date: 2024-09-18 08:12:34
+tags:
 ---
+
 
 I gave a talk last weekend at the [Mauritius Software Craftsmanship Community](https://www.linkedin.com/groups/5033639/) Meetup with the Cloud Native Computing Foundation [Mauritius Chapter](https://cloudnativemauritius.com/). The talk was about creating developer portals using Backstage, how we are using it at MCB and some of the challenges we've had to overcome along the way.
 
