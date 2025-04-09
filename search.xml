@@ -1344,4 +1344,57 @@
         <category>Backstage</category>
       </categories>
   </entry>
+  <entry>
+    <title>Implementing an Engineering Badge Programme</title>
+    <url>/2025/04/09/badges/</url>
+    <content><![CDATA[<p>A year ago we launched our Engineering Badge program. This post talks about what it is, why we needed it and how it’s going.</p>
+<img src="badges1.png"/>
+
+<h1 id="What-is-it"><a href="#What-is-it" class="headerlink" title="What is it?"></a>What is it?</h1><p>Badges are micro-certifications that recognise an individual for a specific trait, behaviour or achievement. Badges are often used in online learning platforms, corporate training, and certification programs. Once earned they can be shared across social media, digital resumes, or professional networks to showcase expertise.</p>
+<p>Badges typically leverage elements of gamification in that there are a number of them to collect with specific criteria or combinations of criteria for each one.  People are encouraged to collect the badges and then share the accomplishment internally and externally via platforms such as LinkedIn or Facebook. The process of earning badges creates a sense of accomplishment and progression, motivating individuals to continue learning or achieving goals.</p>
+<h1 id="Why-do-we-need-one"><a href="#Why-do-we-need-one" class="headerlink" title="Why do we need one?"></a>Why do we need one?</h1><p>The team told us that we needed more recognition, not just in terms of volume but something more meaningful and less transient than a public ‘kudos’. We had seen the popularity of people sharing badges after achieving new certifications on LinkedIn and even people sharing their PluralSight badges and felt that this could be something worth exploring.</p>
+<h1 id="How-is-our-Badge-Program-Structured"><a href="#How-is-our-Badge-Program-Structured" class="headerlink" title="How is our Badge Program Structured?"></a>How is our Badge Program Structured?</h1><p>We started by identifying the underlying principles of the program. We did this by workshopping the idea with the broader team. After all, if the team were not supportive of the initiative and engage with it we were doomed to failure.</p>
+<p>After a bit of discussion the following principles emerged:</p>
+<ul>
+<li>Badges should never conflict with our values as a team or organisation.</li>
+<li>Badges should recognise the behaviours we want to see in our team.</li>
+<li>Badges should never create competition between people. Specifically we should not have a situation where my earning the badge means that you cannot. </li>
+<li>Earning badges should not require additional overtime.</li>
+<li>Someone should never have to choose between the normal activities and earning a badge.</li>
+<li>There must be transparency around how and why a badge was awarded.</li>
+<li>We should prevent sprawl or overly niche badges.</li>
+<li>Badges must always be in response to action - never just an attendance award.</li>
+</ul>
+<p>Next we set about designing the structure:</p>
+<ul>
+<li>Badges can be permanent or they can expire.</li>
+<li>Badges have a level: 1, 2, 3 stars .</li>
+<li>Some badges can be earned multiple times which level’s them up.</li>
+<li>Some badges are earned based on achieving combinations of other badges.</li>
+<li>Badges have a theme.</li>
+</ul>
+<p>With the principles as a guide we workshopped an initial set of Badges, some of which you can see above. Finally, we worked with our Marketing team to design the badges. We wanted something that referenced our corporate identity but that could stand on its own.</p>
+<blockquote>
+<p>My personal favorite is the ‘Agent of Chaos’ - for people who have made mistakes and recovered with style.</p>
+</blockquote>
+<h1 id="How-do-we-run-and-administer-the-Badge-Program"><a href="#How-do-we-run-and-administer-the-Badge-Program" class="headerlink" title="How do we run and administer the Badge Program?"></a>How do we run and administer the Badge Program?</h1><p>We formed a small team of volunteers from all levels of engineering  to look after the badge program. The members of this team rotate over time so that we ensure diversity and representation. </p>
+<p>We created a Badge nomination form where people can nominate themselves or others.</p>
+<p>Once a month the team meets to review the nominations which we then confer to the people at our monthly Engineering Catch-up. </p>
+<p>Periodically we review the badges. Adding new ones and retiring old ones as required.</p>
+<h1 id="How-do-we-track-the-impact-of-the-Badge-program"><a href="#How-do-we-track-the-impact-of-the-Badge-program" class="headerlink" title="How do we track the impact of the Badge program?"></a>How do we track the impact of the Badge program?</h1><p>We use the following metrics to gauge the impact of the program.</p>
+<p><strong>Nominations.</strong> The number of nominations is a proxy for engagement. People taking the time to recognise their colleagues or to nominate themselves tells us that they find meaning and value in the process. In addition to the number of nominations we also look at what badges people are being nominated for. Certain badges garner more nominations than others - Kudos and Team Work are very popular for example. In other cases some badges have never received a nomination. In this case we must evaluate if it’s a case of people not being aware of the badge or if the badge is poorly conceived. In the former case this is a great opportunity to do some PR for the badge - and indirectly highlight the underlying behaviours. In the latter however this is cause for some introspection - does the badge conflict with the principles? Do people not find value in it? Are the criteria poorly defined or onerous.</p>
+<p><strong>Acceptance Rate.</strong> When a badge is issued the recipient must claim it on our Badge platform. This acceptance rate, currently at 80%, tells that the recipient values the badge and wants to be associated with it. The logic here is that if someone saw no value in it, or disagreed with it they would not take the time to go to the website to claim it.</p>
+<p><strong>Sharing rate.</strong> Lastly we track how many people share their badges externally. This is our ultimate validation in that a person would not share something publicly if they did not thing it had value or if they were not in some way proud of the recognition.  This metric is currently at 30% and rising. </p>
+<blockquote>
+<p>We are currently using the <a href="https://openbadgefactory.com/">Open Badge Factory</a> platform. </p>
+</blockquote>
+<h1 id="What-have-our-results-been-like-so-far"><a href="#What-have-our-results-been-like-so-far" class="headerlink" title="What have our results been like so far?"></a>What have our results been like so far?</h1><img width="400" src="badges2.png"/>
+
+<p>To date we have issued over 300 Badges. A good portion of these were for the ‘Secure Developer’ badge awarded to everyone who participated in our annual security hackathon. Shortly after launch we started receiving nominations for and from people outside of Engineering. Based on this we decided to expand the program to include the other chapters in Tech - QA, Infra etc. With the help of our internal culture team we are about to re-launch the initiative as a Tech-wide program and scale it with more tangible rewards and more frequent awards sessions.</p>
+<h1 id="Where-to-from-here"><a href="#Where-to-from-here" class="headerlink" title="Where to from here?"></a>Where to from here?</h1><p>It all comes down to engagement. If people keep engaging with the program we will continue to evolve the program. Some ideas include ‘treasure hunt’ style badges or badges that need to be earned as a team. If we can build enough momentum maybe this is something that grows beyond its origins in Tech and adds value to the larger organisation. Will check in on all of this later, for now - we have some badges to award!</p>
+]]></content>
+      <tags>
+        <tag>Engineering Management</tag>
+      </tags>
+  </entry>
 </search>

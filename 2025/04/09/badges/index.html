@@ -14,7 +14,7 @@
         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
       
-      <title>Archives |  nick dot blog</title>
+      <title>Implementing an Engineering Badge Programme |  nick dot blog</title>
   <meta name="generator" content="hexo-theme-ayer">
       
       <link rel="shortcut icon" href="/favicon.ico" />
@@ -65,236 +65,181 @@
       
     <main class="content on">
       <section class="outer">
-  
-  
-  <article class="articles">
+  <article
+  id="post-badges"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
     
-    
-    <h1 class="page-type-title">Archives</h1>
-    
-    
-  
-  
-  
-  
-  
-  
-  <div class="archives-wrap">
-    <div class="archive-year-wrap">
-      <a href="/archives/2023" class="archive-year">2023</a>
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Implementing an Engineering Badge Programme
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2025/04/09/badges/" class="article-date">
+  <time datetime="2025-04-09T12:50:25.000Z" itemprop="datePublished">2025-04-09</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">1.1k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">6 min</span>
+        </span>
+    </span>
+</div>
+ 
     </div>
-    <div class="archives">
       
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2023/06/02/opsgenie-dashboard/" class="archive-article-date">
-  <time datetime="2023-06-02T10:54:55.000Z" itemprop="datePublished">06/02</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2023/06/02/opsgenie-dashboard/"
-    >Real-time Dashboards with OpsGenie and PowerBI</a> 
-</h2>
- 
+    <div class="tocbot"></div>
 
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2023/05/18/camel-simple/" class="archive-article-date">
-  <time datetime="2023-05-18T14:10:04.000Z" itemprop="datePublished">05/18</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2023/05/18/camel-simple/"
-    >Unit Testing Camel - A simple example</a> 
-</h2>
- 
 
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2023/05/17/tdd-dopamine/" class="archive-article-date">
-  <time datetime="2023-05-17T08:44:16.000Z" itemprop="datePublished">05/17</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2023/05/17/tdd-dopamine/"
-    >TDD - Triggering Dopamine Development</a> 
-</h2>
- 
 
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2023/05/17/swagger-sec/" class="archive-article-date">
-  <time datetime="2023-05-17T06:35:57.000Z" itemprop="datePublished">05/17</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2023/05/17/swagger-sec/"
-    >Configuring Swagger Security</a> 
-</h2>
- 
 
-    </header>
-    
-    
-  </div>
-</article>
-      
   
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2023/04/20/contract-testing-postman/" class="archive-article-date">
-  <time datetime="2023-04-20T04:17:02.000Z" itemprop="datePublished">04/20</time>
-</a>
+    <div class="article-entry" itemprop="articleBody">
        
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2023/04/20/contract-testing-postman/"
-    >Contract Testing with Postman</a> 
-</h2>
- 
+  <p>A year ago we launched our Engineering Badge program. This post talks about what it is, why we needed it and how it’s going.</p>
+<img src="badges1.png"/>
 
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2023/04/18/team-topo/" class="archive-article-date">
-  <time datetime="2023-04-18T04:03:05.000Z" itemprop="datePublished">04/18</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2023/04/18/team-topo/"
-    >Team Topologies Applied</a> 
-</h2>
- 
+<h1 id="What-is-it"><a href="#What-is-it" class="headerlink" title="What is it?"></a>What is it?</h1><p>Badges are micro-certifications that recognise an individual for a specific trait, behaviour or achievement. Badges are often used in online learning platforms, corporate training, and certification programs. Once earned they can be shared across social media, digital resumes, or professional networks to showcase expertise.</p>
+<p>Badges typically leverage elements of gamification in that there are a number of them to collect with specific criteria or combinations of criteria for each one.  People are encouraged to collect the badges and then share the accomplishment internally and externally via platforms such as LinkedIn or Facebook. The process of earning badges creates a sense of accomplishment and progression, motivating individuals to continue learning or achieving goals.</p>
+<h1 id="Why-do-we-need-one"><a href="#Why-do-we-need-one" class="headerlink" title="Why do we need one?"></a>Why do we need one?</h1><p>The team told us that we needed more recognition, not just in terms of volume but something more meaningful and less transient than a public ‘kudos’. We had seen the popularity of people sharing badges after achieving new certifications on LinkedIn and even people sharing their PluralSight badges and felt that this could be something worth exploring.</p>
+<h1 id="How-is-our-Badge-Program-Structured"><a href="#How-is-our-Badge-Program-Structured" class="headerlink" title="How is our Badge Program Structured?"></a>How is our Badge Program Structured?</h1><p>We started by identifying the underlying principles of the program. We did this by workshopping the idea with the broader team. After all, if the team were not supportive of the initiative and engage with it we were doomed to failure.</p>
+<p>After a bit of discussion the following principles emerged:</p>
+<ul>
+<li>Badges should never conflict with our values as a team or organisation.</li>
+<li>Badges should recognise the behaviours we want to see in our team.</li>
+<li>Badges should never create competition between people. Specifically we should not have a situation where my earning the badge means that you cannot. </li>
+<li>Earning badges should not require additional overtime.</li>
+<li>Someone should never have to choose between the normal activities and earning a badge.</li>
+<li>There must be transparency around how and why a badge was awarded.</li>
+<li>We should prevent sprawl or overly niche badges.</li>
+<li>Badges must always be in response to action - never just an attendance award.</li>
+</ul>
+<p>Next we set about designing the structure:</p>
+<ul>
+<li>Badges can be permanent or they can expire.</li>
+<li>Badges have a level: 1, 2, 3 stars .</li>
+<li>Some badges can be earned multiple times which level’s them up.</li>
+<li>Some badges are earned based on achieving combinations of other badges.</li>
+<li>Badges have a theme.</li>
+</ul>
+<p>With the principles as a guide we workshopped an initial set of Badges, some of which you can see above. Finally, we worked with our Marketing team to design the badges. We wanted something that referenced our corporate identity but that could stand on its own.</p>
+<blockquote>
+<p>My personal favorite is the ‘Agent of Chaos’ - for people who have made mistakes and recovered with style.</p>
+</blockquote>
+<h1 id="How-do-we-run-and-administer-the-Badge-Program"><a href="#How-do-we-run-and-administer-the-Badge-Program" class="headerlink" title="How do we run and administer the Badge Program?"></a>How do we run and administer the Badge Program?</h1><p>We formed a small team of volunteers from all levels of engineering  to look after the badge program. The members of this team rotate over time so that we ensure diversity and representation. </p>
+<p>We created a Badge nomination form where people can nominate themselves or others.</p>
+<p>Once a month the team meets to review the nominations which we then confer to the people at our monthly Engineering Catch-up. </p>
+<p>Periodically we review the badges. Adding new ones and retiring old ones as required.</p>
+<h1 id="How-do-we-track-the-impact-of-the-Badge-program"><a href="#How-do-we-track-the-impact-of-the-Badge-program" class="headerlink" title="How do we track the impact of the Badge program?"></a>How do we track the impact of the Badge program?</h1><p>We use the following metrics to gauge the impact of the program.</p>
+<p><strong>Nominations.</strong> The number of nominations is a proxy for engagement. People taking the time to recognise their colleagues or to nominate themselves tells us that they find meaning and value in the process. In addition to the number of nominations we also look at what badges people are being nominated for. Certain badges garner more nominations than others - Kudos and Team Work are very popular for example. In other cases some badges have never received a nomination. In this case we must evaluate if it’s a case of people not being aware of the badge or if the badge is poorly conceived. In the former case this is a great opportunity to do some PR for the badge - and indirectly highlight the underlying behaviours. In the latter however this is cause for some introspection - does the badge conflict with the principles? Do people not find value in it? Are the criteria poorly defined or onerous.</p>
+<p><strong>Acceptance Rate.</strong> When a badge is issued the recipient must claim it on our Badge platform. This acceptance rate, currently at 80%, tells that the recipient values the badge and wants to be associated with it. The logic here is that if someone saw no value in it, or disagreed with it they would not take the time to go to the website to claim it.</p>
+<p><strong>Sharing rate.</strong> Lastly we track how many people share their badges externally. This is our ultimate validation in that a person would not share something publicly if they did not thing it had value or if they were not in some way proud of the recognition.  This metric is currently at 30% and rising. </p>
+<blockquote>
+<p>We are currently using the <a target="_blank" rel="noopener" href="https://openbadgefactory.com/">Open Badge Factory</a> platform. </p>
+</blockquote>
+<h1 id="What-have-our-results-been-like-so-far"><a href="#What-have-our-results-been-like-so-far" class="headerlink" title="What have our results been like so far?"></a>What have our results been like so far?</h1><img width="400" src="badges2.png"/>
 
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2023/03/31/Apache-Camel/" class="archive-article-date">
-  <time datetime="2023-03-31T09:57:01.000Z" itemprop="datePublished">03/31</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2023/03/31/Apache-Camel/"
-    >Riding the Camel: A Practical Guide to TDD with Apache Camel</a> 
-</h2>
+<p>To date we have issued over 300 Badges. A good portion of these were for the ‘Secure Developer’ badge awarded to everyone who participated in our annual security hackathon. Shortly after launch we started receiving nominations for and from people outside of Engineering. Based on this we decided to expand the program to include the other chapters in Tech - QA, Infra etc. With the help of our internal culture team we are about to re-launch the initiative as a Tech-wide program and scale it with more tangible rewards and more frequent awards sessions.</p>
+<h1 id="Where-to-from-here"><a href="#Where-to-from-here" class="headerlink" title="Where to from here?"></a>Where to from here?</h1><p>It all comes down to engagement. If people keep engaging with the program we will continue to evolve the program. Some ideas include ‘treasure hunt’ style badges or badges that need to be earned as a team. If we can build enough momentum maybe this is something that grows beyond its origins in Tech and adds value to the larger organisation. Will check in on all of this later, for now - we have some badges to award!</p>
  
-
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-  
-  </div>
-  </div>
-  
-  
-  <div class="archives-wrap">
-    <div class="archive-year-wrap">
-      <a href="/archives/2016" class="archive-year">2016</a>
-    </div>
-    <div class="archives">
-      
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/11/04/agile-does-not-work/" class="archive-article-date">
-  <time datetime="2016-11-03T20:00:00.000Z" itemprop="datePublished">11/04</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2016/11/04/agile-does-not-work/"
-    >Agile does not work but agile does</a> 
-</h2>
- 
-
-    </header>
-    
-    
-  </div>
-</article>
-      
-  
-  
-      <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/03/21/tdd-for-beginners/" class="archive-article-date">
-  <time datetime="2016-03-21T09:57:01.000Z" itemprop="datePublished">03/21</time>
-</a>
-       
-<h2 itemprop="name">
-  <a class="archive-article-title" href="/2016/03/21/tdd-for-beginners/"
-    >TDD - Advice for Beginners</a> 
-</h2>
- 
-
-    </header>
-    
-    
-  </div>
-</article>
-      
+      <!-- reward -->
       
     </div>
-  </div>
-  
-  
-
-  
-  <nav class="page-nav">
     
-    <a class="extend prev" rel="prev" href="/archives/page/2/">Previous Page</a><a class="page-number" href="/archives/">1</a><a class="page-number" href="/archives/page/2/">2</a><span class="page-number current">3</span>
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Engineering-Management/" rel="tag">Engineering Management</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2024/09/18/BackstagePluginDemo/" class="article-nav-link">
+        <strong class="article-nav-caption">Next Post</strong>
+        <div class="article-nav-title">Building a custom Backstage Plugin</div>
+      </a>
+    
   </nav>
+
   
+   
+<div class="gitalk" id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.7.2/gitalk.min.css">
+
+
+<script src="https://cdn.staticfile.org/gitalk/1.7.2/gitalk.min.js"></script>
+
+
+<script src="https://cdn.staticfile.org/blueimp-md5/2.19.0/js/md5.min.js"></script>
+
+<script type="text/javascript">
+  var gitalk = new Gitalk({
+    clientID: '8318211c28156a054b60',
+    clientSecret: 'a3e7c2c22e61867951cbca3c52fbcc22f43dcfb8',
+    repo: 'BlogComments',
+    owner: 'nickmza',
+    admin: ['nickmza'],
+    // id: location.pathname,      // Ensure uniqueness and length less than 50
+    id: md5(location.pathname),
+    distractionFreeMode: false,  // Facebook-like distraction free mode
+    pagerDirection: 'last'
+  })
+
+  gitalk.render('gitalk-container')
+</script>
+
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
 </section>
       <footer class="footer">
   <div class="outer">
@@ -428,6 +373,22 @@
 <script src="/js/lazyload.min.js"></script>
 
 <!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
 
 <script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
 <link

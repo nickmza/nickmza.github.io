@@ -6,7 +6,7 @@
   <link href="https://nickmck.net/atom.xml" rel="self"/>
   
   <link href="https://nickmck.net/"/>
-  <updated>2024-09-18T05:22:05.541Z</updated>
+  <updated>2025-04-09T12:50:25.402Z</updated>
   <id>https://nickmck.net/</id>
   
   <author>
@@ -15,6 +15,23 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Implementing an Engineering Badge Programme</title>
+    <link href="https://nickmck.net/2025/04/09/badges/"/>
+    <id>https://nickmck.net/2025/04/09/badges/</id>
+    <published>2025-04-09T12:50:25.000Z</published>
+    <updated>2025-04-09T12:50:25.402Z</updated>
+    
+    
+    <summary type="html">A year ago we launched our Engineering Badge program. This post talks about what it is, why we needed it and how it&#39;s going.</summary>
+    
+    
+    
+    
+    <category term="Engineering Management" scheme="https://nickmck.net/tags/Engineering-Management/"/>
+    
+  </entry>
   
   <entry>
     <title>Building a custom Backstage Plugin</title>
@@ -372,23 +389,6 @@
     
     
     
-    
-  </entry>
-  
-  <entry>
-    <title>Real-time Dashboards with OpsGenie and PowerBI</title>
-    <link href="https://nickmck.net/2023/06/02/opsgenie-dashboard/"/>
-    <id>https://nickmck.net/2023/06/02/opsgenie-dashboard/</id>
-    <published>2023-06-02T10:54:55.000Z</published>
-    <updated>2023-07-27T06:02:28.037Z</updated>
-    
-    
-    <summary type="html">We needed to visualise alerts from OpsGenie in real-time. Here&#39;s how we did it using PowerBI and Power Automate.</summary>
-    
-    
-    
-    
-    <category term="devops" scheme="https://nickmck.net/tags/devops/"/>
     
   </entry>
   

@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://nickmck.net/2025/04/09/badges/</loc>
+    
+    <lastmod>2025-04-09</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://nickmck.net/2024/09/18/BackstagePluginDemo/</loc>
     
     <lastmod>2024-09-18</lastmod>
@@ -292,7 +301,7 @@
 
   <url>
     <loc>https://nickmck.net/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -300,112 +309,112 @@
   
   <url>
     <loc>https://nickmck.net/tags/Agile/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/azure/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/TDD/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/Camel/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/Postman/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/Engineering-Management/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/devops/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/OpenApi/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/python/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/design/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/oauth/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/workflow/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/camunda/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/integration/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/Nifi/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/tags/OSS/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -414,49 +423,49 @@
   
   <url>
     <loc>https://nickmck.net/categories/Team-Topologies/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/categories/Agile/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/categories/Software-Engineering/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/categories/School-of-Hard-Knocks/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/categories/Release-The-KrakenD/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/categories/Backstage/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://nickmck.net/categories/ETL/</loc>
-    <lastmod>2024-09-18</lastmod>
+    <lastmod>2025-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
